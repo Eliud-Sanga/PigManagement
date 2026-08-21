@@ -1,0 +1,259 @@
+{% extends "pigs/base.html" %}
+{% load humanize %}
+
+{% block title %}
+Badilisha Nguruwe - {{ purchase.supplier_name }}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        text-align: center;
+        margin-bottom: 25px;
+    }
+
+    .page-header h2 {
+        margin-bottom: 8px;
+    }
+
+    .page-header p {
+        color: #64748b;
+        margin: 0;
+    }
+
+    .form-card {
+        max-width: 100%;
+        margin: 0 auto;
+        background: white;
+        padding: 30px;
+        border-radius: 14px;
+        box-shadow: 0 4px 15px rgba(15, 23, 42, 0.07);
+        overflow-x: auto;
+    }
+
+    .alert-info {
+        background: #eff6ff;
+        border-left: 4px solid #2563eb;
+        padding: 12px 16px;
+        border-radius: 6px;
+        margin-bottom: 20px;
+        color: #1e40af;
+    }
+
+    .alert-warning {
+        background: #fffbeb;
+        border-left: 4px solid #f59e0b;
+        padding: 12px 16px;
+        border-radius: 6px;
+        margin-bottom: 20px;
+        color: #92400e;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+    }
+
+    thead {
+        background: #f1f5f9;
+    }
+
+    th, td {
+        padding: 10px 12px;
+        text-align: left;
+        border: 1px solid #e2e8f0;
+    }
+
+    th {
+        font-weight: 600;
+    }
+
+    .form-control-sm {
+        padding: 6px 8px;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        font-size: 13px;
+        width: 100%;
+    }
+
+    .form-control-sm:focus {
+        outline: none;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.10);
+    }
+
+    .tag-number {
+        font-weight: 600;
+        color: #0f172a;
+    }
+
+    .status-badge {
+        font-size: 11px;
+        padding: 2px 8px;
+        border-radius: 10px;
+        background: #e2e8f0;
+        color: #475569;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 25px;
+    }
+
+    .button {
+        display: inline-block;
+        padding: 12px 20px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        text-align: center;
+        flex: 1;
+    }
+
+    .button-primary {
+        background: #2563eb;
+        color: white;
+    }
+
+    .button-primary:hover {
+        background: #1d4ed8;
+    }
+
+    .button-secondary {
+        background: #e2e8f0;
+        color: #0f172a;
+    }
+
+    .button-secondary:hover {
+        background: #cbd5e1;
+    }
+
+    @media (max-width: 600px) {
+        .form-card {
+            padding: 15px;
+        }
+        table {
+            font-size: 12px;
+        }
+        th, td {
+            padding: 6px 8px;
+        }
+        .form-actions {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h2>
+        <i class="fas fa-edit"></i> Badilisha Taarifa za Nguruwe
+    </h2>
+    <p>{{ purchase.supplier_name }} - {{ purchase.purchase_date|date:"d/m/Y" }}</p>
+</div>
+
+<div class="form-card">
+
+    <div class="alert-info">
+        <i class="fas fa-info-circle"></i>
+        Jaza taarifa za kila nguruwe. Acha tupu ikiwa huna taarifa.
+    </div>
+
+    {% if pigs %}
+        <form method="post">
+            {% csrf_token %}
+
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Tag Number</th>
+                            <th>Jinsia</th>
+                            <th>Bei (TSh)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for pig in pigs %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+
+                                <td>
+                                    <span class="tag-number">
+                                        {{ pig.tag_number }}
+                                    </span>
+                                    <br>
+                                    <span class="status-badge">
+                                        {{ pig.get_status_display }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <select
+                                        name="gender_{{ pig.id }}"
+                                        class="form-control-sm"
+                                    >
+                                        <option value="">-- Chagua --</option>
+
+                                        <option
+                                            value="MALE"
+                                            {% if pig.gender == 'MALE' %}selected{% endif %}
+                                        >
+                                            Dume
+                                        </option>
+
+                                        <option
+                                            value="FEMALE"
+                                            {% if pig.gender == 'FEMALE' %}selected{% endif %}
+                                        >
+                                            Jike
+                                        </option>
+                                    </select>
+                                </td>
+
+                                <td>
+                                    <input
+                                        type="number"
+                                        name="purchase_price_{{ pig.id }}"
+                                        class="form-control-sm"
+                                        step="0.01"
+                                        min="0"
+                                        placeholder="250000"
+                                        value="{{ pig.purchase_price|default:'' }}"
+                                    >
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="form-actions">
+                <a href="{% url 'pigs:pig_list' %}" class="button button-secondary">
+                    <i class="fas fa-times"></i> Ghairi
+                </a>
+                <button type="submit" class="button button-primary">
+                    <i class="fas fa-save"></i> Hifadhi Zote
+                </button>
+            </div>
+        </form>
+    {% else %}
+        <div class="alert-warning">
+            <i class="fas fa-exclamation-triangle"></i>
+            Hakuna nguruwe zinazoweza kubadilishwa. Nguruwe zote zimechinjwa tayari.
+        </div>
+        <a href="{% url 'pigs:pig_list' %}" class="button button-primary" style="display: inline-block; margin-top: 10px;">
+            <i class="fas fa-arrow-left"></i> Rudi kwenye Orodha
+        </a>
+    {% endif %}
+
+</div>
+
+{% endblock %}

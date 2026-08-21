@@ -1,0 +1,738 @@
+{% extends "pigs/base.html" %}
+{% load static %}
+
+{% block title %}
+Dashboard
+{% endblock %}
+
+{% block extra_css %}
+
+<style>
+
+/* ============================================================
+   DASHBOARD
+============================================================ */
+
+.dashboard {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+
+/* ============================================================
+   DASHBOARD HEADER
+============================================================ */
+.dashboard-header {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.dashboard-profile {
+    width: 82px;
+    height: 82px;
+
+    object-fit: cover;
+
+    display: block;
+
+    margin: 0 auto 12px;
+
+    border-radius: 50%;
+
+    border: 3px solid #ffffff;
+
+    box-shadow:
+        0 5px 18px
+        rgba(15, 23, 42, 0.15);
+}
+
+.dashboard-header h2 {
+    margin: 0;
+
+    color: #172554;
+
+    font-size: 25px;
+    font-weight: 700;
+
+    line-height: 1.3;
+}
+
+/* ============================================================
+   QUICK ACTIONS
+============================================================ */
+
+.quick-actions {
+    width: 100%;
+}
+
+.quick-grid {
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(5, minmax(0, 1fr));
+
+    gap: 14px;
+}
+
+
+/* ============================================================
+   QUICK CARD
+============================================================ */
+
+.quick-card {
+    position: relative;
+
+    min-width: 0;
+
+    min-height: 112px;
+
+    padding: 18px 12px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    gap: 10px;
+
+    background: #ffffff;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 14px;
+
+    text-decoration: none;
+
+    color: inherit;
+
+    box-shadow:
+        0 3px 12px
+        rgba(15, 23, 42, 0.06);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        border-color 0.2s ease;
+
+    overflow: hidden;
+}
+
+
+/* ============================================================
+   CARD TOP ACCENT
+============================================================ */
+
+.quick-card::before {
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 3px;
+
+    background: #2563eb;
+
+    opacity: 0;
+
+    transition: opacity 0.2s ease;
+}
+
+
+/* ============================================================
+   HOVER
+============================================================ */
+
+.quick-card:hover {
+    transform: translateY(-3px);
+
+    border-color: #bfdbfe;
+
+    box-shadow:
+        0 8px 22px
+        rgba(15, 23, 42, 0.10);
+}
+
+.quick-card:hover::before {
+    opacity: 1;
+}
+
+
+/* ============================================================
+   ACTIVE / CLICK
+============================================================ */
+
+.quick-card:active {
+    transform: translateY(-1px);
+}
+
+
+/* ============================================================
+   ICON
+============================================================ */
+
+.quick-icon {
+    width: 48px;
+    height: 48px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 13px;
+
+    background: #eff6ff;
+
+    color: #1d4ed8;
+
+    font-size: 23px;
+
+    line-height: 1;
+
+    flex-shrink: 0;
+
+    transition:
+        transform 0.2s ease,
+        background 0.2s ease;
+}
+
+.quick-card:hover .quick-icon {
+    transform: scale(1.06);
+
+    background: #dbeafe;
+}
+
+
+/* ============================================================
+   CARD TITLE
+============================================================ */
+
+.quick-card h4 {
+    width: 100%;
+
+    margin: 0;
+
+    color: #1e293b;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    line-height: 1.35;
+
+    text-align: center;
+
+    overflow-wrap: anywhere;
+}
+
+
+/* ============================================================
+   DIFFERENT CARD ACCENTS
+============================================================ */
+
+.quick-card:nth-child(1)::before {
+    background: #2563eb;
+}
+
+.quick-card:nth-child(2)::before {
+    background: #dc2626;
+}
+
+.quick-card:nth-child(3)::before {
+    background: #16a34a;
+}
+
+.quick-card:nth-child(4)::before {
+    background: #9333ea;
+}
+
+.quick-card:nth-child(5)::before {
+    background: #ea580c;
+}
+
+.quick-card:nth-child(6)::before {
+    background: #0891b2;
+}
+
+.quick-card:nth-child(7)::before {
+    background: #475569;
+}
+
+
+/* ============================================================
+   DIFFERENT ICON BACKGROUNDS
+============================================================ */
+
+.quick-card:nth-child(1) .quick-icon {
+    background: #fce7f3;
+}
+
+.quick-card:nth-child(2) .quick-icon {
+    background: #fee2e2;
+}
+
+.quick-card:nth-child(3) .quick-icon {
+    background: #dcfce7;
+}
+
+.quick-card:nth-child(4) .quick-icon {
+    background: #f3e8ff;
+}
+
+.quick-card:nth-child(5) .quick-icon {
+    background: #ffedd5;
+}
+
+.quick-card:nth-child(6) .quick-icon {
+    background: #cffafe;
+}
+
+.quick-card:nth-child(7) .quick-icon {
+    background: #e2e8f0;
+}
+
+
+/* ============================================================
+   DESKTOP
+============================================================ */
+
+@media (min-width: 1101px) {
+
+    .quick-grid {
+        grid-template-columns:
+            repeat(5, minmax(0, 1fr));
+    }
+
+}
+
+
+/* ============================================================
+   SMALL DESKTOP / LARGE TABLET
+============================================================ */
+
+@media (max-width: 1100px) {
+
+    .dashboard {
+        max-width: 900px;
+    }
+
+    .quick-grid {
+        grid-template-columns:
+            repeat(4, minmax(0, 1fr));
+    }
+
+}
+
+
+/* ============================================================
+   TABLET
+============================================================ */
+
+@media (max-width: 850px) {
+
+    .dashboard {
+        max-width: 700px;
+    }
+
+    .dashboard-header {
+        margin-bottom: 24px;
+    }
+
+    .dashboard-header h2 {
+        font-size: 24px;
+    }
+
+    .quick-grid {
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+
+        gap: 12px;
+    }
+
+    .quick-card {
+        min-height: 105px;
+
+        padding: 16px 10px;
+
+        border-radius: 13px;
+    }
+
+    .quick-icon {
+        width: 45px;
+        height: 45px;
+
+        font-size: 22px;
+
+        border-radius: 12px;
+    }
+
+    .quick-card h4 {
+        font-size: 12px;
+    }
+
+}
+
+
+/* ============================================================
+   LARGE PHONE
+============================================================ */
+
+@media (max-width: 600px) {
+
+    .dashboard {
+        width: 100%;
+    }
+
+    .dashboard-header {
+        margin-bottom: 20px;
+    }
+
+    .dashboard-header h2 {
+        font-size: 22px;
+    }
+
+    .dashboard-header p {
+        font-size: 13px;
+    }
+
+    .quick-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        gap: 11px;
+    }
+
+    .quick-card {
+        min-height: 100px;
+
+        padding: 15px 9px;
+
+        border-radius: 12px;
+    }
+
+    .quick-icon {
+        width: 44px;
+        height: 44px;
+
+        font-size: 21px;
+
+        border-radius: 11px;
+    }
+
+    .quick-card h4 {
+        font-size: 12px;
+    }
+
+}
+
+
+/* ============================================================
+   SMALL PHONE
+============================================================ */
+
+@media (max-width: 400px) {
+
+    .dashboard-header {
+        margin-bottom: 18px;
+    }
+
+    .dashboard-header h2 {
+        font-size: 20px;
+    }
+
+    .dashboard-header p {
+        font-size: 12px;
+    }
+
+    .quick-grid {
+        gap: 9px;
+    }
+
+    .quick-card {
+        min-height: 92px;
+
+        padding: 13px 7px;
+
+        border-radius: 11px;
+    }
+
+    .quick-icon {
+        width: 40px;
+        height: 40px;
+
+        font-size: 19px;
+
+        border-radius: 10px;
+    }
+
+    .quick-card h4 {
+        font-size: 11px;
+    }
+
+}
+
+
+/* ============================================================
+   VERY SMALL PHONE
+============================================================ */
+
+@media (max-width: 330px) {
+
+    .quick-grid {
+        gap: 8px;
+    }
+
+    .quick-card {
+        min-height: 88px;
+
+        padding: 11px 5px;
+    }
+
+    .quick-icon {
+        width: 37px;
+        height: 37px;
+
+        font-size: 17px;
+    }
+
+    .quick-card h4 {
+        font-size: 10px;
+    }
+
+}
+
+
+/* ============================================================
+   ACCESSIBILITY
+============================================================ */
+
+.quick-card:focus-visible {
+    outline: 3px solid #93c5fd;
+
+    outline-offset: 2px;
+}
+
+
+/* ============================================================
+   REDUCED MOTION
+============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .quick-card,
+    .quick-icon,
+    .quick-card::before {
+        transition: none;
+    }
+
+    .quick-card:hover {
+        transform: none;
+    }
+
+    .quick-card:hover .quick-icon {
+        transform: none;
+    }
+
+}
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container">
+
+    <div class="dashboard">
+
+
+        <!-- =====================================================
+             DASHBOARD HEADER
+        ====================================================== -->
+        
+        <div class="dashboard-header">
+
+            <img
+                src="{% static 'users/eliud.jpeg' %}"
+                alt="Welcome"
+                class="dashboard-profile"
+            >
+
+            <h2>Welcome</h2>
+            <p>
+                Vitendo vya Mfumo
+            </p>
+
+
+        </div>
+
+        <!-- =====================================================
+             QUICK ACTIONS
+        ====================================================== -->
+
+        <div class="quick-actions">
+
+            <div class="quick-grid">
+
+
+                <!-- =================================================
+                     NGURUWE
+                ================================================== -->
+
+                <a
+                    href="{% url 'pigs:pig_list' %}"
+                    class="quick-card"
+                >
+
+                    <div class="quick-icon">
+                        🐷
+                    </div>
+
+                    <h4>
+                        Nguruwe
+                    </h4>
+
+                </a>
+
+
+                <!-- =================================================
+                     MACHINJIO
+                ================================================== -->
+
+                <a
+                    href="{% url 'pigs:slaughter_create' %}"
+                    class="quick-card"
+                >
+
+                    <div class="quick-icon">
+                        🔪
+                    </div>
+
+                    <h4>
+                        Machinjio
+                    </h4>
+
+                </a>
+
+
+                <!-- =================================================
+                     MAUZO
+                ================================================== -->
+
+                <a
+                    href="{% url 'pigs:daily_sale_create' %}"
+                    class="quick-card"
+                >
+
+                    <div class="quick-icon">
+                        💰
+                    </div>
+
+                    <h4>
+                        Anza Mauzo
+                    </h4>
+
+                </a>
+
+
+                <!-- =================================================
+                     NYAMA
+                ================================================== -->
+
+                <a
+                    href="{% url 'pigs:meat_list' %}"
+                    class="quick-card"
+                >
+
+                    <div class="quick-icon">
+                        🥩
+                    </div>
+
+                    <h4>
+                        Nyama
+                    </h4>
+
+                </a>
+
+
+                <!-- =================================================
+                     MATUMIZI
+                ================================================== -->
+
+                <a
+                    href="{% url 'pigs:expense_create' %}"
+                    class="quick-card"
+                >
+
+                    <div class="quick-icon">
+                        💸
+                    </div>
+
+                    <h4>
+                        Ongeza Matumizi
+                    </h4>
+
+                </a>
+
+
+                <!-- =================================================
+                     RIPOTI
+                ================================================== -->
+
+                <a
+                    href="{% url 'pigs:daily_sale_list' %}"
+                    class="quick-card"
+                >
+
+                    <div class="quick-icon">
+                        📊
+                    </div>
+
+                    <h4>
+                        Ripoti
+                    </h4>
+
+                </a>
+
+
+                <!-- =================================================
+                     USERS
+                ================================================== -->
+
+                {% if user.is_superuser %}
+
+                    <a
+                        href="{% url 'users:user_list' %}"
+                        class="quick-card"
+                    >
+
+                        <div class="quick-icon">
+                            👥
+                        </div>
+
+                        <h4>
+                            Watumiaji
+                        </h4>
+
+                    </a>
+
+                {% endif %}
+
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+</div>
+
+{% endblock %}

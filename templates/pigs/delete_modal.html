@@ -1,0 +1,77 @@
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center;">
+    <div style="background: white; border-radius: 16px; padding: 30px; max-width: 450px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); animation: modalFadeIn 0.3s ease;">
+        
+        <div style="text-align: center; margin-bottom: 20px;">
+            <div style="font-size: 48px; color: #dc2626;">⚠️</div>
+            <h3 style="color: #172554; margin: 10px 0 5px;">Thibitisha Kufuta</h3>
+            <p style="color: #64748b; margin: 0; font-size: 14px;" id="deleteMessage">Je, una uhakika unataka kufuta hii?</p>
+        </div>
+
+        <form id="deleteForm" method="post">
+            {% csrf_token %}
+            <input type="hidden" id="deleteUrl" name="delete_url" value="">
+            
+            <div style="margin-bottom: 20px;">
+                <label for="passwordInput" style="display: block; font-weight: 600; color: #334155; margin-bottom: 8px; font-size: 14px;">
+                    🔑 Weka Nenosiri la Super Admin
+                </label>
+                <input type="password" id="passwordInput" name="password" placeholder="Weka nenosiri lako" required style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 14px; outline: none;">
+                <div id="passwordError" style="color: #dc2626; font-size: 13px; margin-top: 5px; display: none;">❌ Nenosiri si sahihi!</div>
+            </div>
+
+            <div style="display: flex; gap: 12px;">
+                <button type="button" onclick="closeDeleteModal()" style="flex: 1; padding: 12px; background: #e2e8f0; color: #0f172a; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer;">
+                    Ghairi
+                </button>
+                <button type="submit" style="flex: 1; padding: 12px; background: #dc2626; color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; transition: 0.2s ease;">
+                    <i class="fas fa-trash"></i> Thibitisha Kufuta
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    @keyframes modalFadeIn {
+        from { opacity: 0; transform: scale(0.9); }
+        to { opacity: 1; transform: scale(1); }
+    }
+</style>
+
+<script>
+    function openDeleteModal(url, message) {
+        document.getElementById('deleteModal').style.display = 'flex';
+        document.getElementById('deleteUrl').value = url;
+        document.getElementById('deleteMessage').textContent = message || 'Je, una uhakika unataka kufuta hii?';
+        document.getElementById('passwordInput').value = '';
+        document.getElementById('passwordError').style.display = 'none';
+        
+        // Weka action ya form
+        document.getElementById('deleteForm').action = url;
+    }
+
+    function closeDeleteModal() {
+        document.getElementById('deleteModal').style.display = 'none';
+        document.getElementById('passwordInput').value = '';
+        document.getElementById('passwordError').style.display = 'none';
+    }
+
+    // Funga modal kwa kublika nje
+    document.getElementById('deleteModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeDeleteModal();
+        }
+    });
+
+    // Validate password before submit
+    document.getElementById('deleteForm').addEventListener('submit', function(e) {
+        const password = document.getElementById('passwordInput').value;
+        if (!password || password.length < 1) {
+            e.preventDefault();
+            document.getElementById('passwordError').textContent = '❌ Tafadhali weka nenosiri!';
+            document.getElementById('passwordError').style.display = 'block';
+            return;
+        }
+    });
+</script>

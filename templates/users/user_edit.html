@@ -1,0 +1,851 @@
+{% extends "pigs/base.html" %}
+
+{% block title %}
+Badilisha Mtumiaji - {{ user.username }}
+{% endblock %}
+
+{% block extra_css %}
+
+<style>
+
+/* ============================================================
+   EDIT USER PAGE
+============================================================ */
+
+.edit-user-page {
+    max-width: 720px;
+    margin: 0 auto;
+    padding-bottom: 40px;
+}
+
+
+/* ============================================================
+   PAGE HEADER
+============================================================ */
+
+.page-header {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.page-header h2 {
+    margin: 0 0 8px;
+    color: #172554;
+    font-size: 28px;
+    font-weight: 800;
+}
+
+.page-header p {
+    color: #64748b;
+    margin: 0;
+    font-size: 14px;
+}
+
+
+/* ============================================================
+   FORM CARD
+============================================================ */
+
+.form-card {
+    background: white;
+
+    padding: 30px;
+
+    border-radius: 16px;
+
+    box-shadow:
+        0 4px 15px
+        rgba(15, 23, 42, 0.07);
+
+    border:
+        1px solid #f1f5f9;
+}
+
+
+/* ============================================================
+   SUPER ADMIN PROTECTION NOTICE
+============================================================ */
+
+.super-admin-protection {
+    display: flex;
+    align-items: flex-start;
+
+    gap: 11px;
+
+    background: #faf5ff;
+
+    border:
+        1px solid #ddd6fe;
+
+    border-left:
+        4px solid #7c3aed;
+
+    border-radius: 10px;
+
+    padding: 12px 14px;
+
+    margin-bottom: 20px;
+
+    color: #6b21a8;
+
+    font-size: 12px;
+
+    line-height: 1.5;
+}
+
+.super-admin-protection-icon {
+    flex-shrink: 0;
+
+    width: 30px;
+    height: 30px;
+
+    border-radius: 50%;
+
+    background: #ede9fe;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 14px;
+}
+
+.super-admin-protection strong {
+    display: block;
+
+    color: #581c87;
+
+    margin-bottom: 2px;
+}
+
+
+/* ============================================================
+   CURRENT INFORMATION BOX
+============================================================ */
+
+.info-box {
+    background: #f8fafc;
+
+    padding: 15px;
+
+    border-radius: 9px;
+
+    margin-bottom: 20px;
+
+    border-left:
+        4px solid #2563eb;
+
+    color: #334155;
+
+    font-size: 13px;
+
+    line-height: 1.7;
+}
+
+.info-box strong {
+    color: #172554;
+}
+
+
+/* Super Admin info box */
+
+.info-box.super-admin {
+    background: #faf5ff;
+
+    border-left-color: #7c3aed;
+}
+
+.info-box.super-admin strong {
+    color: #581c87;
+}
+
+
+/* ============================================================
+   FORM GROUP
+============================================================ */
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group:last-child {
+    margin-bottom: 0;
+}
+
+.form-group label {
+    display: block;
+
+    font-weight: 650;
+
+    color: #334155;
+
+    margin-bottom: 7px;
+
+    font-size: 14px;
+}
+
+
+/* ============================================================
+   INPUTS
+============================================================ */
+
+.form-group input {
+    width: 100%;
+
+    padding: 12px 13px;
+
+    border:
+        2px solid #e2e8f0;
+
+    border-radius: 10px;
+
+    font-size: 14px;
+
+    outline: none;
+
+    transition: .2s ease;
+
+    background: white;
+
+    color: #1e293b;
+}
+
+.form-group input:focus {
+    border-color: #2563eb;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(37, 99, 235, 0.10);
+}
+
+
+/* ============================================================
+   PROTECTED INPUT
+============================================================ */
+
+.protected-input {
+    background: #f8fafc !important;
+
+    color: #64748b !important;
+
+    border-color: #e2e8f0 !important;
+
+    cursor: default;
+}
+
+
+/* ============================================================
+   HELP TEXT
+============================================================ */
+
+.form-group .help-text {
+    color: #64748b;
+
+    font-size: 12px;
+
+    margin-top: 5px;
+
+    line-height: 1.4;
+}
+
+
+/* ============================================================
+   CHECKBOX
+============================================================ */
+
+.checkbox-group {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 11px 13px;
+
+    border:
+        1px solid #e2e8f0;
+
+    border-radius: 9px;
+
+    background: #f8fafc;
+}
+
+.checkbox-group input {
+    width: auto;
+
+    padding: 0;
+
+    margin: 0;
+
+    accent-color: #2563eb;
+}
+
+.checkbox-group label {
+    margin: 0;
+
+    cursor: pointer;
+}
+
+
+/* ============================================================
+   SUPER ADMIN DISABLED CHECKBOX
+============================================================ */
+
+.checkbox-group.protected-status {
+    background: #f8fafc;
+
+    border-color: #e2e8f0;
+
+    color: #64748b;
+}
+
+.checkbox-group.protected-status input {
+    cursor: not-allowed;
+
+    accent-color: #94a3b8;
+}
+
+.checkbox-group.protected-status label {
+    color: #64748b;
+
+    cursor: not-allowed;
+}
+
+
+/* ============================================================
+   ACTION BAR
+============================================================ */
+
+.form-actions {
+    display: flex;
+
+    gap: 12px;
+
+    margin-top: 28px;
+
+    padding-top: 22px;
+
+    border-top:
+        1px solid #e2e8f0;
+}
+
+.form-actions .button {
+    flex: 1;
+
+    text-align: center;
+
+    padding: 12px 20px;
+
+    border-radius: 10px;
+
+    font-size: 14px;
+
+    font-weight: 700;
+
+    border: none;
+
+    cursor: pointer;
+
+    text-decoration: none;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 7px;
+
+    transition: .2s ease;
+}
+
+.form-actions .button:hover {
+    transform:
+        translateY(-1px);
+}
+
+
+/* ============================================================
+   PRIMARY BUTTON
+============================================================ */
+
+.btn-primary {
+    background: #2563eb;
+
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #1d4ed8;
+}
+
+
+/* ============================================================
+   SECONDARY BUTTON
+============================================================ */
+
+.btn-secondary {
+    background: #e2e8f0;
+
+    color: #0f172a;
+}
+
+.btn-secondary:hover {
+    background: #cbd5e1;
+}
+
+
+/* ============================================================
+   SECURITY FOOTER
+============================================================ */
+
+.security-note {
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 9px;
+
+    margin-top: 18px;
+
+    padding: 11px 13px;
+
+    border-radius: 9px;
+
+    background: #f8fafc;
+
+    border:
+        1px solid #e2e8f0;
+
+    color: #64748b;
+
+    font-size: 11px;
+
+    line-height: 1.45;
+}
+
+.security-note-icon {
+    flex-shrink: 0;
+
+    color: #64748b;
+
+    font-size: 13px;
+}
+
+
+/* ============================================================
+   SUPER ADMIN SECURITY FOOTER
+============================================================ */
+
+.security-note.super-admin {
+    background: #faf5ff;
+
+    border-color: #ddd6fe;
+
+    color: #6b21a8;
+}
+
+.security-note.super-admin .security-note-icon {
+    color: #7c3aed;
+}
+
+
+/* ============================================================
+   MOBILE
+============================================================ */
+
+@media (max-width: 700px) {
+
+    .edit-user-page {
+        padding-bottom: 20px;
+    }
+
+    .form-card {
+        padding: 22px;
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .page-header h2 {
+        font-size: 23px;
+    }
+
+    .form-card {
+        padding: 20px;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .form-actions .button {
+        width: 100%;
+    }
+
+}
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container">
+
+<div class="edit-user-page">
+
+
+    <!-- ========================================================
+         PAGE HEADER
+    ========================================================= -->
+
+    <div class="page-header">
+
+        <h2>
+            ✏️ Badilisha Mtumiaji
+        </h2>
+
+        <p>
+            Badilisha taarifa za mtumiaji
+            <strong>{{ user.username }}</strong>
+        </p>
+
+    </div>
+
+
+    <!-- ========================================================
+         FORM CARD
+    ========================================================= -->
+
+    <div class="form-card">
+
+
+        <!-- ====================================================
+             SUPER ADMIN PROTECTION
+        ===================================================== -->
+
+        {% if user.is_superuser %}
+
+            <div class="super-admin-protection">
+
+                <div class="super-admin-protection-icon">
+                    🔒
+                </div>
+
+                <div>
+
+                    <strong>
+                        Akaunti ya Super Admin imelindwa
+                    </strong>
+
+                    Kufanya mabadiliko kwenye akaunti hii
+                    kunahitaji uthibitisho wa password ya
+                    Super Admin. Hali ya account haiwezi
+                    kuzimwa.
+
+                </div>
+
+            </div>
+
+        {% endif %}
+
+
+        <!-- ====================================================
+             CURRENT INFORMATION
+        ===================================================== -->
+
+        <div
+            class="info-box
+            {% if user.is_superuser %}super-admin{% endif %}"
+        >
+
+            <strong>
+                📋 Taarifa za Sasa:
+            </strong>
+
+            <br>
+
+            <strong>
+                Jina:
+            </strong>
+
+            {{ user.username }}
+
+            <br>
+
+            <strong>
+                Barua Pepe:
+            </strong>
+
+            {{ user.email|default:"-" }}
+
+            <br>
+
+            <strong>
+                Hali:
+            </strong>
+
+            {% if user.is_active %}
+
+                ✅ Inatumika
+
+            {% else %}
+
+                ❌ Imesimamishwa
+
+            {% endif %}
+
+            <br>
+
+            <strong>
+                Role:
+            </strong>
+
+            {% if user.is_superuser %}
+
+                👑 Super Admin
+
+            {% else %}
+
+                {% for group in user.groups.all %}
+
+                    {{ group.name }}
+
+                    {% if not forloop.last %}
+                        ,
+                    {% endif %}
+
+                {% empty %}
+
+                    Hakuna Role
+
+                {% endfor %}
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- ====================================================
+             EDIT FORM
+        ===================================================== -->
+
+        <form
+            method="post"
+            id="editUserForm"
+        >
+
+            {% csrf_token %}
+
+
+            <!-- ==================================================
+                 USERNAME
+            =================================================== -->
+
+            <div class="form-group">
+
+                <label for="username">
+                    Jina la Mtumiaji
+                </label>
+
+                <input
+                    type="text"
+                    id="username"
+                    name="username"
+                    value="{{ user.username }}"
+                    autocomplete="username"
+                    required
+                >
+
+                <div class="help-text">
+                    Jina la kipekee kwa mtumiaji huyu.
+                </div>
+
+            </div>
+
+
+            <!-- ==================================================
+                 EMAIL
+            =================================================== -->
+
+            <div class="form-group">
+
+                <label for="email">
+                    Barua Pepe
+                </label>
+
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value="{{ user.email|default:'' }}"
+                    autocomplete="email"
+                >
+
+                <div class="help-text">
+                    Barua pepe ya mtumiaji.
+                </div>
+
+            </div>
+
+
+            <!-- ==================================================
+                 NEW PASSWORD
+            =================================================== -->
+
+            <div class="form-group">
+
+                <label for="new_password">
+                    Nenosiri Mpya
+                </label>
+
+                <input
+                    type="password"
+                    id="new_password"
+                    name="new_password"
+                    placeholder="Acha tupu ikiwa hutaki kubadilisha"
+                    autocomplete="new-password"
+                >
+
+                <div class="help-text">
+                    Ukiweka nenosiri jipya,
+                    lazima liwe na herufi 6 au zaidi.
+                </div>
+
+            </div>
+
+
+            <!-- ==================================================
+                 ACCOUNT STATUS
+            =================================================== -->
+
+            <div class="form-group">
+
+                {% if user.is_superuser %}
+
+                    <div class="checkbox-group protected-status">
+
+                        <input
+                            type="checkbox"
+                            id="is_active"
+                            name="is_active"
+                            checked
+                            disabled
+                        >
+
+                        <label for="is_active">
+                            🔒 Super Admin anatumika kila wakati
+                        </label>
+
+                    </div>
+
+                    <div class="help-text">
+                        Hali ya Super Admin haiwezi kuzimwa
+                        kupitia mfumo.
+                    </div>
+
+                {% else %}
+
+                    <div class="checkbox-group">
+
+                        <input
+                            type="checkbox"
+                            id="is_active"
+                            name="is_active"
+                            {% if user.is_active %}checked{% endif %}
+                        >
+
+                        <label for="is_active">
+                            ✅ Mtumiaji anatumika
+                        </label>
+
+                    </div>
+
+                    <div class="help-text">
+                        Ikiwa haijachaguliwa,
+                        mtumiaji hataweza kuingia.
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- ==================================================
+                 SECURITY NOTE
+            =================================================== -->
+
+            {% if user.is_superuser %}
+
+                <div class="security-note super-admin">
+
+                    <div class="security-note-icon">
+                        🔐
+                    </div>
+
+                    <div>
+                        Kwa sababu huyu ni Super Admin,
+                        username, email na password
+                        vinaweza kubadilishwa tu baada ya
+                        kuthibitisha password ya Super Admin.
+                    </div>
+
+                </div>
+
+            {% else %}
+
+                <div class="security-note">
+
+                    <div class="security-note-icon">
+                        🛡️
+                    </div>
+
+                    <div>
+                        Mabadiliko haya yanasimamiwa na
+                        Super Admin. Role na permissions
+                        zinasimamiwa kupitia sehemu zao maalum.
+                    </div>
+
+                </div>
+
+            {% endif %}
+
+
+            <!-- ==================================================
+                 FORM ACTIONS
+            =================================================== -->
+
+            <div class="form-actions">
+
+                <a
+                    href="{% url 'users:user_detail' user.id %}"
+                    class="button btn-secondary"
+                >
+                    <i class="fas fa-times"></i>
+                    Ghairi
+                </a>
+
+
+                <button
+                    type="submit"
+                    class="button btn-primary"
+                >
+                    <i class="fas fa-save"></i>
+                    Hifadhi
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+</div>
+
+{% endblock %}

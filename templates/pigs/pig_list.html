@@ -1,0 +1,419 @@
+{% extends "pigs/base.html" %}
+{% load humanize %}
+
+{% block title %}
+Orodha ya Nguruwe
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .page-header h2 {
+        margin: 0;
+    }
+
+    .page-header p {
+        color: #64748b;
+        margin: 0;
+    }
+
+    .card {
+        background: white;
+        border-radius: 14px;
+        box-shadow: 0 4px 15px rgba(15, 23, 42, 0.07);
+        margin-bottom: 20px;
+        overflow: hidden;
+    }
+
+    .card-header {
+        padding: 16px 20px;
+        background: #f8fafc;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .card-body {
+        padding: 16px 20px;
+        overflow-x: auto;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+    }
+
+    thead {
+        background: #f1f5f9;
+    }
+
+    th, td {
+        padding: 10px 12px;
+        text-align: left;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    th {
+        font-weight: 600;
+    }
+
+    .badge {
+        font-size: 12px;
+        padding: 3px 10px;
+        border-radius: 12px;
+        display: inline-block;
+    }
+
+    .badge-primary {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+
+    .badge-success {
+        background: #d1fae5;
+        color: #065f46;
+    }
+
+    .badge-warning {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .badge-danger {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .badge-secondary {
+        background: #e2e8f0;
+        color: #475569;
+    }
+
+    .badge-pink {
+        background: #fce7f3;
+        color: #9d174d;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: #64748b;
+    }
+
+    .empty-state i {
+        font-size: 48px;
+        color: #cbd5e1;
+        margin-bottom: 15px;
+    }
+
+    /* ============================================================
+       BUTTONS - ZIMEKUBWA
+       ============================================================ */
+
+    .btn-sm {
+        padding: 6px 14px;
+        font-size: 13px;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        transition: 0.2s ease;
+        font-weight: 600;
+    }
+
+    .btn-info {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+
+    .btn-info:hover {
+        background: #bfdbfe;
+    }
+
+    .btn-warning {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .btn-warning:hover {
+        background: #fde68a;
+    }
+
+    /* ✅ DELETE BUTTON - KUBWA NA KUUONEKANA */
+    .btn-danger {
+        background: #fee2e2;
+        color: #991b1b;
+        padding: 6px 16px;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-block;
+        transition: 0.2s ease;
+    }
+
+    .btn-danger:hover {
+        background: #fecaca;
+        transform: scale(1.05);
+    }
+
+    /* ✅ DELETE BATCH BUTTON - KUBWA ZAIDI */
+    .btn-danger-batch {
+        background: #dc2626;
+        color: white;
+        padding: 8px 20px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 700;
+        text-decoration: none;
+        display: inline-block;
+        transition: 0.2s ease;
+    }
+
+    .btn-danger-batch:hover {
+        background: #b91c1c;
+        transform: scale(1.05);
+    }
+
+    .btn-danger-batch i {
+        margin-right: 8px;
+    }
+
+    .btn-secondary {
+        background: #64748b;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        display: inline-block;
+        font-weight: 600;
+    }
+
+    .btn-secondary:hover {
+        background: #475569;
+    }
+
+    .btn-primary {
+        background: #2563eb;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        display: inline-block;
+        font-weight: 600;
+    }
+
+    .btn-primary:hover {
+        background: #1d4ed8;
+    }
+
+    .text-muted {
+        color: #94a3b8;
+    }
+
+    /* ✅ BADGE YA IDADI YA NGURUWE */
+    .pig-count-badge {
+        background: #2563eb;
+        color: white;
+        padding: 2px 12px;
+        border-radius: 12px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .card-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    @media (max-width: 600px) {
+        .page-header {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        table {
+            font-size: 12px;
+        }
+        th, td {
+            padding: 6px 8px;
+        }
+        .card-header {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        .btn-sm {
+            padding: 4px 10px;
+            font-size: 11px;
+        }
+        .btn-danger-batch {
+            padding: 6px 14px;
+            font-size: 12px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- ============================================================
+     PAGE HEADER
+     ============================================================ -->
+
+<div class="page-header">
+    <div>
+        <h2><i class="fas fa-piggy-bank"></i> Orodha ya Nguruwe</h2>
+        <p>Nguruwe zote zilizonunuliwa</p>
+    </div>
+    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <a href="{% url 'pigs:dashboard' %}" class="btn-secondary">
+            <i class="fas fa-arrow-left"></i> Rudi Dashboard
+        </a>
+        <a href="{% url 'pigs:purchase_create' %}" class="btn-primary">
+            <i class="fas fa-plus"></i> Nunua Nguruwe
+        </a>
+    </div>
+</div>
+
+<!-- ============================================================
+     PURCHASES LIST
+     ============================================================ -->
+
+{% for purchase in purchases %}
+    <div class="card">
+        <div class="card-header">
+            <div>
+                <strong>📦 Ununuzi #{{ purchase.id }}</strong>
+                <span class="badge badge-primary">{{ purchase.purchase_date|date:"d/m/Y" }}</span>
+                <span style="color: #64748b; font-size: 13px; margin-left: 10px;">
+                    {{ purchase.supplier_name }}
+                </span>
+                <span class="pig-count-badge" style="margin-left: 10px;">
+                    🐷 {{ purchase.pigs.count }}
+                </span>
+            </div>
+            <div class="card-actions">
+                <a href="{% url 'pigs:pig_bulk_edit' purchase.id %}" class="btn-sm btn-warning">
+                    <i class="fas fa-edit"></i> Edit Zote
+                </a>
+                
+                <!-- ✅ DELETE BATCH - Futa Ununuzi Wote -->
+                {% if user.is_superuser %}
+                    <button onclick="openDeleteModal('{% url 'pigs:purchase_delete' purchase.id %}', 'Je, una uhakika unataka kufuta ununuzi #{{ purchase.id }} na nguruwe zake zote? Kitendo hiki hakiwezi kurudishwa!')" 
+                            class="btn-danger-batch">
+                        <i class="fas fa-trash-alt"></i> Futa Ununuzi Wote
+                    </button>
+                {% endif %}
+            </div>
+        </div>
+        <div class="card-body">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tag</th>
+                        <th>Jinsia</th>
+                        <th>Bei</th>
+                        <th>Status</th>
+                        <th>Vitendo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pig in purchase.pigs.all %}
+                        <tr>
+                            <td><strong>{{ pig.tag_number }}</strong></td>
+                            <td>
+                                {% if pig.gender == 'MALE' %}
+                                    <span class="badge badge-primary">Dume</span>
+                                {% elif pig.gender == 'FEMALE' %}
+                                    <span class="badge badge-pink">Jike</span>
+                                {% else %}
+                                    <span class="badge badge-secondary">Haijajazwa</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if pig.purchase_price %}
+                                    TSh {{ pig.purchase_price|floatformat:0|intcomma }}
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if pig.status == 'AVAILABLE' %}
+                                    <span class="badge badge-success">Hajachinjwa</span>
+                                {% elif pig.status == 'SLAUGHTERED' %}
+                                    <span class="badge badge-warning">Amechinjwa</span>
+                                {% else %}
+                                    <span class="badge badge-danger">Nyama imeisha</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                                    {% if pig.status == 'AVAILABLE' %}
+                                        <a href="{% url 'pigs:pig_detail' pig.id %}" class="btn-sm btn-info" title="Badilisha">
+                                            <i class="fas fa-edit">Edit</i>
+                                        </a>
+                                        
+                                        <!-- ✅ DELETE BUTTON - Super Admin pekee -->
+                                        {% if user.is_superuser %}
+                                            <button onclick="openDeleteModal('{% url 'pigs:pig_delete' pig.id %}', 'Je, una uhakika unataka kufuta nguruwe {{ pig.tag_number }}? Kitendo hiki hakiwezi kurudishwa!')" 
+                                                    class="btn-sm btn-danger" title="Futa Nguruwe">
+                                                <i class="fas fa-trash"></i> Futa
+                                            </button>
+                                        {% endif %}
+                                        
+                                    {% else %}
+                                        <span class="text-muted">Imefungwa</span>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="5" style="text-align: center; color: #94a3b8;">
+                                Hakuna nguruwe katika ununuzi huu
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% empty %}
+    <div class="card">
+        <div class="card-body">
+            <div class="empty-state">
+                <i class="fas fa-piggy-bank"></i>
+                <p style="font-size: 16px;">Hakuna nguruwe zilizonunuliwa bado</p>
+                <a href="{% url 'pigs:purchase_create' %}" class="btn-primary" style="margin-top: 10px;">
+                    <i class="fas fa-plus"></i> Nunua Nguruwe
+                </a>
+            </div>
+        </div>
+    </div>
+{% endfor %}
+
+<!-- ============================================================
+     DELETE MODAL
+     ============================================================ -->
+
+{% include "pigs/delete_modal.html" %}
+
+{% endblock %}

@@ -1,0 +1,242 @@
+{% extends "pigs/base.html" %}
+{% load humanize %}
+
+{% block title %}Hariri Mauzo ya Nyama{% endblock %}
+
+{% block extra_css %}
+<style>
+    .edit-container {
+        max-width: 500px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 14px;
+        padding: 30px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+    }
+    
+    .edit-container h2 {
+        color: #0f172a;
+        margin-bottom: 20px;
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 6px;
+    }
+    
+    .form-group input, .form-group textarea {
+        width: 100%;
+        padding: 10px 14px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: 0.2s;
+    }
+    
+    .form-group input:focus, .form-group textarea:focus {
+        outline: none;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    
+    .form-group .help-text {
+        font-size: 12px;
+        color: #94a3b8;
+        margin-top: 4px;
+    }
+    
+    .btn-group {
+        display: flex;
+        gap: 12px;
+        margin-top: 20px;
+    }
+    
+    .btn-group .btn {
+        flex: 1;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.2s ease;
+        text-decoration: none;
+        text-align: center;
+    }
+    
+    .btn-group .btn-primary {
+        background: #2563eb;
+        color: white;
+    }
+    
+    .btn-group .btn-primary:hover {
+        background: #1d4ed8;
+    }
+    
+    .btn-group .btn-secondary {
+        background: #e2e8f0;
+        color: #475569;
+    }
+    
+    .btn-group .btn-secondary:hover {
+        background: #cbd5e1;
+    }
+    
+    .info-box {
+        background: #f8fafc;
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+    }
+    
+    .info-box .label {
+        color: #94a3b8;
+        font-size: 12px;
+    }
+    
+    .info-box .value {
+        font-weight: 600;
+        color: #0f172a;
+    }
+
+    .field-error {
+        color: #dc2626;
+        font-size: 13px;
+        margin-bottom: 15px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="edit-container">
+
+    <h2>
+        <i class="fas fa-edit"></i>
+        Hariri Mauzo ya Nyama
+    </h2>
+    
+    <div class="info-box">
+
+        <div>
+            <span class="label">Batch:</span>
+            <span class="value">
+                {{ record.slaughter_batch.batch_number }}
+            </span>
+        </div>
+
+        <div>
+            <span class="label">Tarehe:</span>
+            <span class="value">
+                {{ record.daily_sale.sale_date|date:"d/m/Y" }}
+            </span>
+        </div>
+
+        <div>
+            <span class="label">Kilo Zilizouzwa:</span>
+            <span class="value">
+                {{ record.meat_weight_sold|floatformat:2 }} kg
+            </span>
+        </div>
+
+    </div>
+    
+    <form method="post">
+
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            <div class="field-error">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+        
+        <div class="form-group">
+
+            <label for="total_amount">
+                Jumla ya Mauzo (TSh)
+            </label>
+
+            <input
+                type="number"
+                id="total_amount"
+                name="total_amount"
+                step="100"
+                min="100"
+                value="{{ record.total_amount|floatformat:0 }}"
+                required
+            >
+
+            <div class="help-text">
+                Ingiza jumla ya fedha ulizopokea kwa mauzo haya
+            </div>
+
+        </div>
+        
+        <div class="form-group">
+
+            <label for="price_per_kg">
+                Bei kwa Kilo (TSh)
+            </label>
+
+            <input
+                type="number"
+                id="price_per_kg"
+                name="price_per_kg"
+                step="100"
+                min="100"
+                value="{{ record.price_per_kg|floatformat:0 }}"
+                required
+            >
+
+            <div class="help-text">
+                Bei uliyouza nyama kwa kilo
+            </div>
+
+        </div>
+        
+        <div class="form-group">
+
+            <label for="notes">
+                Maelezo
+            </label>
+
+            <textarea
+                id="notes"
+                name="notes"
+                rows="2"
+            >{{ record.notes|default:'' }}</textarea>
+
+        </div>
+        
+        <div class="btn-group">
+
+            <a
+                href="{% url 'pigs:daily_sale_detail' record.daily_sale.id %}"
+                class="btn btn-secondary"
+            >
+                <i class="fas fa-times"></i>
+                Ghairi
+            </a>
+
+            <button
+                type="submit"
+                class="btn btn-primary"
+            >
+                <i class="fas fa-save"></i>
+                Hifadhi Mabadiliko
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

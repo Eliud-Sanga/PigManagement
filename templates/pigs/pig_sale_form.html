@@ -1,0 +1,353 @@
+{% extends "pigs/base.html" %}
+
+{% block title %}
+Uuzaji wa Nyama
+{% endblock %}
+
+{% block extra_css %}
+
+<style>
+
+    .sale-page {
+        max-width: 950px;
+        margin: 0 auto;
+    }
+
+    .sale-header {
+        margin-bottom: 25px;
+    }
+
+    .sale-header h2 {
+        margin-bottom: 8px;
+    }
+
+    .sale-date {
+        display: inline-block;
+        padding: 10px 16px;
+        margin-top: 10px;
+        border-radius: 8px;
+        background: #f3f4f6;
+        font-weight: 600;
+    }
+
+    .sale-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 24px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+
+    .sale-card h3 {
+        margin-top: 0;
+        margin-bottom: 20px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    .form-group,
+    .meat-item {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .form-group label,
+    .meat-item label {
+        font-weight: 600;
+    }
+
+    .form-group input,
+    .form-group select,
+    .meat-item input {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 11px 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 7px;
+    }
+
+    .meat-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+    }
+
+    .meat-item {
+        padding: 18px;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        background: #fafafa;
+    }
+
+    .checkbox-item {
+        flex-direction: row;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .checkbox-item input {
+        width: auto;
+    }
+
+    .help-text {
+        font-size: 13px;
+        opacity: 0.7;
+    }
+
+    .error-list {
+        margin: 0;
+        padding-left: 18px;
+    }
+
+    .sale-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 25px;
+    }
+
+    .action-right {
+        display: flex;
+        gap: 10px;
+    }
+
+    @media (max-width: 700px) {
+
+        .form-row,
+        .meat-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .sale-card {
+            padding: 18px;
+        }
+
+        .sale-actions {
+            flex-direction: column-reverse;
+            gap: 12px;
+            align-items: stretch;
+        }
+
+        .sale-actions .button {
+            width: 100%;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+    }
+
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="sale-page">
+
+<div class="sale-header">
+
+    <h2>
+        Rekodi Uuzaji wa Nyama
+    </h2>
+
+    <p>
+        Weka taarifa za nyama iliyouzwa.
+        Uzito wa nyama utahesabiwa automatically.
+    </p>
+
+    <div class="sale-date">
+        Tarehe: {{ daily_sale.sale_date }}
+    </div>
+
+</div>
+
+
+<form method="post">
+
+    {% csrf_token %}
+
+
+    <!-- TAARIFA ZA MAUZO -->
+
+    <div class="sale-card">
+
+        <h3>
+            Taarifa za Mauzo
+        </h3>
+
+        <div class="form-row">
+
+            <div class="form-group">
+
+                {{ sale_form.slaughter_batch.label_tag }}
+
+                {{ sale_form.slaughter_batch }}
+
+                {% if sale_form.slaughter_batch.errors %}
+
+                    <ul class="error-list">
+
+                        {% for error in sale_form.slaughter_batch.errors %}
+
+                            <li>{{ error }}</li>
+
+                        {% endfor %}
+
+                    </ul>
+
+                {% endif %}
+
+            </div>
+
+
+            <div class="form-group">
+
+                {{ sale_form.price_per_kg.label_tag }}
+
+                {{ sale_form.price_per_kg }}
+
+                {% if sale_form.price_per_kg.errors %}
+
+                    <ul class="error-list">
+
+                        {% for error in sale_form.price_per_kg.errors %}
+
+                            <li>{{ error }}</li>
+
+                        {% endfor %}
+
+                    </ul>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- SEHEMU ZA NYAMA -->
+
+    <div class="sale-card">
+
+        <h3>
+            Sehemu za Nyama Zilizouzwa
+        </h3>
+
+        <div class="meat-grid">
+
+
+            <div class="meat-item">
+
+                {{ parts_form.ribs.label_tag }}
+
+                {{ parts_form.ribs }}
+
+                <div class="help-text">
+                    Weka idadi ya mbavu zilizouzwa.
+                </div>
+
+                {% if parts_form.ribs.errors %}
+
+                    <ul class="error-list">
+
+                        {% for error in parts_form.ribs.errors %}
+
+                            <li>{{ error }}</li>
+
+                        {% endfor %}
+
+                    </ul>
+
+                {% endif %}
+
+            </div>
+
+
+            <div class="meat-item">
+
+                {{ parts_form.thighs.label_tag }}
+
+                {{ parts_form.thighs }}
+
+                <div class="help-text">
+                    Weka idadi ya vipaja vilivyouzwa.
+                </div>
+
+                {% if parts_form.thighs.errors %}
+
+                    <ul class="error-list">
+
+                        {% for error in parts_form.thighs.errors %}
+
+                            <li>{{ error }}</li>
+
+                        {% endfor %}
+
+                    </ul>
+
+                {% endif %}
+
+            </div>
+
+
+            <div class="meat-item checkbox-item">
+
+                {{ parts_form.head_sold }}
+
+                {{ parts_form.head_sold.label_tag }}
+
+            </div>
+
+
+            <div class="meat-item checkbox-item">
+
+                {{ parts_form.internal_organs_sold }}
+
+                {{ parts_form.internal_organs_sold.label_tag }}
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ACTIONS -->
+
+    <div class="sale-actions">
+
+        <a
+            href="{% url 'dashboard' %}"
+            class="button secondary"
+        >
+            Ghairi
+        </a>
+
+        <div class="action-right">
+
+            <button
+                type="submit"
+                class="button"
+            >
+                Hifadhi Mauzo
+            </button>
+
+        </div>
+
+    </div>
+
+</form>
+
+</div>
+
+{% endblock %}

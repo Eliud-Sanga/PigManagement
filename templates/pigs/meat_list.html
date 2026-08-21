@@ -1,0 +1,287 @@
+{% extends "pigs/base.html" %}
+{% load humanize %}
+
+{% block title %}
+Nyama
+{% endblock %}
+
+{% block extra_css %}
+
+<style>
+
+    .page-header {
+        text-align: center;
+        margin-bottom: 25px;
+    }
+
+    .page-header h2 {
+        margin-bottom: 8px;
+        color: #172554;
+    }
+
+    .page-header p {
+        color: #64748b;
+        margin: 0;
+    }
+
+    .top-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 25px;
+        flex-wrap: wrap;
+    }
+
+    .table-card {
+        background: white;
+        border-radius: 14px;
+        padding: 20px;
+        box-shadow: 0 4px 15px rgba(15, 23, 42, 0.07);
+        overflow-x: auto;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        padding: 14px;
+        text-align: center;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    th {
+        background: #f8fafc;
+        color: #334155;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    td {
+        font-size: 14px;
+    }
+
+    .batch-number {
+        font-weight: 700;
+        color: #2563eb;
+    }
+
+    .status {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .available {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .finished {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .confirmation {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .profit-positive {
+        color: #16a34a;
+        font-weight: 700;
+        font-size: 15px;
+    }
+
+    .profit-negative {
+        color: #dc2626;
+        font-weight: 700;
+        font-size: 15px;
+    }
+
+    .view-btn {
+        padding: 4px 12px;
+        background: #2563eb;
+        color: white;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 12px;
+        display: inline-block;
+    }
+
+    .view-btn:hover {
+        background: #1d4ed8;
+    }
+
+    .text-muted {
+        color: #94a3b8;
+    }
+
+    .empty {
+        text-align: center;
+        padding: 45px 20px;
+        color: #64748b;
+    }
+
+    .empty h3 {
+        margin-bottom: 8px;
+        color: #334155;
+    }
+
+    .empty p {
+        margin-bottom: 0;
+    }
+
+    .btn-blue {
+        background: #2563eb;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        display: inline-block;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        transition: 0.2s ease;
+    }
+
+    .btn-blue:hover {
+        background: #1d4ed8;
+        transform: scale(1.02);
+    }
+
+    .btn-secondary {
+        background: #64748b;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        display: inline-block;
+        font-weight: 600;
+    }
+
+    .btn-secondary:hover {
+        background: #475569;
+    }
+
+    @media (max-width: 600px) {
+        .top-actions {
+            flex-direction: column;
+        }
+        .top-actions .btn-blue,
+        .top-actions .btn-secondary {
+            width: 100%;
+            text-align: center;
+        }
+        th, td {
+            padding: 10px 8px;
+            font-size: 12px;
+        }
+        .status {
+            font-size: 10px;
+            padding: 4px 8px;
+        }
+        .profit-positive, .profit-negative {
+            font-size: 13px;
+        }
+    }
+
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h2>🥩 Nyama</h2>
+    <p>Angalia hali ya nyama kwenye stock</p>
+</div>
+
+<div class="top-actions">
+    <a href="{% url 'pigs:dashboard' %}" class="btn-secondary">
+        <i class="fas fa-arrow-left"></i> Rudi
+    </a>
+    <a href="{% url 'pigs:batch_profit_report_list' %}" class="btn-blue">
+        <i class="fas fa-chart-line"></i> Ripoti za Faida
+    </a>
+</div>
+
+<div class="table-card">
+
+    {% if meat_stocks %}
+
+    <table>
+        <thead>
+            <tr>
+                <th>Batch</th>
+                <th>Tarehe</th>
+                <th>Hali</th>
+                <th>Faida</th>
+                <th>Kitendo</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for stock in meat_stocks %}
+            <tr>
+                <td>
+                    <span class="batch-number">{{ stock.slaughter_batch.batch_number }}</span>
+                </td>
+                <td>
+                    {{ stock.slaughter_batch.slaughter_date|date:"d/m/Y" }}
+                </td>
+                <td>
+                    {% if stock.is_finished %}
+                        <span class="status finished">✅ Imeisha</span>
+                    {% elif stock.needs_confirmation %}
+                        <span class="status confirmation">⚠️ Thibitisha</span>
+                    {% else %}
+                        <span class="status available">✅ Ipo</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if stock.is_finished %}
+                        {% with report=stock.slaughter_batch.profit_report %}
+                            {% if report %}
+                                {% if report.total_profit >= 0 %}
+                                    <span class="profit-positive">+TSh {{ report.total_profit|floatformat:0|intcomma }}</span>
+                                {% else %}
+                                    <span class="profit-negative">-TSh {{ report.total_profit|floatformat:0|intcomma }}</span>
+                                {% endif %}
+                            {% else %}
+                                <span class="text-muted">-</span>
+                            {% endif %}
+                        {% endwith %}
+                    {% else %}
+                        <span class="text-muted">-</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if stock.is_finished %}
+                        <a href="{% url 'pigs:batch_profit_report_detail' stock.slaughter_batch.id %}" class="view-btn">
+                            <i class="fas fa-eye"></i> Angalia
+                        </a>
+                    {% else %}
+                        <span class="text-muted">-</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% else %}
+
+    <div class="empty">
+        <h3>📭 Hakuna Nyama</h3>
+        <p>Hakuna stock ya nyama bado.</p>
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

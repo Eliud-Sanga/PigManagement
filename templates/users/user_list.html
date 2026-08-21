@@ -1,0 +1,2187 @@
+```html
+{% extends "pigs/base.html" %}
+
+{% block title %}
+Watumiaji wa Mfumo
+{% endblock %}
+
+{% block extra_css %}
+
+<style>
+
+/* ============================================================
+   USER MANAGEMENT PAGE
+============================================================ */
+
+.users-page {
+    max-width: 1250px;
+    margin: 0 auto;
+    padding-bottom: 45px;
+}
+
+
+/* ============================================================
+   TOP BAR
+============================================================ */
+
+.users-topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+
+/* ============================================================
+   TOP BUTTONS
+============================================================ */
+
+.btn-dashboard,
+.btn-add {
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 40px;
+    padding: 10px 17px;
+    border-radius: 9px;
+    font-size: 13px;
+    font-weight: 700;
+    transition: .2s ease;
+    box-sizing: border-box;
+}
+
+.btn-dashboard {
+    background: #0f172a;
+    color: white;
+}
+
+.btn-dashboard:hover {
+    background: #1e293b;
+    transform: translateY(-1px);
+}
+
+.btn-add {
+    background: #2563eb;
+    color: white;
+}
+
+.btn-add:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+}
+
+
+/* ============================================================
+   PAGE TITLE
+============================================================ */
+
+.users-title {
+    text-align: center;
+    margin-bottom: 28px;
+}
+
+.users-title h2 {
+    margin: 0;
+    color: #172554;
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -.3px;
+}
+
+.users-title p {
+    margin: 7px 0 0;
+    color: #64748b;
+    font-size: 14px;
+}
+
+
+/* ============================================================
+   SUMMARY CARDS
+============================================================ */
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+    margin-bottom: 20px;
+}
+
+.summary-card {
+    position: relative;
+    background: white;
+    border: 1px solid #e8eef5;
+    border-radius: 15px;
+    padding: 20px 22px;
+    min-height: 105px;
+    box-shadow: 0 5px 18px rgba(15, 23, 42, .06);
+    overflow: hidden;
+    transition: .2s ease;
+}
+
+.summary-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(15, 23, 42, .08);
+}
+
+.summary-card::after {
+    content: "";
+    position: absolute;
+    width: 90px;
+    height: 90px;
+    right: -28px;
+    bottom: -38px;
+    border-radius: 50%;
+    background: rgba(37, 99, 235, .04);
+}
+
+.summary-card-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.summary-icon {
+    width: 50px;
+    height: 50px;
+    flex-shrink: 0;
+    border-radius: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 19px;
+}
+
+.summary-icon.green {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.summary-icon.red {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.summary-label {
+    font-size: 11px;
+    color: #94a3b8;
+    font-weight: 750;
+    text-transform: uppercase;
+    letter-spacing: .4px;
+}
+
+.summary-value {
+    margin-top: 3px;
+    color: #172554;
+    font-size: 27px;
+    line-height: 1;
+    font-weight: 850;
+}
+
+.summary-description {
+    margin-top: 5px;
+    color: #94a3b8;
+    font-size: 10px;
+}
+
+
+/* ============================================================
+   SEARCH AREA
+============================================================ */
+
+.filter-card {
+    background: white;
+    border: 1px solid #e8eef5;
+    border-radius: 15px;
+    padding: 17px;
+    margin-bottom: 20px;
+    box-shadow: 0 5px 18px rgba(15, 23, 42, .06);
+}
+
+.filter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.filter-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #334155;
+    font-size: 13px;
+    font-weight: 750;
+}
+
+.filter-title i {
+    color: #2563eb;
+}
+
+.visible-count {
+    color: #94a3b8;
+    font-size: 11px;
+    font-weight: 650;
+}
+
+.filter-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 180px 180px;
+    gap: 10px;
+}
+
+
+/* ============================================================
+   SEARCH BOX
+============================================================ */
+
+.search-wrapper {
+    position: relative;
+}
+
+.search-icon {
+    position: absolute;
+    left: 13px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    font-size: 13px;
+    pointer-events: none;
+}
+
+.search-box {
+    width: 100%;
+    height: 42px;
+    box-sizing: border-box;
+    border: 1px solid #cbd5e1;
+    background: #fff;
+    color: #334155;
+    padding: 10px 42px 10px 37px;
+    border-radius: 9px;
+    font-size: 13px;
+    outline: none;
+    transition: .2s ease;
+}
+
+.search-box::placeholder {
+    color: #94a3b8;
+}
+
+.search-box:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, .09);
+}
+
+.clear-search {
+    position: absolute;
+    right: 9px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 25px;
+    height: 25px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: #94a3b8;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.clear-search:hover {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+
+/* ============================================================
+   FILTER SELECTS
+============================================================ */
+
+.filter-select {
+    width: 100%;
+    height: 42px;
+    box-sizing: border-box;
+    border: 1px solid #cbd5e1;
+    background: white;
+    color: #334155;
+    padding: 10px 12px;
+    border-radius: 9px;
+    font-size: 12px;
+    font-weight: 600;
+    outline: none;
+    cursor: pointer;
+    transition: .2s ease;
+}
+
+.filter-select:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, .08);
+}
+
+
+/* ============================================================
+   USERS CARD
+============================================================ */
+
+.users-card {
+    background: white;
+    border: 1px solid #e8eef5;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 5px 20px rgba(15, 23, 42, .07);
+}
+
+
+/* ============================================================
+   USERS HEADER
+============================================================ */
+
+.users-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 17px 18px;
+    border-bottom: 1px solid #edf2f7;
+}
+
+.users-card-title {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    color: #172554;
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.users-card-title i {
+    color: #2563eb;
+}
+
+.security-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 9px;
+    border-radius: 7px;
+    background: #f0fdf4;
+    color: #166534;
+    border: 1px solid #dcfce7;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.security-indicator i {
+    font-size: 9px;
+}
+
+
+/* ============================================================
+   TABLE WRAPPER
+============================================================ */
+
+.users-table-wrapper {
+    overflow-x: auto;
+}
+
+.users-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 1050px;
+}
+
+
+/* ============================================================
+   TABLE HEADER
+============================================================ */
+
+.users-table th {
+    background: #f8fafc;
+    color: #64748b;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .4px;
+    padding: 13px 15px;
+    border-bottom: 1px solid #e2e8f0;
+    text-align: left;
+    white-space: nowrap;
+}
+
+
+/* ============================================================
+   TABLE BODY
+============================================================ */
+
+.users-table td {
+    padding: 14px 15px;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
+}
+
+.users-table tbody tr {
+    transition: .15s ease;
+}
+
+.users-table tbody tr:hover {
+    background: #fafcff;
+}
+
+.users-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+
+/* ============================================================
+   USER ID
+============================================================ */
+
+.user-id {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 750;
+}
+
+
+/* ============================================================
+   USER PROFILE
+============================================================ */
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    min-width: 205px;
+}
+
+.user-avatar {
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: #2563eb;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 15px;
+    box-shadow: 0 4px 10px rgba(37, 99, 235, .16);
+}
+
+.user-avatar.super {
+    background: linear-gradient(135deg, #7c3aed, #4c1d95);
+}
+
+.user-name {
+    color: #0f172a;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.user-email {
+    color: #94a3b8;
+    font-size: 10px;
+    margin-top: 3px;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+/* ============================================================
+   SUPER ADMIN PROTECTION
+============================================================ */
+
+.protected-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 5px;
+    padding: 3px 7px;
+    border-radius: 6px;
+    background: #f5f3ff;
+    color: #6d28d9;
+    border: 1px solid #ddd6fe;
+    font-size: 9px;
+    font-weight: 750;
+}
+
+.super-label {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 5px;
+    padding: 2px 5px;
+    border-radius: 5px;
+    background: #ede9fe;
+    color: #6d28d9;
+    font-size: 8px;
+    font-weight: 800;
+}
+
+
+/* ============================================================
+   ROLE BADGES
+============================================================ */
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 9px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 750;
+    white-space: nowrap;
+}
+
+.badge-super {
+    background: #ede9fe;
+    color: #6d28d9;
+    border: 1px solid #ddd6fe;
+}
+
+.badge-admin {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.badge-manager {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.badge-viewer {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.badge-none {
+    background: #f1f5f9;
+    color: #64748b;
+}
+
+
+/* ============================================================
+   STATUS
+============================================================ */
+
+.status-active {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.status-inactive {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+
+/* ============================================================
+   PERMISSION SUMMARY
+============================================================ */
+
+.permission-summary {
+    min-width: 155px;
+}
+
+.permission-number {
+    color: #172554;
+    font-size: 11px;
+    font-weight: 750;
+}
+
+.permission-label {
+    color: #94a3b8;
+    font-size: 9px;
+    line-height: 1.4;
+    margin-top: 4px;
+    max-width: 180px;
+}
+
+.permission-locked,
+.permission-user {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 9px;
+    border-radius: 7px;
+    font-size: 9px;
+    font-weight: 750;
+}
+
+.permission-locked {
+    background: #f5f3ff;
+    color: #6d28d9;
+    border: 1px solid #ddd6fe;
+}
+
+.permission-user {
+    background: #eff6ff;
+    color: #1e40af;
+    border: 1px solid #bfdbfe;
+}
+
+
+/* ============================================================
+   ACTIONS
+============================================================ */
+
+.actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    min-width: 245px;
+}
+
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    min-height: 30px;
+    padding: 6px 9px;
+    box-sizing: border-box;
+    border-radius: 7px;
+    border: none;
+    text-decoration: none;
+    cursor: pointer;
+    font-size: 10px;
+    font-weight: 700;
+    transition: .18s ease;
+    white-space: nowrap;
+}
+
+.action-btn:hover {
+    transform: translateY(-1px);
+}
+
+.action-view {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.action-view:hover {
+    background: #bfdbfe;
+}
+
+.action-toggle {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.action-toggle:hover {
+    background: #e2e8f0;
+}
+
+.action-enable {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.action-enable:hover {
+    background: #bbf7d0;
+}
+
+.action-delete {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.action-delete:hover {
+    background: #fecaca;
+}
+
+
+/* ============================================================
+   PROTECTED ACTION
+============================================================ */
+
+.action-locked {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    min-height: 30px;
+    padding: 6px 10px;
+    box-sizing: border-box;
+    border-radius: 7px;
+    background: #f8fafc;
+    color: #94a3b8;
+    border: 1px solid #e2e8f0;
+    font-size: 9px;
+    font-weight: 750;
+    cursor: not-allowed;
+}
+
+
+/* ============================================================
+   EMPTY STATE
+============================================================ */
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #94a3b8;
+}
+
+.empty-state-icon {
+    width: 58px;
+    height: 58px;
+    margin: 0 auto 13px;
+    border-radius: 15px;
+    background: #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #64748b;
+    font-size: 22px;
+}
+
+.empty-state h3 {
+    margin: 0 0 6px;
+    color: #475569;
+    font-size: 16px;
+}
+
+.empty-state p {
+    margin: 0;
+    font-size: 12px;
+}
+
+
+/* ============================================================
+   NO SEARCH RESULTS
+============================================================ */
+
+.no-search-results {
+    display: none;
+    text-align: center;
+    padding: 50px 20px;
+    color: #94a3b8;
+}
+
+.no-search-results-icon {
+    width: 55px;
+    height: 55px;
+    margin: 0 auto 12px;
+    border-radius: 14px;
+    background: #f8fafc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8;
+    font-size: 20px;
+}
+
+.no-search-results h3 {
+    color: #475569;
+    margin: 10px 0 5px;
+    font-size: 15px;
+}
+
+.no-search-results p {
+    margin: 0;
+    font-size: 12px;
+}
+
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+
+@media (max-width: 900px) {
+
+    .filter-row {
+        grid-template-columns: 1fr;
+    }
+
+    .summary-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+@media (max-width: 650px) {
+
+    .users-topbar {
+        align-items: stretch;
+    }
+
+    .topbar-right {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .btn-dashboard,
+    .btn-add {
+        flex: 1;
+    }
+
+    .users-title h2 {
+        font-size: 23px;
+    }
+
+    .summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .summary-card {
+        min-height: 95px;
+    }
+
+    .filter-card {
+        padding: 13px;
+    }
+
+    .filter-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+}
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+{% include "pigs/delete_modal.html" %}
+
+<div class="container">
+
+<div class="users-page">
+
+
+    <!-- ========================================================
+         TOP NAVIGATION
+    ========================================================= -->
+
+    <div class="users-topbar">
+
+        <div></div>
+
+        <div class="topbar-right">
+
+            <a
+                href="{% url 'pigs:dashboard' %}"
+                class="btn-dashboard"
+            >
+                <i class="fas fa-home"></i>
+                Dashboard
+            </a>
+
+            <a
+                href="{% url 'users:user_create' %}"
+                class="btn-add"
+            >
+                <i class="fas fa-user-plus"></i>
+                Ongeza Mtumiaji
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================
+         PAGE TITLE
+    ========================================================= -->
+
+    <div class="users-title">
+
+        <h2>
+            <i class="fas fa-users"></i>
+            Watumiaji wa Mfumo
+        </h2>
+
+        <p>
+            Simamia accounts, roles na permissions
+            za watumiaji.
+        </p>
+
+    </div>
+
+
+    <!-- ========================================================
+         SUMMARY CARDS
+    ========================================================= -->
+
+    <div class="summary-grid">
+
+
+        <!-- ACTIVE USERS -->
+
+        <div class="summary-card">
+
+            <div class="summary-card-content">
+
+                <div class="summary-icon green">
+                    <i class="fas fa-user-check"></i>
+                </div>
+
+                <div>
+
+                    <div class="summary-label">
+                        Wanaotumika
+                    </div>
+
+                    <div
+                        class="summary-value"
+                        id="activeCount"
+                    >
+                        -
+                    </div>
+
+                    <div class="summary-description">
+                        Accounts zilizo active
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- INACTIVE USERS -->
+
+        <div class="summary-card">
+
+            <div class="summary-card-content">
+
+                <div class="summary-icon red">
+                    <i class="fas fa-user-slash"></i>
+                </div>
+
+                <div>
+
+                    <div class="summary-label">
+                        Wamesimamishwa
+                    </div>
+
+                    <div
+                        class="summary-value"
+                        id="inactiveCount"
+                    >
+                        -
+                    </div>
+
+                    <div class="summary-description">
+                        Accounts zisizo active
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================
+         SEARCH / FILTER
+    ========================================================= -->
+
+    <div class="filter-card">
+
+        <div class="filter-header">
+
+            <div class="filter-title">
+                <i class="fas fa-search"></i>
+                Tafuta na chuja watumiaji
+            </div>
+
+            <div
+                class="visible-count"
+                id="visibleCount"
+            >
+                -
+            </div>
+
+        </div>
+
+
+        <div class="filter-row">
+
+
+            <!-- SEARCH -->
+
+            <div class="search-wrapper">
+
+                <i class="fas fa-search search-icon"></i>
+
+                <input
+                    type="text"
+                    id="userSearch"
+                    class="search-box"
+                    placeholder="Tafuta username, email, ID au role..."
+                    autocomplete="off"
+                >
+
+                <button
+                    type="button"
+                    id="clearSearch"
+                    class="clear-search"
+                    title="Futa utafutaji"
+                >
+                    <i class="fas fa-times"></i>
+                </button>
+
+            </div>
+
+
+            <!-- ROLE -->
+
+            <select
+                id="roleFilter"
+                class="filter-select"
+            >
+
+                <option value="">
+                    Roles zote
+                </option>
+
+                <option value="super admin">
+                    Super Admin
+                </option>
+
+                <option value="admin">
+                    Admin
+                </option>
+
+                <option value="manager">
+                    Manager
+                </option>
+
+                <option value="viewer">
+                    Viewer
+                </option>
+
+                <option value="hakuna role">
+                    Hakuna Role
+                </option>
+
+            </select>
+
+
+            <!-- STATUS -->
+
+            <select
+                id="statusFilter"
+                class="filter-select"
+            >
+
+                <option value="">
+                    Hali zote
+                </option>
+
+                <option value="active">
+                    Inatumika
+                </option>
+
+                <option value="inactive">
+                    Imesimamishwa
+                </option>
+
+            </select>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================
+         USERS LIST
+    ========================================================= -->
+
+    <div class="users-card">
+
+
+        <!-- USERS HEADER -->
+
+        <div class="users-card-header">
+
+            <div class="users-card-title">
+
+                <i class="fas fa-user-shield"></i>
+
+                Orodha ya Watumiaji
+
+            </div>
+
+            <div class="security-indicator">
+
+                <i class="fas fa-shield-alt"></i>
+
+                Protected
+
+            </div>
+
+        </div>
+
+
+        {% if user_data %}
+
+
+        <!-- ====================================================
+             TABLE
+        ===================================================== -->
+
+        <div class="users-table-wrapper">
+
+            <table class="users-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            ID
+                        </th>
+
+                        <th>
+                            Mtumiaji
+                        </th>
+
+                        <th>
+                            Role
+                        </th>
+
+                        <th>
+                            Hali
+                        </th>
+
+                        <th>
+                            Permissions
+                        </th>
+
+                        <th>
+                            Vitendo
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="usersTableBody">
+
+
+                {% for data in user_data %}
+
+                    <tr
+                        class="user-row"
+                        data-username="{{ data.user.username|lower }}"
+                        data-email="{{ data.user.email|default:'email haijawekwa'|lower }}"
+                        data-id="{{ data.user.id }}"
+                        data-status="{% if data.user.is_active %}active{% else %}inactive{% endif %}"
+                        data-role="{% if data.is_superuser %}super admin{% elif data.groups %}{{ data.groups.0|lower }}{% else %}hakuna role{% endif %}"
+                    >
+
+
+                        <!-- ==================================================
+                             ID
+                        =================================================== -->
+
+                        <td>
+
+                            <span class="user-id">
+                                #{{ data.user.id }}
+                            </span>
+
+                        </td>
+
+
+                        <!-- ==================================================
+                             USER
+                        =================================================== -->
+
+                        <td>
+
+                            <div class="user-profile">
+
+
+                                <div
+                                    class="
+                                        user-avatar
+                                        {% if data.is_superuser %}
+                                            super
+                                        {% endif %}
+                                    "
+                                >
+
+                                    {{ data.user.username|first|upper }}
+
+                                </div>
+
+
+                                <div>
+
+                                    <div class="user-name">
+
+                                        {{ data.user.username }}
+
+                                        {% if data.is_superuser %}
+
+                                            <span class="super-label">
+                                                SUPER
+                                            </span>
+
+                                        {% endif %}
+
+                                    </div>
+
+
+                                    <div class="user-email">
+
+                                        {{ data.user.email|default:"Email haijawekwa" }}
+
+                                    </div>
+
+
+                                    {% if data.is_superuser %}
+
+                                        <div class="protected-badge">
+
+                                            <i class="fas fa-lock"></i>
+
+                                            Account Protected
+
+                                        </div>
+
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+                        </td>
+
+
+                        <!-- ==================================================
+                             ROLE
+                        =================================================== -->
+
+                        <td>
+
+                            {% if data.is_superuser %}
+
+                                <span class="badge badge-super">
+
+                                    <i class="fas fa-crown"></i>
+                                    Super Admin
+
+                                </span>
+
+                            {% else %}
+
+                                {% for group in data.groups %}
+
+                                    {% if group == "Admin" %}
+
+                                        <span class="badge badge-admin">
+
+                                            <i class="fas fa-user-cog"></i>
+                                            Admin
+
+                                        </span>
+
+                                    {% elif group == "Manager" %}
+
+                                        <span class="badge badge-manager">
+
+                                            <i class="fas fa-user-tie"></i>
+                                            Manager
+
+                                        </span>
+
+                                    {% elif group == "Viewer" %}
+
+                                        <span class="badge badge-viewer">
+
+                                            <i class="fas fa-eye"></i>
+                                            Viewer
+
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="badge badge-none">
+
+                                            {{ group }}
+
+                                        </span>
+
+                                    {% endif %}
+
+                                {% empty %}
+
+                                    <span class="badge badge-none">
+
+                                        <i class="fas fa-minus-circle"></i>
+                                        Hakuna Role
+
+                                    </span>
+
+                                {% endfor %}
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- ==================================================
+                             STATUS
+                        =================================================== -->
+
+                        <td>
+
+                            {% if data.user.is_active %}
+
+                                <span class="badge status-active">
+
+                                    <i class="fas fa-circle"></i>
+                                    Inatumika
+
+                                </span>
+
+                            {% else %}
+
+                                <span class="badge status-inactive">
+
+                                    <i class="fas fa-circle"></i>
+                                    Imesimamishwa
+
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- ==================================================
+                             PERMISSIONS
+                        =================================================== -->
+
+                        <td>
+
+                            <div class="permission-summary">
+
+
+                                {% if data.is_superuser %}
+
+                                    <div class="permission-locked">
+
+                                        <i class="fas fa-lock"></i>
+                                        Full Access
+
+                                    </div>
+
+                                    <div class="permission-label">
+                                        Permissions zimefungwa
+                                    </div>
+
+
+                                {% elif data.user.user_permissions.count %}
+
+                                    <div class="permission-user">
+
+                                        <i class="fas fa-key"></i>
+                                        Direct Permissions
+
+                                    </div>
+
+                                    <div class="permission-label">
+                                        Simamia kupitia Maelezo
+                                    </div>
+
+
+                                {% elif data.groups %}
+
+                                    <div class="permission-number">
+
+                                        Role:
+                                        {{ data.groups.0 }}
+
+                                    </div>
+
+                                    <div class="permission-label">
+                                        Permissions zinasimamiwa na Super Admin
+                                    </div>
+
+
+                                {% else %}
+
+                                    <div class="permission-number">
+                                        0
+                                    </div>
+
+                                    <div class="permission-label">
+                                        Hakuna permissions
+                                    </div>
+
+                                {% endif %}
+
+
+                            </div>
+
+                        </td>
+
+
+                        <!-- ==================================================
+                             ACTIONS
+                        =================================================== -->
+
+                        <td>
+
+                            <div class="actions">
+
+
+                                <!-- VIEW -->
+
+                                <a
+                                    href="{% url 'users:user_detail' data.user.id %}"
+                                    class="action-btn action-view"
+                                    title="Angalia maelezo"
+                                >
+
+                                    <i class="fas fa-eye"></i>
+                                    Maelezo
+
+                                </a>
+
+
+                                <!-- NON-SUPER ADMIN -->
+
+                                {% if not data.is_superuser and data.user != request.user %}
+
+
+                                    <!-- TOGGLE -->
+
+                                    {% if data.user.is_active %}
+
+                                        <a
+                                            href="{% url 'users:user_toggle_active' data.user.id %}"
+                                            class="action-btn action-toggle"
+                                            data-action-type="deactivate"
+                                            data-username="{{ data.user.username }}"
+                                        >
+
+                                            <i class="fas fa-pause"></i>
+                                            Simamisha
+
+                                        </a>
+
+                                    {% else %}
+
+                                        <a
+                                            href="{% url 'users:user_toggle_active' data.user.id %}"
+                                            class="action-btn action-enable"
+                                            data-action-type="activate"
+                                            data-username="{{ data.user.username }}"
+                                        >
+
+                                            <i class="fas fa-play"></i>
+                                            Washa
+
+                                        </a>
+
+                                    {% endif %}
+
+
+                                    <!-- DELETE -->
+
+                                    <button
+                                        type="button"
+                                        class="action-btn action-delete"
+                                        data-delete-url="{% url 'users:user_delete' data.user.id %}"
+                                        data-username="{{ data.user.username }}"
+                                        title="Futa mtumiaji"
+                                    >
+
+                                        <i class="fas fa-trash"></i>
+                                        Futa
+
+                                    </button>
+
+
+                                {% elif data.is_superuser %}
+
+
+                                    <!-- SUPER ADMIN LOCK -->
+
+                                    <span
+                                        class="action-locked"
+                                        title="Super Admin Protected"
+                                    >
+
+                                        <i class="fas fa-lock"></i>
+                                        Protected
+
+                                    </span>
+
+                                {% endif %}
+
+
+                            </div>
+
+                        </td>
+
+
+                    </tr>
+
+                {% endfor %}
+
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <!-- ========================================================
+             NO SEARCH RESULTS
+        ========================================================= -->
+
+        <div
+            id="noSearchResults"
+            class="no-search-results"
+        >
+
+            <div class="no-search-results-icon">
+
+                <i class="fas fa-search"></i>
+
+            </div>
+
+            <h3>
+                Hakuna mtumiaji aliyepatikana
+            </h3>
+
+            <p>
+                Jaribu username, email, ID au filter nyingine.
+            </p>
+
+        </div>
+
+
+        {% else %}
+
+
+        <!-- ========================================================
+             NO USERS
+        ========================================================= -->
+
+        <div class="empty-state">
+
+            <div class="empty-state-icon">
+
+                <i class="fas fa-users"></i>
+
+            </div>
+
+            <h3>
+                Hakuna Watumiaji
+            </h3>
+
+            <p>
+                Hakuna watumiaji waliorekodiwa bado.
+            </p>
+
+        </div>
+
+        {% endif %}
+
+
+    </div>
+
+</div>
+
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+
+        /* ========================================================
+           ELEMENTS
+        ======================================================== */
+
+        const searchInput =
+            document.getElementById(
+                "userSearch"
+            );
+
+        const clearSearch =
+            document.getElementById(
+                "clearSearch"
+            );
+
+        const roleFilter =
+            document.getElementById(
+                "roleFilter"
+            );
+
+        const statusFilter =
+            document.getElementById(
+                "statusFilter"
+            );
+
+        const visibleCount =
+            document.getElementById(
+                "visibleCount"
+            );
+
+        const rows =
+            document.querySelectorAll(
+                ".user-row"
+            );
+
+        const noResults =
+            document.getElementById(
+                "noSearchResults"
+            );
+
+
+        /* ========================================================
+           NORMALIZE
+        ======================================================== */
+
+        function normalize(value) {
+
+            return (
+                value || ""
+            )
+            .replace(
+                /\s+/g,
+                " "
+            )
+            .trim()
+            .toLowerCase();
+
+        }
+
+
+        /* ========================================================
+           UPDATE CLEAR BUTTON
+        ======================================================== */
+
+        function updateClearButton() {
+
+            if (!clearSearch || !searchInput) {
+                return;
+            }
+
+            clearSearch.style.display =
+                searchInput.value.trim()
+                    ? "flex"
+                    : "none";
+
+        }
+
+
+        /* ========================================================
+           FILTER USERS
+        ======================================================== */
+
+        function filterUsers() {
+
+            const search =
+                normalize(
+                    searchInput
+                        ? searchInput.value
+                        : ""
+                );
+
+            const role =
+                normalize(
+                    roleFilter
+                        ? roleFilter.value
+                        : ""
+                );
+
+            const status =
+                normalize(
+                    statusFilter
+                        ? statusFilter.value
+                        : ""
+                );
+
+
+            let visible = 0;
+
+
+            rows.forEach(
+                function (row) {
+
+                    const username =
+                        normalize(
+                            row.dataset.username
+                        );
+
+                    const email =
+                        normalize(
+                            row.dataset.email
+                        );
+
+                    const id =
+                        normalize(
+                            row.dataset.id
+                        );
+
+                    const rowRole =
+                        normalize(
+                            row.dataset.role
+                        );
+
+                    const rowStatus =
+                        normalize(
+                            row.dataset.status
+                        );
+
+
+                    const matchesSearch =
+                        !search
+                        ||
+                        username.includes(search)
+                        ||
+                        email.includes(search)
+                        ||
+                        id.includes(search)
+                        ||
+                        rowRole.includes(search)
+                        ||
+                        rowStatus.includes(search);
+
+
+                    const matchesRole =
+                        !role
+                        ||
+                        rowRole === role;
+
+
+                    const matchesStatus =
+                        !status
+                        ||
+                        rowStatus === status;
+
+
+                    const shouldShow =
+                        matchesSearch
+                        &&
+                        matchesRole
+                        &&
+                        matchesStatus;
+
+
+                    if (shouldShow) {
+
+                        row.style.display = "";
+
+                        visible++;
+
+                    } else {
+
+                        row.style.display = "none";
+
+                    }
+
+                }
+            );
+
+
+            /* ====================================================
+               VISIBLE COUNT
+            ==================================================== */
+
+            if (visibleCount) {
+
+                visibleCount.textContent =
+                    visible
+                    + " kati ya "
+                    + rows.length
+                    + " watumiaji";
+
+            }
+
+
+            /* ====================================================
+               NO RESULTS
+            ==================================================== */
+
+            if (noResults) {
+
+                noResults.style.display =
+                    visible === 0
+                        ? "block"
+                        : "none";
+
+            }
+
+
+            updateClearButton();
+
+        }
+
+
+        /* ========================================================
+           SEARCH
+        ======================================================== */
+
+        if (searchInput) {
+
+            searchInput.addEventListener(
+                "input",
+                filterUsers
+            );
+
+        }
+
+
+        /* ========================================================
+           CLEAR SEARCH
+        ======================================================== */
+
+        if (clearSearch) {
+
+            clearSearch.addEventListener(
+                "click",
+                function () {
+
+                    searchInput.value = "";
+
+                    filterUsers();
+
+                    searchInput.focus();
+
+                }
+            );
+
+        }
+
+
+        /* ========================================================
+           ROLE FILTER
+        ======================================================== */
+
+        if (roleFilter) {
+
+            roleFilter.addEventListener(
+                "change",
+                filterUsers
+            );
+
+        }
+
+
+        /* ========================================================
+           STATUS FILTER
+        ======================================================== */
+
+        if (statusFilter) {
+
+            statusFilter.addEventListener(
+                "change",
+                filterUsers
+            );
+
+        }
+
+
+        /* ========================================================
+           COUNT ACTIVE / INACTIVE
+        ======================================================== */
+
+        let active = 0;
+        let inactive = 0;
+
+
+        rows.forEach(
+            function (row) {
+
+                const status =
+                    normalize(
+                        row.dataset.status
+                    );
+
+
+                if (
+                    status === "active"
+                ) {
+
+                    active++;
+
+                }
+
+
+                if (
+                    status === "inactive"
+                ) {
+
+                    inactive++;
+
+                }
+
+            }
+        );
+
+
+        const activeElement =
+            document.getElementById(
+                "activeCount"
+            );
+
+        const inactiveElement =
+            document.getElementById(
+                "inactiveCount"
+            );
+
+
+        if (activeElement) {
+
+            activeElement.textContent =
+                active;
+
+        }
+
+
+        if (inactiveElement) {
+
+            inactiveElement.textContent =
+                inactive;
+
+        }
+
+
+        /* ========================================================
+           TOGGLE ACTION
+        ======================================================== */
+
+        const toggleButtons =
+            document.querySelectorAll(
+                "[data-action-type]"
+            );
+
+
+        toggleButtons.forEach(
+            function (button) {
+
+                button.addEventListener(
+                    "click",
+                    function (event) {
+
+                        const action =
+                            button.dataset.actionType;
+
+                        const username =
+                            button.dataset.username
+                            || "mtumiaji";
+
+
+                        let message = "";
+
+
+                        if (
+                            action ===
+                            "deactivate"
+                        ) {
+
+                            message =
+                                "Je, una uhakika "
+                                + "unataka kumsimamisha "
+                                + username
+                                + "?";
+
+                        } else {
+
+                            message =
+                                "Je, una uhakika "
+                                + "unataka kumrudisha "
+                                + username
+                                + " kwenye mfumo?";
+
+                        }
+
+
+                        if (
+                            typeof window.confirmUserAction ===
+                            "function"
+                        ) {
+
+                            event.preventDefault();
+
+
+                            window.confirmUserAction(
+                                message,
+                                function () {
+
+                                    window.location.href =
+                                        button.href;
+
+                                }
+                            );
+
+                        }
+
+                    }
+                );
+
+            }
+        );
+
+
+        /* ========================================================
+           DELETE ACTION
+        ======================================================== */
+
+        const deleteButtons =
+            document.querySelectorAll(
+                "[data-delete-url]"
+            );
+
+
+        deleteButtons.forEach(
+            function (button) {
+
+                button.addEventListener(
+                    "click",
+                    function () {
+
+                        const deleteUrl =
+                            button.dataset.deleteUrl;
+
+                        const username =
+                            button.dataset.username
+                            || "mtumiaji";
+
+
+                        const message =
+                            "Je, una uhakika "
+                            + "unataka kufuta mtumiaji "
+                            + username
+                            + "? Kitendo hiki "
+                            + "hakiwezi kurudishwa!";
+
+
+                        if (
+                            typeof window.openDeleteModal ===
+                            "function"
+                        ) {
+
+                            window.openDeleteModal(
+                                deleteUrl,
+                                message
+                            );
+
+                            return;
+
+                        }
+
+
+                        /* ========================================
+                           FALLBACK DELETE
+                        ======================================== */
+
+                        if (
+                            window.confirm(
+                                message
+                            )
+                        ) {
+
+                            const form =
+                                document.createElement(
+                                    "form"
+                                );
+
+                            form.method = "POST";
+
+                            form.action = deleteUrl;
+
+
+                            const csrf =
+                                document.querySelector(
+                                    "[name=csrfmiddlewaretoken]"
+                                );
+
+
+                            if (csrf) {
+
+                                const token =
+                                    document.createElement(
+                                        "input"
+                                    );
+
+                                token.type = "hidden";
+
+                                token.name =
+                                    "csrfmiddlewaretoken";
+
+                                token.value =
+                                    csrf.value;
+
+                                form.appendChild(
+                                    token
+                                );
+
+                            }
+
+
+                            document.body.appendChild(
+                                form
+                            );
+
+                            form.submit();
+
+                        }
+
+                    }
+                );
+
+            }
+        );
+
+
+        /* ========================================================
+           INITIAL STATE
+        ======================================================== */
+
+        filterUsers();
+
+    }
+);
+
+</script>
+
+{% endblock %}

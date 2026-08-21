@@ -1,0 +1,977 @@
+{% extends "pigs/base.html" %}
+{% load humanize %}
+
+{% block title %}
+Mauzo ya Siku
+{% endblock %}
+
+{% block extra_css %}
+
+<style>
+
+/* =========================================================
+   SALES PAGE
+========================================================= */
+
+.sales-page {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.sales-page-header {
+    background: #ffffff;
+    padding: 28px 25px;
+    border-radius: 16px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(15, 23, 42, 0.07);
+    text-align: center;
+}
+
+.sales-page-header h2 {
+    margin: 0;
+    color: #172554;
+    font-size: 27px;
+}
+
+.sales-date {
+    margin: 8px 0 0;
+    color: #64748b;
+}
+
+.sales-date strong {
+    color: #172554;
+}
+
+/* =========================================================
+   TOTAL SALES
+========================================================= */
+
+.total-sales-card {
+    background: linear-gradient(135deg, #172554, #2563eb);
+    color: white;
+    padding: 28px;
+    border-radius: 16px;
+    margin-bottom: 20px;
+    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.20);
+    text-align: center;
+}
+
+.total-sales-card span {
+    display: block;
+    color: #dbeafe;
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.total-sales-card strong {
+    display: block;
+    font-size: 30px;
+}
+
+/* =========================================================
+   SALES SECTION
+========================================================= */
+
+.sales-section {
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 16px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(15, 23, 42, 0.07);
+    text-align: center;
+}
+
+.sales-section h3 {
+    margin-top: 0;
+    color: #172554;
+}
+
+.sales-section p {
+    color: #64748b;
+    margin-bottom: 18px;
+}
+
+/* =========================================================
+   SALE RECORDS
+========================================================= */
+
+.sale-records-box {
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 16px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(15, 23, 42, 0.07);
+    text-align: center;
+}
+
+.sale-records-box h3 {
+    margin: 0 0 8px;
+    color: #172554;
+}
+
+.sale-records-description {
+    color: #64748b;
+    margin-bottom: 20px;
+}
+
+.sale-record {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 18px;
+    margin-bottom: 12px;
+    text-align: left;
+}
+
+.sale-record:last-child {
+    margin-bottom: 0;
+}
+
+.sale-record-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 14px;
+}
+
+.sale-record-title {
+    color: #172554;
+    font-weight: 700;
+    font-size: 15px;
+}
+
+.sale-record-action {
+    flex-shrink: 0;
+}
+
+.sale-record-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+.sale-record-item {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 10px 12px;
+}
+
+.sale-record-item .record-label {
+    display: block;
+    color: #64748b;
+    font-size: 12px;
+    margin-bottom: 4px;
+}
+
+.sale-record-item .record-value {
+    display: block;
+    color: #172554;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.edit-record-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 13px;
+    border-radius: 7px;
+    background: #2563eb;
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    transition: 0.2s ease;
+}
+
+.edit-record-button:hover {
+    background: #1d4ed8;
+}
+
+.no-sale-records {
+    background: #f8fafc;
+    border: 1px dashed #cbd5e1;
+    border-radius: 10px;
+    padding: 20px;
+    color: #64748b;
+}
+
+@media (max-width: 750px) {
+
+    .sale-record-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .sale-record-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .sale-record-action {
+        width: 100%;
+    }
+
+    .edit-record-button {
+        width: 100%;
+        justify-content: center;
+        box-sizing: border-box;
+    }
+
+}
+
+@media (max-width: 500px) {
+
+    .sale-record-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+/* =========================================================
+   SUMMARY
+========================================================= */
+
+.sales-summary {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.sales-summary-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+}
+
+.sales-summary-card span {
+    display: block;
+    color: #64748b;
+    font-size: 13px;
+    margin-bottom: 7px;
+}
+
+.sales-summary-card strong {
+    display: block;
+    color: #172554;
+    font-size: 20px;
+}
+
+/* Meat income */
+.sales-summary-card.meat-card strong {
+    color: #2563eb;
+}
+
+/* Price per kg */
+.sales-summary-card.price-card strong {
+    color: #0f766e;
+}
+
+/* Meat weight */
+.sales-summary-card.kg-card strong {
+    color: #7c3aed;
+}
+
+/* Food income */
+.sales-summary-card.food-card strong {
+    color: #16a34a;
+}
+
+/* Total */
+.sales-summary-card.total-card strong {
+    color: #172554;
+}
+
+/* =========================================================
+   MEAT STATUS
+========================================================= */
+
+.meat-status-box {
+    background: #ffffff;
+    padding: 28px;
+    border-radius: 16px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(15, 23, 42, 0.07);
+    text-align: center;
+}
+
+.meat-status-box h3 {
+    margin: 0 0 8px;
+    color: #172554;
+}
+
+.meat-status-box p {
+    color: #64748b;
+    margin: 0 0 20px;
+}
+
+/* =========================================================
+   STATUS BADGE
+========================================================= */
+
+.meat-status-badge {
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.meat-status-badge.available {
+    background: #dcfce7;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+}
+
+.meat-status-badge.finished {
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+
+.meat-status-badge.unknown {
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+}
+
+/* =========================================================
+   MEAT INFORMATION
+========================================================= */
+
+.meat-info-box {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 18px;
+    margin-top: 18px;
+}
+
+.meat-info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    padding: 9px 0;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.meat-info-row:last-child {
+    border-bottom: none;
+}
+
+.meat-info-row .label {
+    color: #64748b;
+    font-size: 13px;
+}
+
+.meat-info-row .value {
+    color: #172554;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+/* =========================================================
+   BUTTON FORM
+========================================================= */
+
+.status-form {
+    display: inline;
+}
+
+/* =========================================================
+   BOTTOM ACTIONS
+========================================================= */
+
+.sales-bottom-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin: 25px 0 35px;
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 950px) {
+
+    .sales-summary {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 750px) {
+
+    .sales-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .sales-bottom-actions {
+        flex-direction: column;
+    }
+
+    .sales-bottom-actions .button {
+        width: 100%;
+    }
+
+    .meat-info-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+}
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container">
+
+<div class="sales-page">
+
+
+<!-- =========================================================
+     HEADER
+========================================================= -->
+
+<div class="sales-page-header">
+
+    <h2>💰 Mauzo ya Siku</h2>
+
+    <p class="sales-date">
+        Tarehe:
+        <strong>
+            {{ daily_sale.sale_date|date:"d/m/Y" }}
+        </strong>
+    </p>
+
+</div>
+
+
+<!-- =========================================================
+     TOTAL SALES
+========================================================= -->
+
+<div class="total-sales-card">
+
+    <span>
+        Jumla ya Mauzo ya Siku
+    </span>
+
+    <strong>
+        TSh {{ total_day|floatformat:0|intcomma }}
+    </strong>
+
+</div>
+
+
+<!-- =========================================================
+     SALES SUMMARY
+========================================================= -->
+
+<div class="sales-summary">
+
+
+    <!-- =====================================================
+         MEAT SALES
+    ====================================================== -->
+
+    <div class="sales-summary-card meat-card">
+
+        <span>
+            🥩 Mauzo ya Nyama
+        </span>
+
+        <strong>
+            TSh {{ total_meat|floatformat:0|intcomma }}
+        </strong>
+
+    </div>
+
+
+    <!-- =====================================================
+         MEAT PRICE PER KG
+    ====================================================== -->
+
+    <div class="sales-summary-card price-card">
+
+        <span>
+            💰 Bei kwa Kilo
+        </span>
+
+        <strong>
+            {% if daily_sale.meat_price_per_kg %}
+                TSh {{ daily_sale.meat_price_per_kg|floatformat:0|intcomma }}
+            {% else %}
+                —
+            {% endif %}
+        </strong>
+
+    </div>
+
+
+    <!-- =====================================================
+         TOTAL MEAT WEIGHT
+    ====================================================== -->
+
+    <div class="sales-summary-card kg-card">
+
+        <span>
+            ⚖️ Kilo za Nyama
+        </span>
+
+        <strong>
+            {{ daily_sale.total_meat_weight_kg|floatformat:2 }}
+            kg
+        </strong>
+
+    </div>
+
+
+    <!-- =====================================================
+         FOOD SALES
+    ====================================================== -->
+
+    <div class="sales-summary-card food-card">
+
+        <span>
+            🍽️ Mauzo ya Chakula
+        </span>
+
+        <strong>
+            TSh {{ total_food|floatformat:0|intcomma }}
+        </strong>
+
+    </div>
+
+
+    <!-- =====================================================
+         TOTAL DAY
+    ====================================================== -->
+
+    <div class="sales-summary-card total-card">
+
+        <span>
+            📊 Jumla ya Siku
+        </span>
+
+        <strong>
+            TSh {{ total_day|floatformat:0|intcomma }}
+        </strong>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     MEAT STATUS
+========================================================= -->
+
+<div class="meat-status-box">
+
+    <h3>
+        🥩 Hali ya Nyama
+    </h3>
+
+    <p>
+        Hali ya nyama ya batch iliyotumika kwenye mauzo haya.
+    </p>
+
+
+    {% if daily_sale.slaughter_batch %}
+
+        {% if daily_sale.slaughter_batch.stock.is_finished %}
+
+            <div class="meat-status-badge finished">
+                ✅ Nyama Imeisha
+            </div>
+
+        {% else %}
+
+            <div class="meat-status-badge available">
+                🔄 Nyama Bado Ipo
+            </div>
+
+        {% endif %}
+
+
+        <!-- =================================================
+             MEAT INFORMATION
+        ================================================== -->
+
+        <div class="meat-info-box">
+
+            <div class="meat-info-row">
+
+                <span class="label">
+                    📦 Batch
+                </span>
+
+                <span class="value">
+                    {{ daily_sale.slaughter_batch.batch_number }}
+                </span>
+
+            </div>
+
+
+            <div class="meat-info-row">
+
+                <span class="label">
+                    💰 Bei kwa Kilo
+                </span>
+
+                <span class="value">
+
+                    {% if daily_sale.meat_price_per_kg %}
+
+                        TSh
+                        {{ daily_sale.meat_price_per_kg|floatformat:0|intcomma }}
+
+                    {% else %}
+
+                        —
+
+                    {% endif %}
+
+                </span>
+
+            </div>
+
+
+            <div class="meat-info-row">
+
+                <span class="label">
+                    ⚖️ Kilo Zilizouzwa
+                </span>
+
+                <span class="value">
+
+                    {{ daily_sale.total_meat_weight_kg|floatformat:2 }}
+                    kg
+
+                </span>
+
+            </div>
+
+        </div>
+
+    {% else %}
+
+        <div class="meat-status-badge unknown">
+            ℹ️ Hakuna Batch ya Nyama
+        </div>
+
+    {% endif %}
+
+</div>
+
+<!-- =========================================================
+     MEAT SALE RECORDS
+========================================================= -->
+
+<div class="sale-records-box">
+
+    <h3>
+        🥩 Rekodi za Mauzo ya Nyama
+    </h3>
+
+    <p class="sale-records-description">
+        Orodha ya mauzo yote ya nyama yaliyorekodiwa katika siku hii.
+    </p>
+
+    {% if pig_records %}
+
+        {% for record in pig_records %}
+
+            <div class="sale-record">
+
+                <div class="sale-record-header">
+
+                    <div class="sale-record-title">
+                        🥩 Mauzo ya Nyama #{{ forloop.counter }}
+                    </div>
+
+                    {% if perms.pigs.change_pigsalerecord %}
+
+                        <div class="sale-record-action">
+
+                            <a
+                                href="{% url 'pigs:meat_sale_edit' record.id %}"
+                                class="edit-record-button"
+                            >
+                                <i class="fas fa-edit"></i>
+                                Hariri
+                            </a>
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+                <div class="sale-record-grid">
+
+                    <div class="sale-record-item">
+
+                        <span class="record-label">
+                            📦 Batch
+                        </span>
+
+                        <span class="record-value">
+                            {{ record.slaughter_batch.batch_number }}
+                        </span>
+
+                    </div>
+
+                    <div class="sale-record-item">
+
+                        <span class="record-label">
+                            ⚖️ Kilo
+                        </span>
+
+                        <span class="record-value">
+                            {{ record.meat_weight_sold|floatformat:2 }} kg
+                        </span>
+
+                    </div>
+
+                    <div class="sale-record-item">
+
+                        <span class="record-label">
+                            💰 Bei kwa Kilo
+                        </span>
+
+                        <span class="record-value">
+                            TSh {{ record.price_per_kg|floatformat:0|intcomma }}
+                        </span>
+
+                    </div>
+
+                    <div class="sale-record-item">
+
+                        <span class="record-label">
+                            💵 Jumla
+                        </span>
+
+                        <span class="record-value">
+                            TSh {{ record.total_amount|floatformat:0|intcomma }}
+                        </span>
+
+                    </div>
+
+                </div>
+
+                {% if record.notes %}
+
+                    <div class="sale-record-item" style="margin-top: 12px;">
+
+                        <span class="record-label">
+                            📝 Maelezo
+                        </span>
+
+                        <span class="record-value">
+                            {{ record.notes }}
+                        </span>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <div class="no-sale-records">
+            Hakuna mauzo ya nyama yaliyorekodiwa katika siku hii.
+        </div>
+
+    {% endif %}
+
+</div>
+
+
+<!-- =========================================================
+     FOOD SALE RECORDS
+========================================================= -->
+
+<div class="sale-records-box">
+
+    <h3>
+        🍽️ Rekodi za Mauzo ya Chakula
+    </h3>
+
+    <p class="sale-records-description">
+        Orodha ya mauzo yote ya chakula yaliyorekodiwa katika siku hii.
+    </p>
+
+    {% if food_records %}
+
+        {% for record in food_records %}
+
+            <div class="sale-record">
+
+                <div class="sale-record-header">
+
+                    <div class="sale-record-title">
+                        🍽️ {{ record.food_item.name }}
+                    </div>
+
+                    {% if perms.pigs.change_foodsalerecord %}
+
+                        <div class="sale-record-action">
+
+                            <a
+                                href="{% url 'pigs:food_sale_edit' record.id %}"
+                                class="edit-record-button"
+                            >
+                                <i class="fas fa-edit"></i>
+                                Hariri
+                            </a>
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+                <div class="sale-record-grid">
+
+                    <div class="sale-record-item">
+
+                        <span class="record-label">
+                            🍽️ Chakula
+                        </span>
+
+                        <span class="record-value">
+                            {{ record.food_item.name }}
+                        </span>
+
+                    </div>
+
+                    <div class="sale-record-item">
+
+                        <span class="record-label">
+                            🔢 Idadi
+                        </span>
+
+                        <span class="record-value">
+                            {{ record.quantity }}
+                        </span>
+
+                    </div>
+
+                    <div class="sale-record-item">
+
+                        <span class="record-label">
+                            💰 Bei kwa Sahani
+                        </span>
+
+                        <span class="record-value">
+                            TSh {{ record.unit_price|floatformat:0|intcomma }}
+                        </span>
+
+                    </div>
+
+                    <div class="sale-record-item">
+
+                        <span class="record-label">
+                            💵 Jumla
+                        </span>
+
+                        <span class="record-value">
+                            TSh {{ record.total_price|floatformat:0|intcomma }}
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        {% endfor %}
+
+        <div class="sales-summary-card" style="margin-top: 15px;">
+
+            <span>
+                Jumla ya Mauzo ya Chakula
+            </span>
+
+            <strong>
+                TSh {{ total_food|floatformat:0|intcomma }}
+            </strong>
+
+        </div>
+
+    {% else %}
+
+        <div class="no-sale-records">
+            Hakuna mauzo ya chakula yaliyorekodiwa katika siku hii.
+        </div>
+
+    {% endif %}
+
+</div>
+
+<!-- =========================================================
+     BOTTOM ACTIONS
+========================================================= -->
+
+<div class="sales-bottom-actions">
+
+
+    <!-- DAILY REPORT -->
+
+    <a
+        href="{% url 'pigs:daily_report' daily_sale.id %}"
+        class="button"
+    >
+        📊 Angalia Ripoti
+    </a>
+
+
+    <!-- SALES HISTORY -->
+
+    <a
+        href="{% url 'pigs:daily_sale_list' %}"
+        class="button secondary"
+    >
+        📋 Historia ya Mauzo
+    </a>
+
+
+    <!-- DASHBOARD -->
+
+    <a
+        href="{% url 'pigs:dashboard' %}"
+        class="button secondary"
+    >
+        🏠 Dashboard
+    </a>
+
+</div>
+
+
+</div>
+
+</div>
+
+{% endblock %}

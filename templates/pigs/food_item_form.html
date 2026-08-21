@@ -1,0 +1,182 @@
+{% extends "pigs/base.html" %}
+{% load humanize %}
+
+{% block title %}
+Sajili Chakula
+{% endblock %}
+
+{% block extra_css %}
+
+<style>
+
+    .page-header {
+        text-align: center;
+        margin-bottom: 25px;
+    }
+
+    .page-header h2 {
+        margin: 0 0 8px;
+        color: #172554;
+        font-size: 27px;
+    }
+
+    .page-header p {
+        margin: 0;
+        color: #64748b;
+        font-size: 14px;
+    }
+
+    .form-card {
+        max-width: 600px;
+        margin: 0 auto;
+        background: white;
+        padding: 30px;
+        border-radius: 14px;
+        box-shadow: 0 4px 15px rgba(15, 23, 42, 0.07);
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 7px;
+        font-weight: 600;
+        color: #334155;
+        font-size: 14px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 11px 12px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        font-size: 14px;
+        background: white;
+        outline: none;
+        transition: 0.2s ease;
+        box-sizing: border-box;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.10);
+    }
+
+    .form-group .helptext {
+        display: block;
+        margin-top: 5px;
+        color: #64748b;
+        font-size: 12px;
+    }
+
+    .form-group .errorlist {
+        color: #dc2626;
+        margin: 5px 0 0;
+        padding-left: 18px;
+        font-size: 13px;
+    }
+
+    .checkbox-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .checkbox-group input {
+        width: auto;
+        padding: 0;
+        margin: 0;
+    }
+
+    .checkbox-group label {
+        margin: 0;
+        cursor: pointer;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 25px;
+        padding-top: 20px;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .form-actions .button {
+        flex: 1;
+        text-align: center;
+    }
+
+    @media (max-width: 600px) {
+        .form-card {
+            padding: 20px;
+        }
+        .form-actions {
+            flex-direction: column;
+        }
+        .form-actions .button {
+            width: 100%;
+        }
+    }
+
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+
+    <div class="page-header">
+        <h2>🍽️ Sajili Chakula</h2>
+        <p>Ongeza aina mpya ya chakula kinachouzwa kwenye biashara</p>
+    </div>
+
+    <div class="form-card">
+
+        <form method="post">
+            {% csrf_token %}
+
+            {{ form.non_field_errors }}
+
+            {% for field in form %}
+                <div class="form-group">
+                    {{ field.label_tag }}
+                    
+                    {% if field.field.widget.input_type == 'checkbox' %}
+                        <div class="checkbox-group">
+                            {{ field }}
+                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        </div>
+                    {% else %}
+                        {{ field }}
+                    {% endif %}
+
+                    {{ field.errors }}
+                    {% if field.help_text %}
+                        <span class="helptext">{{ field.help_text }}</span>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <div class="form-actions">
+                <a href="{% url 'pigs:dashboard' %}" class="button secondary">
+                    <i class="fas fa-arrow-left"></i> Rudi
+                </a>
+                <button type="submit" class="button">
+                    <i class="fas fa-save"></i> Hifadhi Chakula
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

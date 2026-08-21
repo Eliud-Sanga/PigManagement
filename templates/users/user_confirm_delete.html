@@ -1,0 +1,958 @@
+{% extends "pigs/base.html" %}
+
+
+{% block title %}
+
+Futa Mtumiaji - {{ user.username }}
+
+{% endblock %}
+
+
+{% block extra_css %}
+
+<style>
+
+/* ============================================================
+   DELETE USER PAGE
+============================================================ */
+
+.delete-page {
+
+    max-width: 560px;
+
+    margin: 35px auto;
+
+    padding-bottom: 40px;
+}
+
+
+/* ============================================================
+   DELETE CARD
+============================================================ */
+
+.delete-card {
+
+    background: white;
+
+    border-radius: 16px;
+
+    padding: 30px;
+
+    box-shadow:
+        0 5px 20px
+        rgba(15, 23, 42, 0.08);
+
+    border:
+        1px solid #f1f5f9;
+
+    text-align: center;
+}
+
+
+/* ============================================================
+   WARNING ICON
+============================================================ */
+
+.delete-icon {
+
+    width: 65px;
+
+    height: 65px;
+
+    margin: 0 auto 16px;
+
+    border-radius: 50%;
+
+    background: #fee2e2;
+
+    color: #dc2626;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 28px;
+
+    box-shadow:
+        0 6px 18px
+        rgba(220, 38, 38, 0.12);
+}
+
+
+/* ============================================================
+   TITLE
+============================================================ */
+
+.delete-card h2 {
+
+    margin: 0 0 8px;
+
+    color: #172554;
+
+    font-size: 24px;
+
+    font-weight: 800;
+}
+
+
+.delete-card .subtitle {
+
+    margin: 0 0 22px;
+
+    color: #64748b;
+
+    font-size: 13px;
+
+    line-height: 1.5;
+}
+
+
+/* ============================================================
+   USER INFORMATION
+============================================================ */
+
+.user-info {
+
+    background: #f8fafc;
+
+    border:
+        1px solid #e2e8f0;
+
+    border-radius: 11px;
+
+    padding: 16px;
+
+    margin-bottom: 20px;
+
+    text-align: left;
+}
+
+
+.user-info-row {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: flex-start;
+
+    gap: 15px;
+
+    padding: 8px 0;
+
+    border-bottom:
+        1px solid #e2e8f0;
+}
+
+
+.user-info-row:last-child {
+
+    border-bottom: none;
+
+}
+
+
+.user-info-label {
+
+    color: #94a3b8;
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    text-transform: uppercase;
+}
+
+
+.user-info-value {
+
+    color: #334155;
+
+    font-size: 13px;
+
+    font-weight: 650;
+
+    text-align: right;
+
+    word-break: break-word;
+}
+
+
+/* ============================================================
+   ROLE BADGES
+============================================================ */
+
+.role-badge {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 5px;
+
+    padding: 5px 9px;
+
+    border-radius: 20px;
+
+    font-size: 11px;
+
+    font-weight: 750;
+}
+
+
+.role-admin {
+
+    background: #dbeafe;
+
+    color: #1d4ed8;
+}
+
+
+.role-manager {
+
+    background: #dcfce7;
+
+    color: #166534;
+}
+
+
+.role-viewer {
+
+    background: #fef3c7;
+
+    color: #92400e;
+}
+
+
+.role-other {
+
+    background: #f1f5f9;
+
+    color: #475569;
+}
+
+
+/* ============================================================
+   WARNING NOTICE
+============================================================ */
+
+.delete-warning {
+
+    background: #fff7ed;
+
+    border:
+        1px solid #fed7aa;
+
+    border-left:
+        4px solid #f97316;
+
+    border-radius: 10px;
+
+    padding: 12px 14px;
+
+    margin-bottom: 22px;
+
+    color: #9a3412;
+
+    font-size: 12px;
+
+    line-height: 1.5;
+
+    text-align: left;
+}
+
+
+.delete-warning strong {
+
+    display: block;
+
+    margin-bottom: 3px;
+
+    color: #7c2d12;
+}
+
+
+/* ============================================================
+   SUPER ADMIN PROTECTED
+============================================================ */
+
+.super-admin-protected {
+
+    background: #faf5ff;
+
+    border:
+        1px solid #ddd6fe;
+
+    border-left:
+        4px solid #7c3aed;
+
+    color: #6b21a8;
+
+    border-radius: 10px;
+
+    padding: 14px 15px;
+
+    margin-bottom: 22px;
+
+    font-size: 12px;
+
+    line-height: 1.5;
+
+    text-align: left;
+}
+
+
+.super-admin-protected strong {
+
+    display: block;
+
+    margin-bottom: 3px;
+
+    color: #581c87;
+}
+
+
+/* ============================================================
+   ACTIONS
+============================================================ */
+
+.delete-actions {
+
+    display: flex;
+
+    gap: 10px;
+
+    margin-top: 5px;
+}
+
+
+.delete-actions .button {
+
+    flex: 1;
+
+    min-height: 44px;
+
+    padding: 11px 18px;
+
+    border-radius: 9px;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    border: none;
+
+    cursor: pointer;
+
+    text-decoration: none;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 7px;
+
+    transition: .2s ease;
+}
+
+
+.delete-actions .button:hover {
+
+    transform:
+        translateY(-1px);
+}
+
+
+/* ============================================================
+   CANCEL
+============================================================ */
+
+.btn-secondary {
+
+    background: #e2e8f0;
+
+    color: #0f172a;
+}
+
+
+.btn-secondary:hover {
+
+    background: #cbd5e1;
+}
+
+
+/* ============================================================
+   DELETE BUTTON
+============================================================ */
+
+.btn-danger {
+
+    background: #dc2626;
+
+    color: white;
+}
+
+
+.btn-danger:hover {
+
+    background: #b91c1c;
+}
+
+
+.btn-danger:active {
+
+    transform:
+        translateY(0);
+}
+
+
+/* ============================================================
+   PROTECTED BUTTON
+============================================================ */
+
+.btn-protected {
+
+    background: #f1f5f9;
+
+    color: #64748b;
+
+    border:
+        1px solid #e2e8f0;
+
+    cursor: not-allowed;
+
+}
+
+
+/* ============================================================
+   SMALL SECURITY NOTE
+============================================================ */
+
+.security-note {
+
+    margin-top: 18px;
+
+    color: #94a3b8;
+
+    font-size: 10px;
+
+    line-height: 1.5;
+}
+
+
+/* ============================================================
+   MOBILE
+============================================================ */
+
+@media (max-width: 600px) {
+
+    .delete-page {
+
+        margin: 20px 15px;
+
+    }
+
+
+    .delete-card {
+
+        padding: 22px 18px;
+
+    }
+
+
+    .delete-card h2 {
+
+        font-size: 21px;
+
+    }
+
+
+    .user-info-row {
+
+        flex-direction: column;
+
+        gap: 3px;
+
+    }
+
+
+    .user-info-value {
+
+        text-align: left;
+
+    }
+
+
+    .delete-actions {
+
+        flex-direction: column;
+
+    }
+
+
+    .delete-actions .button {
+
+        width: 100%;
+
+    }
+
+}
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container">
+
+<div class="delete-page">
+
+
+    <!-- ========================================================
+         DELETE CARD
+    ========================================================= -->
+
+    <div class="delete-card">
+
+
+        {% if user.is_superuser %}
+
+
+            <!-- ==================================================
+                 SUPER ADMIN PROTECTED
+            =================================================== -->
+
+            <div class="delete-icon"
+                 style="
+                    background:#f3e8ff;
+                    color:#7c3aed;
+                 "
+            >
+                🔒
+            </div>
+
+
+            <h2>
+                Akaunti Imelindwa
+            </h2>
+
+
+            <p class="subtitle">
+
+                Akaunti ya Super Admin haiwezi kufutwa
+                kupitia mfumo.
+
+            </p>
+
+
+            <!-- ==================================================
+                 USER INFORMATION
+            =================================================== -->
+
+            <div class="user-info">
+
+                <div class="user-info-row">
+
+                    <span class="user-info-label">
+                        Jina
+                    </span>
+
+                    <span class="user-info-value">
+                        {{ user.username }}
+                    </span>
+
+                </div>
+
+
+                <div class="user-info-row">
+
+                    <span class="user-info-label">
+                        Barua Pepe
+                    </span>
+
+                    <span class="user-info-value">
+                        {{ user.email|default:"-" }}
+                    </span>
+
+                </div>
+
+
+                <div class="user-info-row">
+
+                    <span class="user-info-label">
+                        Role
+                    </span>
+
+                    <span class="user-info-value">
+
+                        <span class="role-badge"
+                              style="
+                                  background:#ede9fe;
+                                  color:#6d28d9;
+                              "
+                        >
+                            👑 Super Admin
+                        </span>
+
+                    </span>
+
+                </div>
+
+
+                <div class="user-info-row">
+
+                    <span class="user-info-label">
+                        Hali
+                    </span>
+
+                    <span class="user-info-value"
+                          style="color:#166534;"
+                    >
+
+                        ● Inatumika
+
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- ==================================================
+                 PROTECTION NOTICE
+            =================================================== -->
+
+            <div class="super-admin-protected">
+
+                <strong>
+                    🔐 Super Admin Protection
+                </strong>
+
+                Super Admin hawezi kufutwa,
+                kusimamishwa au kuondolewa
+                permissions zake kupitia frontend.
+
+                Vitendo vyake nyeti vinalindwa na
+                password verification.
+
+            </div>
+
+
+            <!-- ==================================================
+                 BACK
+            =================================================== -->
+
+            <div class="delete-actions">
+
+                <a
+                    href="{% url 'users:user_list' %}"
+                    class="button btn-secondary"
+                >
+
+                    <i class="fas fa-arrow-left"></i>
+
+                    Rudi kwa Users
+
+                </a>
+
+            </div>
+
+
+            <div class="security-note">
+
+                Mfumo umezuia action hii pia upande wa backend.
+
+            </div>
+
+
+        {% else %}
+
+
+            <!-- ==================================================
+                 NORMAL USER DELETE
+            =================================================== -->
+
+            <div class="delete-icon">
+                ⚠️
+            </div>
+
+
+            <h2>
+                Futa Mtumiaji
+            </h2>
+
+
+            <p class="subtitle">
+
+                Je, una uhakika unataka kufuta
+                mtumiaji huyu?
+
+                <br>
+
+                Kitendo hiki hakiwezi kurudishwa
+                baada ya kuthibitisha.
+
+            </p>
+
+
+            <!-- ==================================================
+                 USER INFORMATION
+            =================================================== -->
+
+            <div class="user-info">
+
+
+                <div class="user-info-row">
+
+                    <span class="user-info-label">
+                        Jina
+                    </span>
+
+                    <span class="user-info-value">
+                        {{ user.username }}
+                    </span>
+
+                </div>
+
+
+                <div class="user-info-row">
+
+                    <span class="user-info-label">
+                        Barua Pepe
+                    </span>
+
+                    <span class="user-info-value">
+                        {{ user.email|default:"-" }}
+                    </span>
+
+                </div>
+
+
+                <div class="user-info-row">
+
+                    <span class="user-info-label">
+                        Role
+                    </span>
+
+                    <span class="user-info-value">
+
+                        {% for group in user.groups.all %}
+
+                            {% if group.name == "Admin" %}
+
+                                <span class="role-badge role-admin">
+                                    👤 Admin
+                                </span>
+
+                            {% elif group.name == "Manager" %}
+
+                                <span class="role-badge role-manager">
+                                    👩 Manager
+                                </span>
+
+                            {% elif group.name == "Viewer" %}
+
+                                <span class="role-badge role-viewer">
+                                    👀 Viewer
+                                </span>
+
+                            {% else %}
+
+                                <span class="role-badge role-other">
+                                    {{ group.name }}
+                                </span>
+
+                            {% endif %}
+
+                        {% empty %}
+
+                            <span class="role-badge role-other">
+                                Hakuna Role
+                            </span>
+
+                        {% endfor %}
+
+                    </span>
+
+                </div>
+
+
+                <div class="user-info-row">
+
+                    <span class="user-info-label">
+                        Hali
+                    </span>
+
+                    <span
+                        class="user-info-value"
+                        style="
+                            color:
+                            {% if user.is_active %}
+                                #166534
+                            {% else %}
+                                #991b1b
+                            {% endif %};
+                        "
+                    >
+
+                        {% if user.is_active %}
+
+                            ● Inatumika
+
+                        {% else %}
+
+                            ● Imesimamishwa
+
+                        {% endif %}
+
+                    </span>
+
+                </div>
+
+
+            </div>
+
+
+            <!-- ==================================================
+                 WARNING
+            =================================================== -->
+
+            <div class="delete-warning">
+
+                <strong>
+                    ⚠️ Tahadhari
+                </strong>
+
+                Kufuta account hii kutaondoa mtumiaji
+                kwenye mfumo pamoja na taarifa zake
+                zinazohusiana na account.
+
+            </div>
+
+
+            <!-- ==================================================
+                 DELETE ACTION
+            =================================================== -->
+
+            <div class="delete-actions">
+
+
+                <a
+                    href="{% url 'users:user_list' %}"
+                    class="button btn-secondary"
+                >
+
+                    <i class="fas fa-times"></i>
+
+                    Ghairi
+
+                </a>
+
+
+                <form
+                    method="post"
+                    style="
+                        display:flex;
+                        flex:1;
+                        margin:0;
+                    "
+                    id="deleteUserForm"
+                >
+
+                    {% csrf_token %}
+
+                    <button
+                        type="submit"
+                        class="button btn-danger"
+                        id="deleteUserButton"
+                        style="width:100%;"
+                    >
+
+                        <i class="fas fa-trash"></i>
+
+                        Thibitisha Kufuta
+
+                    </button>
+
+                </form>
+
+
+            </div>
+
+
+            <div class="security-note">
+
+                Action hii inatumika kwa
+                account za kawaida tu.
+
+            </div>
+
+
+        {% endif %}
+
+
+    </div>
+
+</div>
+
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        const form =
+            document.getElementById(
+                "deleteUserForm"
+            );
+
+        const button =
+            document.getElementById(
+                "deleteUserButton"
+            );
+
+
+        /*
+         * Hakuna browser confirm() hapa.
+         *
+         * Ukifika kwenye page hii tayari
+         * umepewa nafasi ya kuthibitisha action
+         * kupitia UI yetu.
+         */
+
+        if (form && button) {
+
+            form.addEventListener(
+                "submit",
+                function () {
+
+                    button.disabled = true;
+
+                    button.innerHTML =
+                        '<i class="fas fa-spinner fa-spin"></i> ' +
+                        'Inafuta...';
+
+                }
+            );
+
+        }
+
+    }
+);
+
+</script>
+
+{% endblock %}

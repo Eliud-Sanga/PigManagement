@@ -1,0 +1,1524 @@
+{% extends "pigs/base.html" %}
+
+{% block title %}
+Ongeza Mtumiaji
+{% endblock %}
+
+{% block extra_css %}
+
+<style>
+
+/* ============================================================
+   CREATE USER PAGE
+============================================================ */
+
+.create-user-page {
+    max-width: 720px;
+    margin: 0 auto;
+    padding-bottom: 40px;
+}
+
+
+/* ============================================================
+   PAGE HEADER
+============================================================ */
+
+.page-header {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.page-header h2 {
+    margin: 0 0 8px;
+    color: #172554;
+    font-size: 28px;
+    font-weight: 800;
+}
+
+.page-header p {
+    color: #64748b;
+    margin: 0;
+    font-size: 14px;
+}
+
+
+/* ============================================================
+   MAIN FORM CARD
+============================================================ */
+
+.form-card {
+    background: white;
+
+    padding: 30px;
+
+    border-radius: 16px;
+
+    box-shadow:
+        0 4px 15px
+        rgba(15, 23, 42, 0.07);
+
+    border:
+        1px solid #f1f5f9;
+}
+
+
+/* ============================================================
+   FORM GROUP
+============================================================ */
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group:last-child {
+    margin-bottom: 0;
+}
+
+.form-group label {
+    display: block;
+
+    font-weight: 650;
+
+    color: #334155;
+
+    margin-bottom: 7px;
+
+    font-size: 14px;
+}
+
+
+/* ============================================================
+   INPUTS / SELECT
+============================================================ */
+
+.form-group input,
+.form-group select {
+    width: 100%;
+
+    padding: 12px 13px;
+
+    border:
+        1px solid #cbd5e1;
+
+    border-radius: 9px;
+
+    font-size: 14px;
+
+    outline: none;
+
+    background: white;
+
+    color: #1e293b;
+
+    transition: .2s ease;
+}
+
+
+.form-group input::placeholder {
+    color: #94a3b8;
+}
+
+
+.form-group input:focus,
+.form-group select:focus {
+
+    border-color:
+        #2563eb;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(37, 99, 235, 0.10);
+
+}
+
+
+/* ============================================================
+   PASSWORD INPUT WRAPPER
+============================================================ */
+
+.password-wrapper {
+    position: relative;
+}
+
+.password-wrapper input {
+    padding-right: 48px;
+}
+
+.password-toggle {
+    position: absolute;
+
+    right: 12px;
+
+    top: 50%;
+
+    transform:
+        translateY(-50%);
+
+    border: none;
+
+    background: transparent;
+
+    color: #64748b;
+
+    cursor: pointer;
+
+    font-size: 15px;
+
+    padding: 4px;
+
+    transition: .2s ease;
+}
+
+.password-toggle:hover {
+    color: #2563eb;
+}
+
+
+/* ============================================================
+   HELP TEXT
+============================================================ */
+
+.help-text {
+    color: #64748b;
+
+    font-size: 12px;
+
+    margin-top: 5px;
+
+    line-height: 1.4;
+}
+
+
+/* ============================================================
+   ERROR TEXT
+============================================================ */
+
+.error-text {
+    color: #dc2626;
+
+    font-size: 13px;
+
+    margin-top: 5px;
+}
+
+
+/* ============================================================
+   REQUIRED MARK
+============================================================ */
+
+.required-mark {
+    color: #dc2626;
+}
+
+
+/* ============================================================
+   ROLE SECTION
+============================================================ */
+
+.role-section {
+    margin-top: 25px;
+
+    padding-top: 22px;
+
+    border-top:
+        1px solid #e2e8f0;
+}
+
+
+/* ============================================================
+   ROLE LABEL
+============================================================ */
+
+.role-label-row {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 10px;
+
+    margin-bottom: 7px;
+}
+
+.role-label-row label {
+    margin-bottom: 0;
+}
+
+
+/* ============================================================
+   DEFAULT ROLE BADGE
+============================================================ */
+
+.default-role-badge {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 5px;
+
+    padding: 5px 9px;
+
+    border-radius: 20px;
+
+    background: #fef3c7;
+
+    color: #92400e;
+
+    font-size: 10px;
+
+    font-weight: 750;
+
+    white-space: nowrap;
+}
+
+
+/* ============================================================
+   ROLE INFORMATION
+============================================================ */
+
+.role-info {
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 10px;
+
+    background: #eff6ff;
+
+    border:
+        1px solid #bfdbfe;
+
+    border-left:
+        4px solid #2563eb;
+
+    border-radius: 10px;
+
+    padding: 12px 13px;
+
+    margin-top: 10px;
+}
+
+.role-info-icon {
+    flex-shrink: 0;
+
+    width: 28px;
+
+    height: 28px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #dbeafe;
+
+    color: #1d4ed8;
+
+    font-size: 13px;
+}
+
+.role-info-content {
+    color: #1e40af;
+
+    font-size: 12px;
+
+    line-height: 1.5;
+}
+
+.role-info-content strong {
+    display: block;
+
+    margin-bottom: 2px;
+
+    color: #1e3a8a;
+}
+
+
+/* ============================================================
+   ROLE PREVIEW
+============================================================ */
+
+.role-preview {
+    margin-top: 12px;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 9px;
+}
+
+.role-preview-item {
+    border:
+        1px solid #e2e8f0;
+
+    border-radius: 9px;
+
+    padding: 10px;
+
+    background: #f8fafc;
+
+    text-align: center;
+
+    transition: .2s ease;
+}
+
+.role-preview-item.active {
+    background: #eff6ff;
+
+    border-color: #93c5fd;
+}
+
+.role-preview-icon {
+    display: block;
+
+    font-size: 17px;
+
+    margin-bottom: 4px;
+}
+
+.role-preview-name {
+    display: block;
+
+    color: #334155;
+
+    font-size: 11px;
+
+    font-weight: 750;
+}
+
+.role-preview-description {
+    display: block;
+
+    color: #94a3b8;
+
+    font-size: 9px;
+
+    margin-top: 2px;
+
+    line-height: 1.3;
+}
+
+
+/* ============================================================
+   PASSWORD MATCH STATUS
+============================================================ */
+
+.password-match {
+    margin-top: 6px;
+
+    font-size: 11px;
+
+    font-weight: 650;
+
+    min-height: 16px;
+}
+
+.password-match.success {
+    color: #15803d;
+}
+
+.password-match.error {
+    color: #dc2626;
+}
+
+
+/* ============================================================
+   FORM ACTIONS
+============================================================ */
+
+.form-actions {
+    display: flex;
+
+    gap: 12px;
+
+    margin-top: 28px;
+
+    padding-top: 22px;
+
+    border-top:
+        1px solid #e2e8f0;
+}
+
+
+.form-actions .button {
+    flex: 1;
+
+    text-align: center;
+
+    padding: 12px 20px;
+
+    border-radius: 9px;
+
+    font-size: 14px;
+
+    font-weight: 700;
+
+    border: none;
+
+    cursor: pointer;
+
+    text-decoration: none;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 7px;
+
+    transition: .2s ease;
+}
+
+
+.form-actions .button:hover {
+    transform:
+        translateY(-1px);
+}
+
+
+/* ============================================================
+   PRIMARY BUTTON
+============================================================ */
+
+.btn-primary {
+    background: #2563eb;
+
+    color: white;
+}
+
+
+.btn-primary:hover {
+    background: #1d4ed8;
+}
+
+
+/* ============================================================
+   SECONDARY BUTTON
+============================================================ */
+
+.btn-secondary {
+    background: #e2e8f0;
+
+    color: #0f172a;
+}
+
+
+.btn-secondary:hover {
+    background: #cbd5e1;
+}
+
+
+/* ============================================================
+   DISABLED SUBMIT STATE
+============================================================ */
+
+.btn-primary:disabled {
+    background: #93c5fd;
+
+    cursor: not-allowed;
+
+    transform: none;
+}
+
+
+/* ============================================================
+   SECURITY NOTE
+============================================================ */
+
+.security-note {
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 9px;
+
+    margin-top: 18px;
+
+    padding: 11px 13px;
+
+    border-radius: 9px;
+
+    background: #f8fafc;
+
+    border:
+        1px solid #e2e8f0;
+
+    color: #64748b;
+
+    font-size: 11px;
+
+    line-height: 1.45;
+}
+
+.security-note-icon {
+    flex-shrink: 0;
+
+    color: #64748b;
+
+    font-size: 13px;
+}
+
+
+/* ============================================================
+   MOBILE
+============================================================ */
+
+@media (max-width: 700px) {
+
+    .create-user-page {
+        padding-bottom: 20px;
+    }
+
+    .form-card {
+        padding: 22px;
+    }
+
+    .role-preview {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .page-header h2 {
+        font-size: 23px;
+    }
+
+    .form-card {
+        padding: 20px;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .form-actions .button {
+        width: 100%;
+    }
+
+    .role-label-row {
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+}
+
+
+/* ============================================================
+   SMALL DEVICES
+============================================================ */
+
+@media (max-width: 400px) {
+
+    .form-card {
+        padding: 17px;
+    }
+
+}
+
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container">
+
+<div class="create-user-page">
+
+
+    <!-- ========================================================
+         PAGE HEADER
+    ======================================================== -->
+
+    <div class="page-header">
+
+        <h2>
+            ➕ Ongeza Mtumiaji Mpya
+        </h2>
+
+        <p>
+            Jaza taarifa za mtumiaji mpya wa mfumo
+        </p>
+
+    </div>
+
+
+    <!-- ========================================================
+         FORM CARD
+    ======================================================== -->
+
+    <div class="form-card">
+
+        <form
+            method="post"
+            id="createUserForm"
+        >
+
+            {% csrf_token %}
+
+
+            <!-- ==================================================
+                 USERNAME
+            =================================================== -->
+
+            <div class="form-group">
+
+                <label for="username">
+
+                    Jina la Mtumiaji
+
+                    <span class="required-mark">
+                        *
+                    </span>
+
+                </label>
+
+                <input
+                    type="text"
+                    id="username"
+                    name="username"
+                    placeholder="Weka jina la mtumiaji"
+                    autocomplete="username"
+                    required
+                >
+
+                <div class="help-text">
+
+                    Jina la kipekee kwa mtumiaji huyu.
+
+                </div>
+
+            </div>
+
+
+            <!-- ==================================================
+                 EMAIL
+            =================================================== -->
+
+            <div class="form-group">
+
+                <label for="email">
+
+                    Barua Pepe
+
+                </label>
+
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="mfano@email.com"
+                    autocomplete="email"
+                >
+
+                <div class="help-text">
+
+                    Barua pepe ya mtumiaji
+                    (si lazima).
+
+                </div>
+
+            </div>
+
+
+            <!-- ==================================================
+                 PASSWORD
+            =================================================== -->
+
+            <div class="form-group">
+
+                <label for="password">
+
+                    Nenosiri
+
+                    <span class="required-mark">
+                        *
+                    </span>
+
+                </label>
+
+                <div class="password-wrapper">
+
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Weka nenosiri"
+                        autocomplete="new-password"
+                        required
+                    >
+
+                    <button
+                        type="button"
+                        class="password-toggle"
+                        data-target="password"
+                        aria-label="Onyesha nenosiri"
+                    >
+                        <i class="fas fa-eye"></i>
+                    </button>
+
+                </div>
+
+                <div class="help-text">
+
+                    Nenosiri lazima liwe na
+                    herufi 6 au zaidi.
+
+                </div>
+
+            </div>
+
+
+            <!-- ==================================================
+                 PASSWORD CONFIRMATION
+            =================================================== -->
+
+            <div class="form-group">
+
+                <label for="password_confirm">
+
+                    Thibitisha Nenosiri
+
+                    <span class="required-mark">
+                        *
+                    </span>
+
+                </label>
+
+                <div class="password-wrapper">
+
+                    <input
+                        type="password"
+                        id="password_confirm"
+                        name="password_confirm"
+                        placeholder="Andika nenosiri tena"
+                        autocomplete="new-password"
+                        required
+                    >
+
+                    <button
+                        type="button"
+                        class="password-toggle"
+                        data-target="password_confirm"
+                        aria-label="Onyesha nenosiri"
+                    >
+                        <i class="fas fa-eye"></i>
+                    </button>
+
+                </div>
+
+                <div
+                    id="passwordMatch"
+                    class="password-match"
+                ></div>
+
+            </div>
+
+
+            <!-- ==================================================
+                 ROLE
+            =================================================== -->
+
+            <div class="form-group role-section">
+
+                <div class="role-label-row">
+
+                    <label for="group">
+
+                        Role
+
+                    </label>
+
+                    <span
+                        class="default-role-badge"
+                        id="defaultRoleBadge"
+                    >
+                        👀 Default: Viewer
+                    </span>
+
+                </div>
+
+
+                <select
+                    id="group"
+                    name="group"
+                >
+
+                    <option
+                        value=""
+                        selected
+                    >
+                        👀 Viewer — Default
+                    </option>
+
+
+                    {% for group in groups %}
+
+                        {% if group.name != "Viewer" %}
+
+                            <option
+                                value="{{ group.id }}"
+                            >
+
+                                {% if group.name == "Admin" %}
+
+                                    👤 Admin
+
+                                {% elif group.name == "Manager" %}
+
+                                    👩 Manager (Mama)
+
+                                {% else %}
+
+                                    {{ group.name }}
+
+                                {% endif %}
+
+                            </option>
+
+                        {% endif %}
+
+                    {% endfor %}
+
+                </select>
+
+
+                <div class="help-text">
+
+                    Mtumiaji mpya atakuwa
+                    <strong>Viewer</strong>
+                    kama hujachagua role nyingine.
+
+                </div>
+
+
+                <!-- ==================================================
+                     ROLE INFORMATION
+                =================================================== -->
+
+                <div class="role-info">
+
+                    <div class="role-info-icon">
+                        <i class="fas fa-info"></i>
+                    </div>
+
+                    <div class="role-info-content">
+
+                        <strong>
+                            Viewer ndiyo role ya mwanzo
+                        </strong>
+
+                        User mpya huanza na
+                        permissions za kuona taarifa
+                        muhimu za mfumo.
+
+                        Add, Change na Delete
+                        hazitolewi automatically.
+
+                    </div>
+
+                </div>
+
+
+                <!-- ==================================================
+                     ROLE PREVIEW
+                =================================================== -->
+
+                <div class="role-preview">
+
+
+                    <div
+                        class="role-preview-item active"
+                        data-role-preview="Viewer"
+                    >
+
+                        <span class="role-preview-icon">
+                            👀
+                        </span>
+
+                        <span class="role-preview-name">
+                            Viewer
+                        </span>
+
+                        <span class="role-preview-description">
+                            Kuona taarifa
+                        </span>
+
+                    </div>
+
+
+                    <div
+                        class="role-preview-item"
+                        data-role-preview="Manager"
+                    >
+
+                        <span class="role-preview-icon">
+                            👩
+                        </span>
+
+                        <span class="role-preview-name">
+                            Manager
+                        </span>
+
+                        <span class="role-preview-description">
+                            Permissions zitasimamiwa
+                        </span>
+
+                    </div>
+
+
+                    <div
+                        class="role-preview-item"
+                        data-role-preview="Admin"
+                    >
+
+                        <span class="role-preview-icon">
+                            👤
+                        </span>
+
+                        <span class="role-preview-name">
+                            Admin
+                        </span>
+
+                        <span class="role-preview-description">
+                            Permissions zitasimamiwa
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ==================================================
+                 SECURITY NOTE
+            =================================================== -->
+
+            <div class="security-note">
+
+                <div class="security-note-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+
+                <div>
+
+                    Role pekee haiamui kila ruhusa.
+
+                    Super Admin ndiye anayesimamia
+                    permissions za mtumiaji kupitia
+                    <strong>
+                        Simamia Permissions
+                    </strong>.
+
+                </div>
+
+            </div>
+
+
+            <!-- ==================================================
+                 FORM ACTIONS
+            =================================================== -->
+
+            <div class="form-actions">
+
+                <a
+                    href="{% url 'users:user_list' %}"
+                    class="button btn-secondary"
+                >
+
+                    <i class="fas fa-times"></i>
+
+                    Ghairi
+
+                </a>
+
+
+                <button
+                    type="submit"
+                    class="button btn-primary"
+                    id="submitButton"
+                >
+
+                    <i class="fas fa-save"></i>
+
+                    Hifadhi Mtumiaji
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        /* =====================================================
+           PASSWORD SHOW / HIDE
+        ====================================================== */
+
+        const toggleButtons =
+            document.querySelectorAll(
+                ".password-toggle"
+            );
+
+
+        toggleButtons.forEach(
+            function (button) {
+
+                button.addEventListener(
+                    "click",
+                    function () {
+
+                        const targetId =
+                            button.dataset.target;
+
+                        const input =
+                            document.getElementById(
+                                targetId
+                            );
+
+                        const icon =
+                            button.querySelector(
+                                "i"
+                            );
+
+                        if (!input) {
+                            return;
+                        }
+
+
+                        if (
+                            input.type ===
+                            "password"
+                        ) {
+
+                            input.type =
+                                "text";
+
+                            button.setAttribute(
+                                "aria-label",
+                                "Ficha nenosiri"
+                            );
+
+                            if (icon) {
+
+                                icon.classList
+                                    .remove(
+                                        "fa-eye"
+                                    );
+
+                                icon.classList
+                                    .add(
+                                        "fa-eye-slash"
+                                    );
+
+                            }
+
+                        } else {
+
+                            input.type =
+                                "password";
+
+                            button.setAttribute(
+                                "aria-label",
+                                "Onyesha nenosiri"
+                            );
+
+                            if (icon) {
+
+                                icon.classList
+                                    .remove(
+                                        "fa-eye-slash"
+                                    );
+
+                                icon.classList
+                                    .add(
+                                        "fa-eye"
+                                    );
+
+                            }
+
+                        }
+
+                    }
+                );
+
+            }
+        );
+
+
+        /* =====================================================
+           PASSWORD MATCH
+        ====================================================== */
+
+        const password =
+            document.getElementById(
+                "password"
+            );
+
+        const passwordConfirm =
+            document.getElementById(
+                "password_confirm"
+            );
+
+        const passwordMatch =
+            document.getElementById(
+                "passwordMatch"
+            );
+
+
+        function checkPasswordMatch() {
+
+            if (
+                !password ||
+                !passwordConfirm ||
+                !passwordMatch
+            ) {
+                return;
+            }
+
+
+            const first =
+                password.value;
+
+            const second =
+                passwordConfirm.value;
+
+
+            if (!second) {
+
+                passwordMatch.textContent =
+                    "";
+
+                passwordMatch.className =
+                    "password-match";
+
+                return;
+
+            }
+
+
+            if (first === second) {
+
+                passwordMatch.textContent =
+                    "✓ Nenosiri zinafanana.";
+
+                passwordMatch.className =
+                    "password-match success";
+
+            } else {
+
+                passwordMatch.textContent =
+                    "✗ Nenosiri hazifanani.";
+
+                passwordMatch.className =
+                    "password-match error";
+
+            }
+
+        }
+
+
+        if (password) {
+
+            password.addEventListener(
+                "input",
+                checkPasswordMatch
+            );
+
+        }
+
+
+        if (passwordConfirm) {
+
+            passwordConfirm.addEventListener(
+                "input",
+                checkPasswordMatch
+            );
+
+        }
+
+
+        /* =====================================================
+           ROLE PREVIEW
+        ====================================================== */
+
+        const roleSelect =
+            document.getElementById(
+                "group"
+            );
+
+        const rolePreviewItems =
+            document.querySelectorAll(
+                "[data-role-preview]"
+            );
+
+        const defaultRoleBadge =
+            document.getElementById(
+                "defaultRoleBadge"
+            );
+
+
+        function getSelectedRole() {
+
+            if (!roleSelect) {
+
+                return "Viewer";
+
+            }
+
+
+            const selectedOption =
+                roleSelect.options[
+                    roleSelect.selectedIndex
+                ];
+
+
+            if (!selectedOption) {
+
+                return "Viewer";
+
+            }
+
+
+            const value =
+                selectedOption.value;
+
+
+            if (!value) {
+
+                return "Viewer";
+
+            }
+
+
+            const text =
+                selectedOption.textContent
+                    .trim()
+                    .toLowerCase();
+
+
+            if (
+                text.includes("admin")
+                &&
+                !text.includes("manager")
+            ) {
+
+                return "Admin";
+
+            }
+
+
+            if (
+                text.includes("manager")
+            ) {
+
+                return "Manager";
+
+            }
+
+
+            if (
+                text.includes("viewer")
+            ) {
+
+                return "Viewer";
+
+            }
+
+
+            return "Viewer";
+
+        }
+
+
+        function updateRolePreview() {
+
+            const selectedRole =
+                getSelectedRole();
+
+
+            rolePreviewItems.forEach(
+                function (item) {
+
+                    const itemRole =
+                        item.dataset.rolePreview;
+
+
+                    if (
+                        itemRole ===
+                        selectedRole
+                    ) {
+
+                        item.classList.add(
+                            "active"
+                        );
+
+                    } else {
+
+                        item.classList.remove(
+                            "active"
+                        );
+
+                    }
+
+                }
+            );
+
+
+            if (defaultRoleBadge) {
+
+                if (
+                    selectedRole ===
+                    "Viewer"
+                ) {
+
+                    defaultRoleBadge.textContent =
+                        "👀 Default: Viewer";
+
+                    defaultRoleBadge.style
+                        .background = "#fef3c7";
+
+                    defaultRoleBadge.style
+                        .color = "#92400e";
+
+                } else {
+
+                    defaultRoleBadge.textContent =
+                        "⚙️ Role: "
+                        + selectedRole;
+
+                    defaultRoleBadge.style
+                        .background = "#dbeafe";
+
+                    defaultRoleBadge.style
+                        .color = "#1e40af";
+
+                }
+
+            }
+
+        }
+
+
+        if (roleSelect) {
+
+            roleSelect.addEventListener(
+                "change",
+                updateRolePreview
+            );
+
+            updateRolePreview();
+
+        }
+
+
+        /* =====================================================
+           FORM SUBMIT GUARD
+        ====================================================== */
+
+        const form =
+            document.getElementById(
+                "createUserForm"
+            );
+
+        const submitButton =
+            document.getElementById(
+                "submitButton"
+            );
+
+
+        if (form) {
+
+            form.addEventListener(
+                "submit",
+                function (event) {
+
+                    if (
+                        password &&
+                        passwordConfirm &&
+                        password.value !==
+                        passwordConfirm.value
+                    ) {
+
+                        event.preventDefault();
+
+                        if (passwordMatch) {
+
+                            passwordMatch.textContent =
+                                "✗ Nenosiri hazifanani.";
+
+                            passwordMatch.className =
+                                "password-match error";
+
+                        }
+
+                        passwordConfirm.focus();
+
+                        return;
+
+                    }
+
+
+                    if (
+                        password &&
+                        password.value.length < 6
+                    ) {
+
+                        event.preventDefault();
+
+                        password.focus();
+
+                        return;
+
+                    }
+
+
+                    if (submitButton) {
+
+                        submitButton.disabled =
+                            true;
+
+                        submitButton.innerHTML =
+                            '<i class="fas fa-spinner fa-spin"></i> ' +
+                            'Inahifadhi...';
+
+                    }
+
+                }
+            );
+
+        }
+
+    }
+);
+
+</script>
+
+{% endblock %}

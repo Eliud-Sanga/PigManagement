@@ -1,0 +1,483 @@
+{% extends "pigs/base.html" %}
+{% load humanize %}
+
+{% block title %}
+Matumizi
+{% endblock %}
+
+{% block extra_css %}
+<style>
+
+    /* =========================================================
+       EXPENSE PAGE
+    ========================================================= */
+
+    .expense-page {
+        width: 100%;
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    /* =========================================================
+       PAGE HEADER
+    ========================================================= */
+
+    .expense-header {
+        background: linear-gradient(
+            135deg,
+            #172554,
+            #2563eb
+        );
+
+        color: white;
+
+        border-radius: 16px;
+
+        padding: 25px;
+
+        margin-bottom: 20px;
+
+        box-shadow:
+            0 6px 20px
+            rgba(37, 99, 235, 0.20);
+
+        text-align: center;
+    }
+
+    .expense-header h2 {
+        margin: 0;
+        font-size: 27px;
+    }
+
+    .expense-header p {
+        margin: 7px 0 0;
+        color: #dbeafe;
+        font-size: 14px;
+    }
+
+    /* =========================================================
+       ACTIONS
+    ========================================================= */
+
+    .expense-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+
+        background: white;
+
+        padding: 15px 18px;
+
+        border-radius: 12px;
+
+        margin-bottom: 20px;
+
+        box-shadow:
+            0 3px 12px
+            rgba(15, 23, 42, 0.06);
+    }
+
+    .expense-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        gap: 8px;
+
+        padding: 10px 17px;
+
+        border-radius: 8px;
+
+        text-decoration: none;
+
+        font-size: 14px;
+
+        font-weight: 600;
+
+        transition: 0.2s ease;
+    }
+
+    .expense-btn-back {
+        background: #e2e8f0;
+        color: #0f172a;
+    }
+
+    .expense-btn-back:hover {
+        background: #cbd5e1;
+    }
+
+    .expense-btn-add {
+        background: #2563eb;
+        color: white;
+    }
+
+    .expense-btn-add:hover {
+        background: #1d4ed8;
+        transform: translateY(-1px);
+    }
+
+    /* =========================================================
+       EXPENSE LIST
+    ========================================================= */
+
+    .expense-list {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .expense-card {
+        display: block;
+
+        background: white;
+
+        border-radius: 14px;
+
+        padding: 20px;
+
+        text-decoration: none;
+
+        color: inherit;
+
+        box-shadow:
+            0 4px 15px
+            rgba(15, 23, 42, 0.07);
+
+        border: 1px solid transparent;
+
+        transition:
+            transform 0.2s ease,
+            box-shadow 0.2s ease,
+            border-color 0.2s ease;
+    }
+
+    .expense-card:hover {
+        transform: translateY(-2px);
+
+        border-color: #bfdbfe;
+
+        box-shadow:
+            0 7px 20px
+            rgba(37, 99, 235, 0.12);
+    }
+
+    /* =========================================================
+       CARD TOP
+    ========================================================= */
+
+    .expense-card-top {
+        display: flex;
+
+        justify-content: space-between;
+
+        align-items: flex-start;
+
+        gap: 15px;
+
+        margin-bottom: 10px;
+    }
+
+    .expense-title {
+        color: #172554;
+
+        font-size: 18px;
+
+        font-weight: 700;
+
+        margin: 0;
+    }
+
+    .expense-date {
+        color: #64748b;
+
+        font-size: 13px;
+
+        white-space: nowrap;
+    }
+
+    .expense-amount {
+        color: #172554;
+
+        font-size: 18px;
+
+        font-weight: 700;
+
+        white-space: nowrap;
+    }
+
+    /* =========================================================
+       DESCRIPTION
+    ========================================================= */
+
+    .expense-description {
+        color: #64748b;
+
+        font-size: 14px;
+
+        line-height: 1.6;
+
+        margin: 8px 0 0;
+
+        max-width: 800px;
+    }
+
+    /* =========================================================
+       CARD FOOTER
+    ========================================================= */
+
+    .expense-card-footer {
+        display: flex;
+
+        justify-content: space-between;
+
+        align-items: center;
+
+        margin-top: 15px;
+
+        padding-top: 12px;
+
+        border-top:
+            1px solid #e2e8f0;
+    }
+
+    .expense-view {
+        color: #2563eb;
+
+        font-size: 13px;
+
+        font-weight: 600;
+    }
+
+    .expense-arrow {
+        color: #2563eb;
+
+        font-size: 18px;
+    }
+
+    /* =========================================================
+       EMPTY STATE
+    ========================================================= */
+
+    .expense-empty {
+        background: white;
+
+        border-radius: 14px;
+
+        padding: 55px 20px;
+
+        text-align: center;
+
+        box-shadow:
+            0 4px 15px
+            rgba(15, 23, 42, 0.07);
+    }
+
+    .expense-empty-icon {
+        font-size: 45px;
+
+        margin-bottom: 10px;
+    }
+
+    .expense-empty h3 {
+        margin: 0 0 8px;
+
+        color: #172554;
+    }
+
+    .expense-empty p {
+        margin: 0 0 20px;
+
+        color: #64748b;
+    }
+
+    /* =========================================================
+       MOBILE
+    ========================================================= */
+
+    @media (max-width: 650px) {
+
+        .expense-header {
+            padding: 22px 15px;
+        }
+
+        .expense-header h2 {
+            font-size: 23px;
+        }
+
+        .expense-actions {
+            flex-direction: column;
+
+            align-items: stretch;
+        }
+
+        .expense-btn {
+            width: 100%;
+        }
+
+        .expense-card-top {
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .expense-amount {
+            font-size: 17px;
+        }
+
+    }
+
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="expense-page">
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <div class="expense-header">
+
+        <h2>
+            💰 Matumizi
+        </h2>
+
+        <p>
+            Kumbukumbu za matumizi ya biashara
+        </p>
+
+    </div>
+
+
+    <!-- =====================================================
+         ACTIONS
+    ====================================================== -->
+
+    <div class="expense-actions">
+
+        <a
+            href="{% url 'pigs:dashboard' %}"
+            class="expense-btn expense-btn-back"
+        >
+            <i class="fas fa-arrow-left"></i>
+            Rudi
+        </a>
+
+        <a
+            href="{% url 'pigs:expense_create' %}"
+            class="expense-btn expense-btn-add"
+        >
+            <i class="fas fa-plus"></i>
+            Rekodi Matumizi
+        </a>
+
+    </div>
+
+
+    <!-- =====================================================
+         EXPENSE RECORDS
+    ====================================================== -->
+
+    {% if expenses %}
+
+        <div class="expense-list">
+
+            {% for expense in expenses %}
+
+                <a
+                    href="{% url 'pigs:expense_detail' expense.id %}"
+                    class="expense-card"
+                >
+
+                    <div class="expense-card-top">
+
+                        <div>
+
+                            <h3 class="expense-title">
+                                {{ expense.title }}
+                            </h3>
+
+                            <div class="expense-date">
+                                <i class="far fa-calendar"></i>
+
+                                {{ expense.expense_date|date:"d/m/Y" }}
+
+                            </div>
+
+                        </div>
+
+                        <div class="expense-amount">
+
+                            TSh {{ expense.amount|floatformat:0|intcomma }}
+
+                        </div>
+
+                    </div>
+
+
+                    {% if expense.description %}
+
+                        <p class="expense-description">
+
+                            {{ expense.description|truncatechars:180 }}
+
+                        </p>
+
+                    {% endif %}
+
+
+                    <div class="expense-card-footer">
+
+                        <span class="expense-view">
+                            Fungua taarifa
+                        </span>
+
+                        <span class="expense-arrow">
+                            →
+                        </span>
+
+                    </div>
+
+                </a>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <!-- =================================================
+             EMPTY
+        ================================================== -->
+
+        <div class="expense-empty">
+
+            <div class="expense-empty-icon">
+                💰
+            </div>
+
+            <h3>
+                Hakuna kumbukumbu za matumizi
+            </h3>
+
+            <p>
+                Bado hujaweka rekodi yoyote ya matumizi.
+            </p>
+
+            <a
+                href="{% url 'pigs:expense_create' %}"
+                class="expense-btn expense-btn-add"
+            >
+                <i class="fas fa-plus"></i>
+                Rekodi Matumizi
+            </a>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

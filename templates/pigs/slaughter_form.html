@@ -1,0 +1,324 @@
+{% extends "pigs/base.html" %}
+{% load humanize %}
+
+{% block title %}
+Machinjio
+{% endblock %}
+
+{% block extra_css %}
+
+<style>
+
+    .slaughter-page {
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+
+    .page-header {
+        text-align: center;
+        margin-bottom: 25px;
+    }
+
+    .page-header h2 {
+        margin-bottom: 8px;
+        color: #172554;
+    }
+
+    .page-header p {
+        margin: 0;
+        color: #64748b;
+        font-size: 14px;
+    }
+
+    .slaughter-form-card {
+        background: white;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 4px 18px rgba(15, 23, 42, 0.08);
+    }
+
+    .date-section {
+        margin-bottom: 25px;
+    }
+
+    .date-section label {
+        display: block;
+        margin-bottom: 8px;
+        color: #334155;
+        font-weight: 600;
+    }
+
+    .date-section input {
+        width: 100%;
+        max-width: 300px;
+        padding: 11px 12px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        font-size: 14px;
+    }
+
+    .pig-section-header {
+        margin-bottom: 15px;
+    }
+
+    .pig-section-header h3 {
+        margin: 0 0 5px;
+        color: #172554;
+    }
+
+    .pig-section-header p {
+        margin: 0;
+        color: #64748b;
+        font-size: 13px;
+    }
+
+    .table-card {
+        overflow-x: auto;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+    }
+
+    .pig-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 650px;
+    }
+
+    .pig-table th {
+        background: #eff6ff;
+        color: #1e3a8a;
+        padding: 14px 12px;
+        text-align: left;
+        font-size: 13px;
+        font-weight: 700;
+        border-right: 1px solid #dbeafe;
+        border-bottom: 2px solid #bfdbfe;
+        white-space: nowrap;
+    }
+
+    .pig-table th:last-child {
+        border-right: none;
+    }
+
+    .pig-table td {
+        padding: 14px 12px;
+        color: #334155;
+        font-size: 14px;
+        border-right: 1px solid #e2e8f0;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .pig-table td:last-child {
+        border-right: none;
+    }
+
+    .pig-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .pig-table tbody tr:hover {
+        background: #f8fafc;
+    }
+
+    .select-cell {
+        width: 70px;
+        text-align: center !important;
+    }
+
+    .pig-checkbox {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+    }
+
+    .pig-number {
+        font-weight: 700;
+        color: #1d4ed8;
+    }
+
+    .price {
+        font-weight: 600;
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 12px;
+        font-size: 12px;
+    }
+
+    .badge-primary {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+
+    .badge-pink {
+        background: #fce7f3;
+        color: #9d174d;
+    }
+
+    .badge-secondary {
+        background: #e2e8f0;
+        color: #475569;
+    }
+
+    .empty-row {
+        text-align: center;
+        padding: 35px !important;
+        color: #64748b;
+    }
+
+    .form-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 25px;
+        padding-top: 20px;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .form-error {
+        margin-top: 6px;
+        color: #dc2626;
+        font-size: 13px;
+    }
+
+    .weight-input {
+        width: 100%;
+        max-width: 200px;
+        padding: 11px 12px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        font-size: 14px;
+    }
+
+    @media (max-width: 700px) {
+        .slaughter-form-card {
+            padding: 15px;
+        }
+        .form-actions {
+            flex-direction: column;
+            gap: 10px;
+        }
+        .form-actions .button {
+            width: 100%;
+            text-align: center;
+        }
+        .date-section input {
+            max-width: 100%;
+        }
+    }
+
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="slaughter-page">
+
+    <div class="page-header">
+        <h2>🔪 Machinjio</h2>
+        <p>Chagua nguruwe wanaokwenda kuchinjwa</p>
+    </div>
+
+    <div class="slaughter-form-card">
+
+        <form method="post">
+            {% csrf_token %}
+
+            <!-- Tarehe -->
+            <div class="date-section">
+                <label for="{{ form.slaughter_date.id_for_label }}">
+                    Tarehe ya Kuchinja
+                </label>
+                {{ form.slaughter_date }}
+                {% if form.slaughter_date.errors %}
+                    <div class="form-error">{{ form.slaughter_date.errors }}</div>
+                {% endif %}
+            </div>
+
+            <!-- Uzito wa Nyama -->
+            <div class="date-section">
+                <label for="{{ form.total_meat_weight_kg.id_for_label }}">
+                    Uzito wa Nyama (kg)
+                </label>
+                {{ form.total_meat_weight_kg }}
+                {% if form.total_meat_weight_kg.errors %}
+                    <div class="form-error">{{ form.total_meat_weight_kg.errors }}</div>
+                {% endif %}
+            </div>
+
+            <!-- Orodha ya Nguruwe -->
+            <div class="pig-section-header">
+                <h3>🐷 Nguruwe Waliopo</h3>
+                <p>Chagua nguruwe mmoja au zaidi kutoka kwenye orodha.</p>
+            </div>
+
+            <div class="table-card">
+                {% if form.pigs.errors %}
+                    <div class="form-error">{{ form.pigs.errors }}</div>
+                {% endif %}
+
+                <table class="pig-table">
+                    <thead>
+                        <tr>
+                            <th class="select-cell">Chagua</th>
+                            <th>Namba</th>
+                            <th>Jinsia</th>
+                            <th>Bei</th>
+                            <th>Muuzaji</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for pig in available_pigs %}
+                        <tr>
+                            <td class="select-cell">
+                                <input type="checkbox" name="pigs" value="{{ pig.id }}" class="pig-checkbox">
+                            </td>
+                            <td class="pig-number">{{ pig.tag_number }}</td>
+                            <td>
+                                {% if pig.gender == 'MALE' %}
+                                    <span class="badge badge-primary">Dume</span>
+                                {% elif pig.gender == 'FEMALE' %}
+                                    <span class="badge badge-pink">Jike</span>
+                                {% else %}
+                                    <span class="badge badge-secondary">-</span>
+                                {% endif %}
+                            </td>
+                            <td class="price">
+                                {% if pig.purchase_price %}
+                                    TSh {{ pig.purchase_price|floatformat:0|intcomma }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td>{{ pig.purchase.supplier_name }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="empty-row">
+                                Hakuna nguruwe walio tayari kuchinjwa.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="form-actions">
+                <a href="{% url 'pigs:dashboard' %}" class="button secondary">
+                    <i class="fas fa-arrow-left"></i> Rudi
+                </a>
+                <button type="submit" class="button">
+                    <i class="fas fa-save"></i> Hifadhi
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

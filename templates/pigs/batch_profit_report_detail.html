@@ -1,0 +1,320 @@
+{% extends "pigs/base.html" %}
+{% load humanize %}
+
+{% block title %}
+Ripoti ya Faida - {{ batch.batch_number }}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        text-align: center;
+        margin-bottom: 25px;
+    }
+
+    .page-header h2 {
+        margin: 0 0 8px;
+        color: #172554;
+    }
+
+    .page-header p {
+        color: #64748b;
+        margin: 0;
+    }
+
+    .top-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+
+    .report-card {
+        background: white;
+        border-radius: 14px;
+        padding: 25px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 15px rgba(15, 23, 42, 0.07);
+    }
+
+    .report-card h3 {
+        margin: 0 0 15px;
+        color: #172554;
+        text-align: center;
+    }
+
+    .profit-summary-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+    }
+
+    .profit-item {
+        text-align: center;
+        padding: 15px;
+        background: #f8fafc;
+        border-radius: 10px;
+    }
+
+    .profit-item span {
+        display: block;
+        color: #64748b;
+        font-size: 13px;
+        margin-bottom: 5px;
+    }
+
+    .profit-item strong {
+        display: block;
+        font-size: 22px;
+        color: #172554;
+    }
+
+    .profit-item .profit-positive {
+        color: #16a34a;
+    }
+
+    .profit-item .profit-negative {
+        color: #dc2626;
+    }
+
+    .batch-info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        text-align: center;
+    }
+
+    .batch-info-item span {
+        display: block;
+        color: #64748b;
+        font-size: 13px;
+    }
+
+    .batch-info-item strong {
+        display: block;
+        color: #172554;
+        font-size: 16px;
+        margin-top: 4px;
+    }
+
+    .table-card {
+        background: white;
+        border-radius: 14px;
+        padding: 20px;
+        box-shadow: 0 4px 15px rgba(15, 23, 42, 0.07);
+        overflow-x: auto;
+        margin-bottom: 20px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        padding: 10px 12px;
+        text-align: center;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    th {
+        background: #f8fafc;
+        color: #334155;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    td {
+        font-size: 13px;
+    }
+
+    .pig-tag {
+        display: inline-block;
+        padding: 3px 10px;
+        background: #dbeafe;
+        color: #1e40af;
+        border-radius: 4px;
+        font-size: 12px;
+        margin: 2px;
+    }
+
+    .pigs-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        justify-content: center;
+        padding: 5px 0;
+    }
+
+    .amount-cell {
+        font-weight: 600;
+        color: #172554;
+    }
+
+    @media (max-width: 700px) {
+        .profit-summary-grid {
+            grid-template-columns: 1fr;
+        }
+        .top-actions {
+            flex-direction: column;
+        }
+        .top-actions .button {
+            width: 100%;
+            text-align: center;
+        }
+        th, td {
+            padding: 8px 10px;
+            font-size: 12px;
+        }
+        .profit-item strong {
+            font-size: 18px;
+        }
+        .batch-info-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+
+    @media (max-width: 500px) {
+        .batch-info-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h2>📊 Ripoti ya Faida - {{ batch.batch_number }}</h2>
+    <p>Ripoti kamili ya faida ya batch hii</p>
+</div>
+
+<div class="top-actions">
+    <a href="{% url 'pigs:batch_profit_report_list' %}" class="button secondary">
+        <i class="fas fa-arrow-left"></i> Ripoti Zote
+    </a>
+    <a href="{% url 'pigs:meat_list' %}" class="button secondary">
+        <i class="fas fa-arrow-left"></i> Nyama
+    </a>
+    <a href="{% url 'pigs:dashboard' %}" class="button secondary">
+        <i class="fas fa-home"></i> Dashboard
+    </a>
+</div>
+
+<!-- Summary -->
+<div class="report-card">
+    <h3>📋 Muhtasari wa Faida</h3>
+    <div class="profit-summary-grid">
+        <div class="profit-item">
+            <span>🟢 Gharama ya Ununuzi</span>
+            <strong>TSh {{ report.total_purchase_cost|floatformat:0|intcomma }}</strong>
+        </div>
+        <div class="profit-item">
+            <span>🟢 Mauzo ya Nyama</span>
+            <strong>TSh {{ report.total_meat_sales|floatformat:0|intcomma }}</strong>
+        </div>
+        <div class="profit-item">
+            <span>📈 Faida Halisi</span>
+            {% if report.total_profit >= 0 %}
+                <strong class="profit-positive">+TSh {{ report.total_profit|floatformat:0|intcomma }}</strong>
+            {% else %}
+                <strong class="profit-negative">-TSh {{ report.total_profit|floatformat:0|intcomma }}</strong>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Batch Info -->
+<div class="report-card">
+    <h3>📦 Taarifa za Batch</h3>
+    <div class="batch-info-grid">
+        <div class="batch-info-item">
+            <span>Batch Number</span>
+            <strong>{{ batch.batch_number }}</strong>
+        </div>
+        <div class="batch-info-item">
+            <span>Tarehe ya Kuchinja</span>
+            <strong>{{ batch.slaughter_date|date:"d/m/Y" }}</strong>
+        </div>
+        <div class="batch-info-item">
+            <span>Tarehe ya Kufungwa</span>
+            <strong>{{ report.finalized_date|date:"d/m/Y" }}</strong>
+        </div>
+        <div class="batch-info-item">
+            <span>Idadi ya Nguruwe</span>
+            <strong>{{ report.total_pigs }}</strong>
+        </div>
+    </div>
+</div>
+
+<!-- Nguruwe zilizochinjwa -->
+<div class="table-card">
+    <h3>🐷 Nguruwe Zilizochinjwa</h3>
+    <div class="pigs-container">
+        {% for pig in pigs %}
+            <span class="pig-tag">{{ pig.tag_number }}</span>
+        {% empty %}
+            <span style="color: #94a3b8;">Hakuna nguruwe</span>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Mauzo ya Nyama -->
+{% if sales %}
+<div class="table-card">
+    <h3>💰 Mauzo ya Nyama</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Tarehe</th>
+                <th>Kilo (kg)</th>
+                <th>Bei / kg</th>
+                <th>Jumla</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for sale in sales %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ sale.daily_sale.sale_date|date:"d/m/Y" }}</td>
+                <td>{{ sale.meat_weight_sold|floatformat:2 }}</td>
+                <td>TSh {{ sale.price_per_kg|floatformat:0|intcomma }}</td>
+                <td class="amount-cell">TSh {{ sale.total_amount|floatformat:0|intcomma }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+<!-- Profit Summary Table -->
+<div class="report-card">
+    <h3>📋 Muhtasari wa Faida</h3>
+    <table style="max-width: 500px; margin: 0 auto;">
+        <tbody>
+            <tr>
+                <td style="text-align: left; font-weight: 600;">Gharama ya Ununuzi</td>
+                <td style="text-align: right; font-weight: 600;">TSh {{ report.total_purchase_cost|floatformat:0|intcomma }}</td>
+            </tr>
+            <tr>
+                <td style="text-align: left; font-weight: 600;">Mauzo ya Nyama</td>
+                <td style="text-align: right; font-weight: 600;">TSh {{ report.total_meat_sales|floatformat:0|intcomma }}</td>
+            </tr>
+            <tr style="border-top: 2px solid #172554;">
+                <td style="text-align: left; font-size: 18px; font-weight: 700; color: #172554;">FAIDA HALISI</td>
+                <td style="text-align: right; font-size: 18px; font-weight: 700;">
+                    {% if report.total_profit >= 0 %}
+                        <span style="color: #16a34a;">+TSh {{ report.total_profit|floatformat:0|intcomma }}</span>
+                    {% else %}
+                        <span style="color: #dc2626;">-TSh {{ report.total_profit|floatformat:0|intcomma }}</span>
+                    {% endif %}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

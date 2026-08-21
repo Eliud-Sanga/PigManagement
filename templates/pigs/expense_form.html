@@ -1,0 +1,300 @@
+{% extends "pigs/base.html" %}
+
+{% block title %}
+{% if expense %}Hariri Matumizi{% else %}Rekodi Matumizi{% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+
+    .expense-form-page {
+        max-width: 750px;
+        margin: 30px auto;
+    }
+
+    .expense-header {
+        text-align: center;
+        margin-bottom: 25px;
+    }
+
+    .expense-header h2 {
+        margin: 0;
+        color: #172554;
+        font-size: 28px;
+    }
+
+    .expense-header p {
+        margin: 8px 0 0;
+        color: #64748b;
+    }
+
+    .expense-form-card {
+        background: white;
+        border-radius: 16px;
+        padding: 30px;
+        box-shadow: 0 5px 20px rgba(15, 23, 42, 0.08);
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 7px;
+        color: #172554;
+        font-weight: 600;
+    }
+
+    .form-group input,
+    .form-group textarea {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 12px 14px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        font-size: 14px;
+        outline: none;
+        transition: 0.2s;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.10);
+    }
+
+    .form-group textarea {
+        min-height: 120px;
+        resize: vertical;
+    }
+
+    .form-help {
+        margin-top: 5px;
+        color: #64748b;
+        font-size: 12px;
+    }
+
+    .form-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-top: 25px;
+        padding-top: 20px;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .btn-expense {
+        border: none;
+        border-radius: 8px;
+        padding: 11px 20px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+    }
+
+    .btn-save {
+        background: #2563eb;
+        color: white;
+    }
+
+    .btn-save:hover {
+        background: #1d4ed8;
+    }
+
+    .btn-back {
+        background: #e2e8f0;
+        color: #0f172a;
+    }
+
+    .btn-back:hover {
+        background: #cbd5e1;
+    }
+
+    .required {
+        color: #dc2626;
+    }
+
+    @media (max-width: 600px) {
+
+        .expense-form-page {
+            margin: 20px 0;
+        }
+
+        .expense-form-card {
+            padding: 20px;
+        }
+
+        .form-actions {
+            flex-direction: column-reverse;
+        }
+
+        .btn-expense {
+            width: 100%;
+        }
+
+    }
+
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="expense-form-page">
+
+    <div class="expense-header">
+
+        <h2>
+            {% if expense %}
+                ✏️ Hariri Matumizi
+            {% else %}
+                💰 Rekodi Matumizi
+            {% endif %}
+        </h2>
+
+        <p>
+            Hifadhi kumbukumbu ya matumizi ya biashara
+        </p>
+
+    </div>
+
+
+    <div class="expense-form-card">
+
+        <form method="post">
+
+            {% csrf_token %}
+
+            <!-- DATE -->
+
+            <div class="form-group">
+
+                <label for="expense_date">
+                    📅 Tarehe <span class="required">*</span>
+                </label>
+
+                <input
+                    type="date"
+                    id="expense_date"
+                    name="expense_date"
+                    value="{% if expense %}{{ expense.expense_date|date:'Y-m-d' }}{% else %}{% now 'Y-m-d' %}{% endif %}"
+                    required
+                >
+
+                <div class="form-help">
+                    Tarehe ya leo imewekwa moja kwa moja. Unaweza kuibadilisha.
+                </div>
+
+            </div>
+
+
+            <!-- TITLE -->
+
+            <div class="form-group">
+
+                <label for="title">
+                    📝 Jina la Matumizi <span class="required">*</span>
+                </label>
+
+                <input
+                    type="text"
+                    id="title"
+                    name="title"
+                    value="{{ expense.title|default:'' }}"
+                    placeholder="Mfano: Usafiri, Mshahara, Umeme..."
+                    maxlength="200"
+                    required
+                >
+
+            </div>
+
+
+            <!-- AMOUNT -->
+
+            <div class="form-group">
+
+                <label for="amount">
+                    💰 Kiasi <span class="required">*</span>
+                </label>
+
+                <input
+                    type="number"
+                    id="amount"
+                    name="amount"
+                    value="{{ expense.amount|default:'' }}"
+                    placeholder="Mfano: 15000"
+                    min="0"
+                    step="0.01"
+                    required
+                >
+
+                <div class="form-help">
+                    Weka kiasi kwa TSh.
+                </div>
+
+            </div>
+
+
+            <!-- DESCRIPTION -->
+
+            <div class="form-group">
+
+                <label for="description">
+                    📄 Maelezo
+                </label>
+
+                <textarea
+                    id="description"
+                    name="description"
+                    placeholder="Andika maelezo ya ziada kuhusu matumizi haya..."
+                >{{ expense.description|default:'' }}</textarea>
+
+                <div class="form-help">
+                    Sehemu hii ni hiari.
+                </div>
+
+            </div>
+
+
+            <!-- ACTIONS -->
+
+            <div class="form-actions">
+
+                <a
+                    href="{% url 'pigs:expense_list' %}"
+                    class="btn-expense btn-back"
+                >
+                    <i class="fas fa-arrow-left"></i>
+                    Rudi
+                </a>
+
+                <button
+                    type="submit"
+                    class="btn-expense btn-save"
+                >
+                    <i class="fas fa-save"></i>
+
+                    {% if expense %}
+                        Hifadhi Mabadiliko
+                    {% else %}
+                        Hifadhi Rekodi
+                    {% endif %}
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

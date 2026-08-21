@@ -1,0 +1,249 @@
+{% extends "pigs/base.html" %}
+{% load humanize %}
+
+{% block title %}
+Ripoti za Faida - Batch
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        text-align: center;
+        margin-bottom: 25px;
+    }
+
+    .page-header h2 {
+        margin: 0 0 8px;
+        color: #172554;
+    }
+
+    .page-header p {
+        color: #64748b;
+        margin: 0;
+    }
+
+    .top-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 25px;
+        flex-wrap: wrap;
+    }
+
+    .profit-summary {
+        background: linear-gradient(135deg, #172554, #2563eb);
+        color: white;
+        border-radius: 14px;
+        padding: 25px;
+        margin-bottom: 20px;
+        text-align: center;
+        box-shadow: 0 6px 20px rgba(37, 99, 235, 0.20);
+    }
+
+    .profit-summary span {
+        display: block;
+        color: #dbeafe;
+        font-size: 14px;
+        margin-bottom: 8px;
+    }
+
+    .profit-summary strong {
+        display: block;
+        font-size: 32px;
+    }
+
+    .profit-summary .profit-positive {
+        color: #86efac;
+    }
+
+    .profit-summary .profit-negative {
+        color: #fca5a5;
+    }
+
+    .table-card {
+        background: white;
+        border-radius: 14px;
+        padding: 20px;
+        box-shadow: 0 4px 15px rgba(15, 23, 42, 0.07);
+        overflow-x: auto;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        padding: 12px 14px;
+        text-align: center;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    th {
+        background: #f8fafc;
+        color: #334155;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    td {
+        font-size: 13px;
+    }
+
+    .batch-number {
+        font-weight: 700;
+        color: #2563eb;
+    }
+
+    .profit-positive {
+        color: #16a34a;
+        font-weight: 700;
+    }
+
+    .profit-negative {
+        color: #dc2626;
+        font-weight: 700;
+    }
+
+    .view-btn {
+        padding: 4px 12px;
+        background: #2563eb;
+        color: white;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 12px;
+        display: inline-block;
+    }
+
+    .view-btn:hover {
+        background: #1d4ed8;
+    }
+
+    .empty {
+        text-align: center;
+        padding: 45px 20px;
+        color: #64748b;
+    }
+
+    .empty h3 {
+        margin-bottom: 8px;
+        color: #334155;
+    }
+
+    .empty p {
+        font-size: 13px;
+        margin-bottom: 5px;
+    }
+
+    @media (max-width: 700px) {
+        .top-actions {
+            flex-direction: column;
+        }
+        .top-actions .button {
+            width: 100%;
+            text-align: center;
+        }
+        .profit-summary strong {
+            font-size: 24px;
+        }
+        th, td {
+            padding: 8px 10px;
+            font-size: 12px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h2>📊 Ripoti za Faida - Batch</h2>
+    <p>Ripoti za faida za kila batch ya nguruwe iliyokamilika</p>
+</div>
+
+<div class="top-actions">
+    <a href="{% url 'pigs:meat_list' %}" class="button secondary">
+        <i class="fas fa-arrow-left"></i> Rudi kwenye Nyama
+    </a>
+    <a href="{% url 'pigs:dashboard' %}" class="button secondary">
+        <i class="fas fa-home"></i> Dashboard
+    </a>
+</div>
+
+<!-- Jumla ya Faida -->
+<div class="profit-summary">
+    <span>💰 JUMLA YA FAIDA ZOTE</span>
+    {% if total_profit >= 0 %}
+        <strong class="profit-positive">+TSh {{ total_profit|floatformat:0|intcomma }}</strong>
+    {% else %}
+        <strong class="profit-negative">-TSh {{ total_profit|floatformat:0|intcomma }}</strong>
+    {% endif %}
+</div>
+
+<div class="table-card">
+
+    {% if reports %}
+
+    <table>
+        <thead>
+            <tr>
+                <th>Batch</th>
+                <th>Tarehe ya Kufungwa</th>
+                <th>Nguruwe</th>
+                <th>Gharama ya Ununuzi</th>
+                <th>Mauzo ya Nyama</th>
+                <th>Faida</th>
+                <th>Kitendo</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for report in reports %}
+            <tr>
+                <td>
+                    <span class="batch-number">{{ report.slaughter_batch.batch_number }}</span>
+                </td>
+                <td>
+                    {{ report.finalized_date|date:"d/m/Y" }}
+                </td>
+                <td>
+                    {{ report.total_pigs }}
+                </td>
+                <td>
+                    TSh {{ report.total_purchase_cost|floatformat:0|intcomma }}
+                </td>
+                <td>
+                    TSh {{ report.total_meat_sales|floatformat:0|intcomma }}
+                </td>
+                <td>
+                    {% if report.total_profit >= 0 %}
+                        <span class="profit-positive">+TSh {{ report.total_profit|floatformat:0|intcomma }}</span>
+                    {% else %}
+                        <span class="profit-negative">-TSh {{ report.total_profit|floatformat:0|intcomma }}</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{% url 'pigs:batch_profit_report_detail' report.slaughter_batch.id %}" class="view-btn">
+                        <i class="fas fa-eye"></i> Angalia
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% else %}
+
+    <div class="empty">
+        <h3>📭 Hakuna Ripoti</h3>
+        <p>Hakuna ripoti za faida zilizopatikana bado.</p>
+        <p style="font-size: 12px; color: #94a3b8; margin-top: 8px;">
+            💡 Ripoti zinaundwa automatically baada ya nyama kuisha.
+        </p>
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

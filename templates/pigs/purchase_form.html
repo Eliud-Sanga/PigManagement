@@ -1,0 +1,227 @@
+{% extends "pigs/base.html" %}
+
+{% block title %}
+Sajili Nguruwe
+{% endblock %}
+
+{% block extra_css %}
+
+<style>
+
+    .form-wrapper {
+        max-width: 650px;
+        margin: 0 auto;
+    }
+
+    .form-header {
+        text-align: center;
+        margin-bottom: 25px;
+    }
+
+    .form-header h2 {
+        margin: 0 0 8px;
+        color: #172554;
+    }
+
+    .form-header p {
+        margin: 0;
+        color: #64748b;
+        font-size: 14px;
+    }
+
+    .form-card {
+        background: white;
+        padding: 30px;
+        border-radius: 14px;
+        box-shadow: 0 4px 15px rgba(15, 23, 42, 0.07);
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 7px;
+        font-weight: 600;
+        color: #334155;
+        font-size: 14px;
+    }
+
+    input,
+    textarea,
+    select {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        background: white;
+        color: #1e293b;
+        font-size: 15px;
+        outline: none;
+        transition: 0.2s ease;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.10);
+    }
+
+    textarea {
+        resize: vertical;
+    }
+
+    .errorlist {
+        margin: 6px 0 0;
+        padding-left: 18px;
+        color: #dc2626;
+        font-size: 13px;
+    }
+
+    .helptext {
+        display: block;
+        margin-top: 5px;
+        color: #64748b;
+        font-size: 12px;
+    }
+
+    /* ========================================================= */
+    /* ALERT / NOTIFICATION BOX - ADDED */
+    /* ========================================================= */
+    .alert-info {
+        background: #eff6ff;
+        border-left: 4px solid #2563eb;
+        padding: 12px 16px;
+        border-radius: 6px;
+        margin-bottom: 20px;
+        color: #1e40af;
+        font-size: 14px;
+    }
+
+    .alert-info i {
+        margin-right: 8px;
+    }
+
+    .buttons {
+        display: flex;
+        gap: 12px;
+        margin-top: 28px;
+    }
+
+    .buttons .button {
+        flex: 1;
+        text-align: center;
+        border: none;
+        cursor: pointer;
+        display: inline-block;
+        padding: 12px 20px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .save-button {
+        background: #2563eb;
+        color: white;
+    }
+
+    .save-button:hover {
+        background: #1d4ed8;
+    }
+
+    .secondary {
+        background: #e2e8f0;
+        color: #0f172a;
+    }
+
+    .secondary:hover {
+        background: #cbd5e1;
+    }
+
+    @media (max-width: 600px) {
+        .form-card {
+            padding: 22px 18px;
+        }
+        .buttons {
+            flex-direction: column;
+        }
+        .buttons .button {
+            width: 100%;
+        }
+    }
+
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+
+    <div class="form-wrapper">
+
+        <div class="form-header">
+            <h2>
+                <i class="fas fa-shopping-cart"></i> Sajili Ununuzi wa Nguruwe
+            </h2>
+            <p>
+                Ingiza taarifa za ununuzi wa nguruwe
+            </p>
+        </div>
+
+        <div class="form-card">
+
+            <!-- ========================================================= -->
+            <!-- ADDED: ALERT MESSAGE FOR MAMA -->
+            <!-- ========================================================= -->
+            <div class="alert-info">
+                <i class="fas fa-info-circle"></i>
+                <strong>Kumbuka:</strong> Baada ya kuhifadhi, utaelekezwa kwenye ukurasa wa 
+                kujaza taarifa za kila nguruwe (jinsia, bei, maelezo).
+            </div>
+
+            <form method="post">
+
+                {% csrf_token %}
+
+                {{ form.non_field_errors }}
+
+                {% for field in form %}
+
+                    <div class="form-group">
+                        {{ field.label_tag }}
+                        {{ field }}
+                        {{ field.errors }}
+                        {% if field.help_text %}
+                            <span class="helptext">
+                                {{ field.help_text }}
+                            </span>
+                        {% endif %}
+                    </div>
+
+                {% endfor %}
+
+                <div class="buttons">
+
+                    <a href="{% url 'pigs:pig_list' %}" class="button secondary">
+                        <i class="fas fa-arrow-left"></i> Rudi
+                    </a>
+
+                    <button type="submit" class="button save-button">
+                        <i class="fas fa-save"></i> Hifadhi na Endelea
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

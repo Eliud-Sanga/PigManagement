@@ -1,0 +1,868 @@
+{% extends "pigs/base.html" %}
+
+
+{% block title %}
+
+Thibitisha Super Admin
+
+{% endblock %}
+
+
+{% block extra_css %}
+
+<style>
+
+/* ============================================================
+   VERIFY SUPER ADMIN PAGE
+============================================================ */
+
+.verify-page {
+
+    max-width: 520px;
+
+    margin: 45px auto;
+
+    padding-bottom: 40px;
+}
+
+
+/* ============================================================
+   CARD
+============================================================ */
+
+.verify-card {
+
+    background: white;
+
+    border-radius: 18px;
+
+    padding: 30px;
+
+    box-shadow:
+        0 8px 30px
+        rgba(15, 23, 42, 0.10);
+
+    border:
+        1px solid #f1f5f9;
+
+    text-align: center;
+}
+
+
+/* ============================================================
+   ICON
+============================================================ */
+
+.verify-icon {
+
+    width: 68px;
+
+    height: 68px;
+
+    margin: 0 auto 17px;
+
+    border-radius: 50%;
+
+    background: #f3e8ff;
+
+    color: #7c3aed;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 27px;
+
+    box-shadow:
+        0 6px 18px
+        rgba(124, 58, 237, 0.12);
+}
+
+
+/* ============================================================
+   TITLE
+============================================================ */
+
+.verify-card h2 {
+
+    margin: 0 0 8px;
+
+    color: #172554;
+
+    font-size: 24px;
+
+    font-weight: 800;
+}
+
+
+.verify-card .subtitle {
+
+    margin: 0;
+
+    color: #64748b;
+
+    font-size: 13px;
+
+    line-height: 1.6;
+}
+
+
+/* ============================================================
+   TARGET USER
+============================================================ */
+
+.target-user {
+
+    margin: 20px 0;
+
+    padding: 13px 15px;
+
+    background: #faf5ff;
+
+    border:
+        1px solid #ddd6fe;
+
+    border-left:
+        4px solid #7c3aed;
+
+    border-radius: 10px;
+
+    color: #5b21b6;
+
+    text-align: left;
+
+    font-size: 13px;
+
+    line-height: 1.5;
+}
+
+
+.target-user-label {
+
+    display: block;
+
+    color: #8b5cf6;
+
+    font-size: 10px;
+
+    font-weight: 750;
+
+    text-transform: uppercase;
+
+    margin-bottom: 3px;
+}
+
+
+.target-user-name {
+
+    color: #4c1d95;
+
+    font-size: 14px;
+
+    font-weight: 800;
+}
+
+
+/* ============================================================
+   SECURITY NOTICE
+============================================================ */
+
+.security-notice {
+
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 9px;
+
+    margin-bottom: 20px;
+
+    padding: 11px 13px;
+
+    background: #f8fafc;
+
+    border:
+        1px solid #e2e8f0;
+
+    border-radius: 9px;
+
+    color: #64748b;
+
+    font-size: 11px;
+
+    line-height: 1.5;
+
+    text-align: left;
+}
+
+
+.security-notice-icon {
+
+    flex-shrink: 0;
+
+    color: #64748b;
+
+    font-size: 13px;
+}
+
+
+/* ============================================================
+   FORM GROUP
+============================================================ */
+
+.form-group {
+
+    text-align: left;
+
+    margin-top: 18px;
+}
+
+
+.form-group label {
+
+    display: block;
+
+    margin-bottom: 7px;
+
+    color: #334155;
+
+    font-size: 13px;
+
+    font-weight: 700;
+}
+
+
+/* ============================================================
+   PASSWORD WRAPPER
+============================================================ */
+
+.password-wrapper {
+
+    position: relative;
+}
+
+
+.password-wrapper input {
+
+    width: 100%;
+
+    box-sizing: border-box;
+
+    padding:
+        12px 45px 12px 14px;
+
+    border:
+        1px solid #cbd5e1;
+
+    border-radius: 9px;
+
+    font-size: 14px;
+
+    outline: none;
+
+    background: white;
+
+    color: #1e293b;
+
+    transition: .2s ease;
+}
+
+
+.password-wrapper input:focus {
+
+    border-color:
+        #2563eb;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(37, 99, 235, 0.10);
+}
+
+
+.password-wrapper input::placeholder {
+
+    color: #94a3b8;
+}
+
+
+/* ============================================================
+   PASSWORD TOGGLE
+============================================================ */
+
+.password-toggle {
+
+    position: absolute;
+
+    top: 50%;
+
+    right: 10px;
+
+    transform:
+        translateY(-50%);
+
+    border: none;
+
+    background: transparent;
+
+    color: #64748b;
+
+    cursor: pointer;
+
+    padding: 5px;
+
+    font-size: 14px;
+
+    transition: .2s ease;
+}
+
+
+.password-toggle:hover {
+
+    color: #2563eb;
+}
+
+
+/* ============================================================
+   ACTIONS
+============================================================ */
+
+.actions {
+
+    display: flex;
+
+    gap: 10px;
+
+    margin-top: 24px;
+}
+
+
+.btn {
+
+    flex: 1;
+
+    min-height: 44px;
+
+    padding:
+        11px 18px;
+
+    border-radius: 9px;
+
+    border: none;
+
+    text-decoration: none;
+
+    cursor: pointer;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 7px;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    transition: .2s ease;
+}
+
+
+.btn:hover {
+
+    transform:
+        translateY(-1px);
+}
+
+
+/* ============================================================
+   PRIMARY
+============================================================ */
+
+.btn-primary {
+
+    background: #2563eb;
+
+    color: white;
+}
+
+
+.btn-primary:hover {
+
+    background: #1d4ed8;
+}
+
+
+/* ============================================================
+   SECONDARY
+============================================================ */
+
+.btn-secondary {
+
+    background: #e2e8f0;
+
+    color: #334155;
+}
+
+
+.btn-secondary:hover {
+
+    background: #cbd5e1;
+}
+
+
+/* ============================================================
+   SUBMIT LOADING
+============================================================ */
+
+.btn-primary:disabled {
+
+    background: #93c5fd;
+
+    cursor: not-allowed;
+
+    transform: none;
+}
+
+
+/* ============================================================
+   FOOT NOTE
+============================================================ */
+
+.verify-footer-note {
+
+    margin-top: 17px;
+
+    color: #94a3b8;
+
+    font-size: 10px;
+
+    line-height: 1.5;
+}
+
+
+/* ============================================================
+   MOBILE
+============================================================ */
+
+@media (max-width: 600px) {
+
+    .verify-page {
+
+        margin:
+            25px 15px;
+
+    }
+
+
+    .verify-card {
+
+        padding:
+            23px 18px;
+
+    }
+
+
+    .verify-card h2 {
+
+        font-size: 21px;
+
+    }
+
+
+    .actions {
+
+        flex-direction: column-reverse;
+
+    }
+
+
+    .btn {
+
+        width: 100%;
+
+    }
+
+}
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container">
+
+<div class="verify-page">
+
+
+    <!-- ========================================================
+         VERIFY CARD
+    ========================================================= -->
+
+    <div class="verify-card">
+
+
+        <!-- ====================================================
+             ICON
+        ===================================================== -->
+
+        <div class="verify-icon">
+
+            🔐
+
+        </div>
+
+
+        <!-- ====================================================
+             TITLE
+        ===================================================== -->
+
+        <h2>
+
+            Thibitisha Super Admin
+
+        </h2>
+
+
+        <p class="subtitle">
+
+            Kwa usalama, thibitisha password yako ya
+            Super Admin kabla ya kufungua au kufanya
+            mabadiliko kwenye taarifa nyeti za account hii.
+
+        </p>
+
+
+        <!-- ====================================================
+             TARGET USER
+        ===================================================== -->
+
+        <div class="target-user">
+
+            <span class="target-user-label">
+
+                Account inayolindwa
+
+            </span>
+
+
+            <span class="target-user-name">
+
+                👑 {{ target_user.username }}
+
+            </span>
+
+
+            <div style="margin-top:4px; font-size:11px;">
+
+                Super Admin Account
+
+            </div>
+
+        </div>
+
+
+        <!-- ====================================================
+             SECURITY NOTICE
+        ===================================================== -->
+
+        <div class="security-notice">
+
+            <div class="security-notice-icon">
+
+                <i class="fas fa-shield-alt"></i>
+
+            </div>
+
+
+            <div>
+
+                <strong>
+
+                    Uthibitisho wa usalama
+
+                </strong>
+
+                <br>
+
+                Ingiza password ya Super Admin
+                anayesimamia mfumo.
+
+                Password hii haitabadilishwa;
+                inathibitisha tu kuwa action nyeti
+                imeidhinishwa.
+
+            </div>
+
+        </div>
+
+
+        <!-- ====================================================
+             FORM
+        ===================================================== -->
+
+        <form
+            method="post"
+            id="verifySuperAdminForm"
+        >
+
+            {% csrf_token %}
+
+
+            <!-- ==================================================
+                 PASSWORD
+            =================================================== -->
+
+            <div class="form-group">
+
+                <label for="password">
+
+                    🔑 Password ya Super Admin
+
+                </label>
+
+
+                <div class="password-wrapper">
+
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Ingiza password yako"
+                        autocomplete="current-password"
+                        required
+                        autofocus
+                    >
+
+
+                    <button
+                        type="button"
+                        class="password-toggle"
+                        id="passwordToggle"
+                        aria-label="Onyesha password"
+                    >
+
+                        <i class="fas fa-eye"></i>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- ==================================================
+                 ACTIONS
+            =================================================== -->
+
+            <div class="actions">
+
+
+                <!-- ----------------------------------------------
+                     CANCEL
+                     Goes to user list to avoid verification loop.
+                ----------------------------------------------- -->
+
+                <a
+                    href="{% url 'users:user_list' %}"
+                    class="btn btn-secondary"
+                >
+
+                    <i class="fas fa-arrow-left"></i>
+
+                    Ghairi
+
+                </a>
+
+
+                <!-- ----------------------------------------------
+                     VERIFY
+                ----------------------------------------------- -->
+
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                    id="verifyButton"
+                >
+
+                    <i class="fas fa-unlock"></i>
+
+                    Thibitisha
+
+                </button>
+
+
+            </div>
+
+
+        </form>
+
+
+        <div class="verify-footer-note">
+
+            Uthibitisho huu umehifadhiwa kwenye session ya sasa
+            kwa action inayolindwa.
+
+        </div>
+
+    </div>
+
+</div>
+
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+
+        /* =====================================================
+           PASSWORD SHOW / HIDE
+        ====================================================== */
+
+        const passwordInput =
+            document.getElementById(
+                "password"
+            );
+
+
+        const passwordToggle =
+            document.getElementById(
+                "passwordToggle"
+            );
+
+
+        if (
+            passwordInput &&
+            passwordToggle
+        ) {
+
+            passwordToggle.addEventListener(
+                "click",
+                function () {
+
+                    const icon =
+                        passwordToggle
+                            .querySelector("i");
+
+
+                    if (
+                        passwordInput.type ===
+                        "password"
+                    ) {
+
+                        passwordInput.type =
+                            "text";
+
+
+                        passwordToggle.setAttribute(
+                            "aria-label",
+                            "Ficha password"
+                        );
+
+
+                        if (icon) {
+
+                            icon.classList
+                                .remove(
+                                    "fa-eye"
+                                );
+
+                            icon.classList
+                                .add(
+                                    "fa-eye-slash"
+                                );
+
+                        }
+
+                    } else {
+
+                        passwordInput.type =
+                            "password";
+
+
+                        passwordToggle.setAttribute(
+                            "aria-label",
+                            "Onyesha password"
+                        );
+
+
+                        if (icon) {
+
+                            icon.classList
+                                .remove(
+                                    "fa-eye-slash"
+                                );
+
+                            icon.classList
+                                .add(
+                                    "fa-eye"
+                                );
+
+                        }
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        /* =====================================================
+           FORM SUBMIT PROTECTION
+        ====================================================== */
+
+        const form =
+            document.getElementById(
+                "verifySuperAdminForm"
+            );
+
+
+        const verifyButton =
+            document.getElementById(
+                "verifyButton"
+            );
+
+
+        if (
+            form &&
+            verifyButton
+        ) {
+
+            form.addEventListener(
+                "submit",
+                function () {
+
+                    verifyButton.disabled =
+                        true;
+
+
+                    verifyButton.innerHTML =
+                        '<i class="fas fa-spinner fa-spin"></i> ' +
+                        'Inathibitisha...';
+
+                }
+            );
+
+        }
+
+    }
+
+);
+
+</script>
+
+{% endblock %}

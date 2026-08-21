@@ -1,0 +1,963 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="sw">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Ingia - Pig Management</title>
+
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+
+        body {
+
+            min-height: 100vh;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            font-family:
+                'Segoe UI',
+                Tahoma,
+                Geneva,
+                Verdana,
+                sans-serif;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #0f172a 0%,
+                    #1e3a5f 52%,
+                    #2563eb 100%
+                );
+
+            padding: 15px;
+
+        }
+
+
+        /* =====================================================
+           LOGIN WRAPPER
+        ===================================================== */
+
+        .login-wrapper {
+
+            width: 100%;
+
+            max-width: 370px;
+
+            animation:
+                fadeIn 0.55s ease-out;
+
+        }
+
+
+        @keyframes fadeIn {
+
+            from {
+
+                opacity: 0;
+
+                transform:
+                    translateY(-18px);
+
+            }
+
+            to {
+
+                opacity: 1;
+
+                transform:
+                    translateY(0);
+
+            }
+
+        }
+
+
+        /* =====================================================
+           LOGIN CARD
+        ===================================================== */
+
+        .login-card {
+
+            background:
+                rgba(255, 255, 255, 0.97);
+
+            backdrop-filter:
+                blur(10px);
+
+            border-radius: 18px;
+
+            padding:
+                28px 27px 22px;
+
+            box-shadow:
+                0 16px 45px
+                rgba(0, 0, 0, 0.28);
+
+            border:
+                1px solid
+                rgba(255, 255, 255, 0.25);
+
+        }
+
+
+        /* =====================================================
+           HEADER
+        ===================================================== */
+
+        .login-header {
+
+            text-align: center;
+
+            margin-bottom: 23px;
+
+        }
+
+
+        /* =====================================================
+           USER IMAGE
+        ===================================================== */
+
+        .login-image {
+
+            width: 72px;
+
+            height: 72px;
+
+            margin: 0 auto 10px;
+
+            border-radius: 50%;
+
+            object-fit: cover;
+
+            display: block;
+
+            border:
+                3px solid white;
+
+            box-shadow:
+                0 7px 18px
+                rgba(37, 99, 235, 0.22);
+
+            background: #e2e8f0;
+
+        }
+
+
+        .login-header h1 {
+
+            color: #0f172a;
+
+            font-size: 23px;
+
+            font-weight: 800;
+
+            line-height: 1.2;
+
+        }
+
+
+        .login-header p {
+
+            color: #64748b;
+
+            font-size: 12px;
+
+            margin-top: 5px;
+
+        }
+
+
+        .login-header .subtitle {
+
+            display: block;
+
+            color: #2563eb;
+
+            font-size: 11px;
+
+            font-weight: 750;
+
+            margin-top: 7px;
+
+            letter-spacing: 0.4px;
+
+        }
+
+
+        .decorative-line {
+
+            width: 45px;
+
+            height: 3px;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    #2563eb,
+                    #7c3aed
+                );
+
+            border-radius: 3px;
+
+            margin: 10px auto 0;
+
+        }
+
+
+        /* =====================================================
+           MESSAGES
+        ===================================================== */
+
+        .messages {
+
+            margin-bottom: 14px;
+
+        }
+
+
+        .message {
+
+            padding:
+                9px 12px;
+
+            border-radius: 8px;
+
+            font-size: 12px;
+
+            font-weight: 600;
+
+            margin-bottom: 7px;
+
+            line-height: 1.4;
+
+        }
+
+
+        .message:last-child {
+
+            margin-bottom: 0;
+
+        }
+
+
+        .message.error {
+
+            background: #fee2e2;
+
+            color: #991b1b;
+
+            border:
+                1px solid #fecaca;
+
+        }
+
+
+        .message.success {
+
+            background: #dcfce7;
+
+            color: #166534;
+
+            border:
+                1px solid #bbf7d0;
+
+        }
+
+
+        .message.warning {
+
+            background: #fef3c7;
+
+            color: #92400e;
+
+            border:
+                1px solid #fde68a;
+
+        }
+
+
+        .message.info {
+
+            background: #dbeafe;
+
+            color: #1e40af;
+
+            border:
+                1px solid #bfdbfe;
+
+        }
+
+
+        /* =====================================================
+           FORM
+        ===================================================== */
+
+        .form-group {
+
+            margin-bottom: 15px;
+
+        }
+
+
+        .form-group label {
+
+            display: block;
+
+            font-weight: 700;
+
+            color: #1e293b;
+
+            font-size: 12px;
+
+            margin-bottom: 6px;
+
+        }
+
+
+        .input-wrapper {
+
+            position: relative;
+
+        }
+
+
+        .form-group input {
+
+            width: 100%;
+
+            padding:
+                11px 13px;
+
+            border:
+                1px solid #dbe3ed;
+
+            border-radius: 9px;
+
+            font-size: 13px;
+
+            transition:
+                all 0.2s ease;
+
+            background: #f8fafc;
+
+            color: #0f172a;
+
+            outline: none;
+
+        }
+
+
+        .password-input {
+
+            padding-right: 42px !important;
+
+        }
+
+
+        .form-group input::placeholder {
+
+            color: #94a3b8;
+
+        }
+
+
+        .form-group input:focus {
+
+            border-color:
+                #2563eb;
+
+            box-shadow:
+                0 0 0 3px
+                rgba(37, 99, 235, 0.10);
+
+            background: white;
+
+        }
+
+
+        /* =====================================================
+           PASSWORD TOGGLE
+        ===================================================== */
+
+        .password-toggle {
+
+            position: absolute;
+
+            right: 10px;
+
+            top: 50%;
+
+            transform:
+                translateY(-50%);
+
+            border: none;
+
+            background: transparent;
+
+            color: #64748b;
+
+            cursor: pointer;
+
+            font-size: 13px;
+
+            padding: 4px;
+
+        }
+
+
+        .password-toggle:hover {
+
+            color: #2563eb;
+
+        }
+
+
+        /* =====================================================
+           REMEMBER ROW
+        ===================================================== */
+
+        .remember-row {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content:
+                space-between;
+
+            gap: 10px;
+
+            margin-bottom: 17px;
+
+        }
+
+
+        .checkbox-group {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 7px;
+
+        }
+
+
+        .checkbox-group input {
+
+            width: 15px;
+
+            height: 15px;
+
+            accent-color:
+                #2563eb;
+
+            cursor: pointer;
+
+        }
+
+
+        .checkbox-group label {
+
+            color: #475569;
+
+            font-size: 12px;
+
+            cursor: pointer;
+
+        }
+
+
+        .login-hint {
+
+            color: #94a3b8;
+
+            font-size: 10px;
+
+            text-align: right;
+
+        }
+
+
+        /* =====================================================
+           LOGIN BUTTON
+        ===================================================== */
+
+        .btn-login {
+
+            width: 100%;
+
+            padding: 12px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #2563eb,
+                    #1d4ed8
+                );
+
+            color: white;
+
+            border: none;
+
+            border-radius: 9px;
+
+            font-size: 13px;
+
+            font-weight: 750;
+
+            cursor: pointer;
+
+            transition:
+                all 0.2s ease;
+
+        }
+
+
+        .btn-login:hover {
+
+            transform:
+                translateY(-1px);
+
+            box-shadow:
+                0 7px 18px
+                rgba(37, 99, 235, 0.25);
+
+        }
+
+
+        .btn-login:disabled {
+
+            opacity: 0.7;
+
+            cursor: not-allowed;
+
+            transform: none;
+
+        }
+
+
+        /* =====================================================
+           FOOTER
+        ===================================================== */
+
+        .login-footer {
+
+            text-align: center;
+
+            margin-top: 18px;
+
+            color: #94a3b8;
+
+            font-size: 10px;
+
+            line-height: 1.5;
+
+        }
+
+
+        .login-footer strong {
+
+            color: #2563eb;
+
+        }
+
+
+        /* =====================================================
+           MOBILE
+        ===================================================== */
+
+        @media (max-width: 420px) {
+
+            body {
+
+                padding: 12px;
+
+            }
+
+
+            .login-card {
+
+                padding:
+                    23px 18px 19px;
+
+                border-radius: 15px;
+
+            }
+
+
+            .login-image {
+
+                width: 64px;
+
+                height: 64px;
+
+            }
+
+
+            .login-header h1 {
+
+                font-size: 21px;
+
+            }
+
+
+            .remember-row {
+
+                align-items: flex-start;
+
+            }
+
+
+            .login-hint {
+
+                max-width: 125px;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="login-wrapper">
+
+
+    <div class="login-card">
+
+
+        <!-- =================================================
+             HEADER
+        ================================================== -->
+
+        <div class="login-header">
+
+
+            <img
+                src="{% static 'users/eliud.jpeg' %}"
+                alt="Pig Management"
+                class="login-image"
+            >
+
+
+            <h1>
+                Pig Management
+            </h1>
+
+
+            <p>
+                Karibu tena
+            </p>
+
+
+            <div class="decorative-line"></div>
+
+
+            <span class="subtitle">
+                Ingia kuendelea
+            </span>
+
+        </div>
+
+
+        <!-- =================================================
+             DJANGO MESSAGES
+        ================================================== -->
+
+        {% if messages %}
+
+            <div class="messages">
+
+                {% for message in messages %}
+
+                    <div
+                        class="message {{ message.tags }}"
+                    >
+                        {{ message }}
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% endif %}
+
+
+        <!-- =================================================
+             LOGIN FORM
+        ================================================== -->
+
+        <form
+            method="post"
+            id="loginForm"
+        >
+
+            {% csrf_token %}
+
+
+            <!-- USERNAME -->
+
+            <div class="form-group">
+
+                <label for="username">
+                    Jina la Mtumiaji
+                </label>
+
+
+                <input
+                    type="text"
+                    id="username"
+                    name="username"
+                    placeholder="Username"
+                    autocomplete="username"
+                    required
+                    autofocus
+                >
+
+            </div>
+
+
+            <!-- PASSWORD -->
+
+            <div class="form-group">
+
+                <label for="password">
+                    Nenosiri
+                </label>
+
+
+                <div class="input-wrapper">
+
+
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        class="password-input"
+                        placeholder="Nenosiri"
+                        autocomplete="current-password"
+                        required
+                    >
+
+
+                    <button
+                        type="button"
+                        class="password-toggle"
+                        id="passwordToggle"
+                        aria-label="Onyesha nenosiri"
+                    >
+
+                        👁
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- REMEMBER -->
+
+            <div class="remember-row">
+
+                <div class="checkbox-group">
+
+                    <input
+                        type="checkbox"
+                        id="remember_me"
+                        name="remember_me"
+                    >
+
+                    <label for="remember_me">
+                        Nikumbuke
+                    </label>
+
+                </div>
+
+
+                <span class="login-hint">
+                    Weka taarifa sahihi
+                </span>
+
+            </div>
+
+
+            <!-- LOGIN -->
+
+            <button
+                type="submit"
+                class="btn-login"
+                id="loginButton"
+            >
+                Ingia
+            </button>
+
+
+        </form>
+
+
+        <!-- =================================================
+             FOOTER
+        ================================================== -->
+
+        <div class="login-footer">
+
+            <p>
+                © 2026
+                <strong>Pig Management</strong>
+            </p>
+
+            <p>
+                Mfumo salama wa usimamizi
+            </p>
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+
+        /* =================================================
+           PASSWORD SHOW / HIDE
+        ================================================== */
+
+        const password =
+            document.getElementById(
+                "password"
+            );
+
+
+        const passwordToggle =
+            document.getElementById(
+                "passwordToggle"
+            );
+
+
+        if (
+            password &&
+            passwordToggle
+        ) {
+
+            passwordToggle.addEventListener(
+                "click",
+                function () {
+
+                    if (
+                        password.type ===
+                        "password"
+                    ) {
+
+                        password.type =
+                            "text";
+
+                        passwordToggle.textContent =
+                            "🙈";
+
+                        passwordToggle.setAttribute(
+                            "aria-label",
+                            "Ficha nenosiri"
+                        );
+
+                    } else {
+
+                        password.type =
+                            "password";
+
+                        passwordToggle.textContent =
+                            "👁";
+
+                        passwordToggle.setAttribute(
+                            "aria-label",
+                            "Onyesha nenosiri"
+                        );
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        /* =================================================
+           SUBMIT PROTECTION
+        ================================================== */
+
+        const form =
+            document.getElementById(
+                "loginForm"
+            );
+
+
+        const loginButton =
+            document.getElementById(
+                "loginButton"
+            );
+
+
+        if (
+            form &&
+            loginButton
+        ) {
+
+            form.addEventListener(
+                "submit",
+                function () {
+
+                    loginButton.disabled =
+                        true;
+
+                    loginButton.textContent =
+                        "Inaingia...";
+
+                }
+            );
+
+        }
+
+    }
+
+);
+
+</script>
+
+
+</body>
+
+</html>

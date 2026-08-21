@@ -1,0 +1,228 @@
+{% extends "pigs/base.html" %}
+{% load humanize %}
+
+{% block title %}
+Machinjio
+{% endblock %}
+
+{% block extra_css %}
+
+<style>
+
+    .page-header {
+        text-align: center;
+        margin-bottom: 25px;
+    }
+
+    .page-header h2 {
+        margin-bottom: 8px;
+        color: #172554;
+    }
+
+    .page-header p {
+        color: #64748b;
+        margin: 0;
+    }
+
+    .top-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 25px;
+    }
+
+    .table-card {
+        background: white;
+        border-radius: 14px;
+        padding: 20px;
+        box-shadow: 0 4px 15px rgba(15, 23, 42, 0.07);
+        overflow-x: auto;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        padding: 14px;
+        border-bottom: 1px solid #e2e8f0;
+        text-align: left;
+        vertical-align: middle;
+    }
+
+    th {
+        background: #f8fafc;
+        color: #334155;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    td {
+        font-size: 14px;
+    }
+
+    .batch-number {
+        font-weight: 700;
+        color: #2563eb;
+    }
+
+    .pig-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .pig-tag {
+        display: inline-block;
+        padding: 4px 10px;
+        background: #e0e7ff;
+        color: #3730a3;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .weight {
+        font-weight: 600;
+        color: #1e293b;
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 12px;
+        font-size: 12px;
+    }
+
+    .badge-success {
+        background: #d1fae5;
+        color: #065f46;
+    }
+
+    .badge-warning {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .badge-secondary {
+        background: #e2e8f0;
+        color: #475569;
+    }
+
+    .empty {
+        text-align: center;
+        padding: 45px 20px;
+        color: #64748b;
+    }
+
+    .empty h3 {
+        margin-bottom: 8px;
+        color: #334155;
+    }
+
+    .empty p {
+        margin-bottom: 20px;
+    }
+
+    @media (max-width: 700px) {
+        .top-actions {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        .top-actions .button {
+            width: 100%;
+            text-align: center;
+        }
+        .table-card {
+            padding: 10px;
+        }
+        th, td {
+            padding: 8px 10px;
+            font-size: 12px;
+        }
+    }
+
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h2>🔪 Machinjio</h2>
+    <p>Historia ya nguruwe waliochinjwa</p>
+</div>
+
+<div class="top-actions">
+    <a href="{% url 'pigs:dashboard' %}" class="button secondary">
+        <i class="fas fa-arrow-left"></i> Rudi
+    </a>
+    <a href="{% url 'pigs:slaughter_create' %}" class="button">
+        <i class="fas fa-plus"></i> Sajili Machinjio
+    </a>
+</div>
+
+<div class="table-card">
+
+    {% if batches %}
+
+    <table>
+        <thead>
+            <tr>
+                <th>Batch</th>
+                <th>Tarehe</th>
+                <th>Nguruwe</th>
+                <th>Uzito (kg)</th>
+                <th>Maelezo</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for batch in batches %}
+            <tr>
+                <td>
+                    <span class="batch-number">{{ batch.batch_number }}</span>
+                </td>
+                <td>
+                    {{ batch.slaughter_date|date:"d/m/Y" }}
+                </td>
+                <td>
+                    <div class="pig-list">
+                        {% for pig in batch.pigs.all %}
+                            <span class="pig-tag">{{ pig.tag_number }}</span>
+                        {% endfor %}
+                    </div>
+                </td>
+                <td>
+                    <span class="weight">
+                        {% if batch.stock.initial_weight_kg %}
+                            {{ batch.stock.initial_weight_kg|floatformat:2 }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </span>
+                </td>
+                <td>
+                    {{ batch.notes|default:"-" }}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% else %}
+
+    <div class="empty">
+        <h3>📭 Hakuna machinjio bado</h3>
+        <p>Sajili batch ya kwanza ya machinjio.</p>
+        <a href="{% url 'pigs:slaughter_create' %}" class="button">
+            <i class="fas fa-plus"></i> Sajili Machinjio
+        </a>
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

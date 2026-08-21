@@ -1,0 +1,842 @@
+{% extends "pigs/base.html" %}
+
+{% block title %}
+Permissions - {{ user.username }}
+{% endblock %}
+
+{% block extra_css %}
+
+<style>
+
+/* ============================================================
+   PERMISSION PAGE
+============================================================ */
+
+.permission-page {
+    max-width: 1000px;
+    margin: 30px auto;
+}
+
+
+/* ============================================================
+   HEADER
+============================================================ */
+
+.permission-header {
+    background: white;
+    border-radius: 16px;
+    padding: 25px;
+    margin-bottom: 20px;
+    box-shadow:
+        0 4px 15px rgba(15, 23, 42, 0.07);
+}
+
+.permission-header h2 {
+    margin: 0 0 5px;
+    color: #172554;
+}
+
+.permission-header p {
+    margin: 0;
+    color: #64748b;
+}
+
+
+/* ============================================================
+   SUPER ADMIN INFORMATION
+============================================================ */
+
+.super-admin-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    background: #f8fafc;
+
+    border:
+        1px solid #e2e8f0;
+
+    border-left:
+        4px solid #94a3b8;
+
+    border-radius: 10px;
+
+    padding: 11px 13px;
+
+    margin-top: 17px;
+
+    color: #64748b;
+
+    font-size: 12px;
+
+    line-height: 1.5;
+}
+
+.super-admin-info-icon {
+    flex-shrink: 0;
+
+    width: 28px;
+    height: 28px;
+
+    border-radius: 50%;
+
+    background: #e2e8f0;
+
+    color: #64748b;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 13px;
+}
+
+.super-admin-info strong {
+    display: block;
+
+    margin-bottom: 1px;
+
+    color: #475569;
+}
+
+
+/* ============================================================
+   PERMISSION CARD
+============================================================ */
+
+.permission-card {
+    background: white;
+    border-radius: 14px;
+    margin-bottom: 18px;
+    overflow: hidden;
+
+    box-shadow:
+        0 4px 15px
+        rgba(15, 23, 42, 0.07);
+}
+
+
+/* ============================================================
+   PERMISSION TITLE
+============================================================ */
+
+.permission-title {
+    background: #f1f5f9;
+
+    padding: 15px 20px;
+
+    font-size: 17px;
+
+    font-weight: 700;
+
+    color: #172554;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 10px;
+}
+
+.permission-title-left {
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+}
+
+
+/* ============================================================
+   SUPER ADMIN CATEGORY STATE
+============================================================ */
+
+.permission-title-state {
+    color: #94a3b8;
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    background: #e2e8f0;
+
+    padding: 4px 9px;
+
+    border-radius: 20px;
+}
+
+
+/* ============================================================
+   PERMISSION LIST
+============================================================ */
+
+.permission-list {
+    padding: 10px 20px;
+}
+
+
+/* ============================================================
+   PERMISSION ITEM
+============================================================ */
+
+.permission-item {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    padding: 14px 5px;
+
+    border-bottom:
+        1px solid #f1f5f9;
+
+    gap: 15px;
+}
+
+.permission-item:last-child {
+    border-bottom: none;
+}
+
+
+/* ============================================================
+   PERMISSION INFORMATION
+============================================================ */
+
+.permission-name {
+    font-weight: 600;
+
+    color: #334155;
+}
+
+.permission-code {
+    font-size: 11px;
+
+    color: #94a3b8;
+
+    margin-top: 3px;
+}
+
+
+/* ============================================================
+   PERMISSION CHECKBOX
+============================================================ */
+
+.permission-checkbox {
+    position: relative;
+
+    width: 48px;
+
+    height: 26px;
+
+    flex-shrink: 0;
+}
+
+
+/* Hide real checkbox */
+
+.permission-checkbox input {
+    opacity: 0;
+
+    width: 0;
+
+    height: 0;
+}
+
+
+/* ============================================================
+   NORMAL SLIDER
+============================================================ */
+
+.slider {
+    position: absolute;
+
+    cursor: pointer;
+
+    inset: 0;
+
+    background: #cbd5e1;
+
+    border-radius: 30px;
+
+    transition: .2s;
+}
+
+
+/* Slider circle */
+
+.slider:before {
+    content: "";
+
+    position: absolute;
+
+    width: 20px;
+
+    height: 20px;
+
+    left: 3px;
+
+    top: 3px;
+
+    background: white;
+
+    border-radius: 50%;
+
+    transition: .2s;
+
+    box-shadow:
+        0 1px 3px
+        rgba(0, 0, 0, 0.12);
+}
+
+
+/* ============================================================
+   NORMAL ON
+============================================================ */
+
+.permission-checkbox
+input:checked
++ .slider {
+    background: #2563eb;
+}
+
+
+.permission-checkbox
+input:checked
++ .slider:before {
+    transform:
+        translateX(22px);
+}
+
+
+/* ============================================================
+   SUPER ADMIN FADED TOGGLE
+============================================================ */
+
+.permission-checkbox.locked {
+    cursor: default;
+
+    opacity: 0.62;
+
+    filter: grayscale(0.65);
+}
+
+
+/* Super Admin ON */
+
+.permission-checkbox.locked
+input:checked
++ .slider {
+    background: #64748b;
+
+    opacity: 0.72;
+}
+
+
+/* Prevent visual hover/click indication */
+
+.permission-checkbox.locked .slider {
+    cursor: default;
+}
+
+
+/* ============================================================
+   SUPER ADMIN PERMISSION LABEL
+============================================================ */
+
+.permission-always-on {
+    color: #94a3b8;
+
+    font-size: 10px;
+
+    font-weight: 700;
+
+    margin-left: 8px;
+
+    vertical-align: middle;
+}
+
+
+/* ============================================================
+   SAVE AREA
+============================================================ */
+
+.action-bar {
+    position: sticky;
+
+    bottom: 15px;
+
+    background: white;
+
+    border-radius: 14px;
+
+    padding: 15px;
+
+    box-shadow:
+        0 6px 25px
+        rgba(15, 23, 42, .15);
+
+    display: flex;
+
+    justify-content: space-between;
+
+    gap: 10px;
+
+    margin-top: 25px;
+}
+
+
+/* ============================================================
+   BUTTONS
+============================================================ */
+
+.btn {
+    border: none;
+
+    border-radius: 9px;
+
+    padding: 12px 22px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    text-decoration: none;
+
+    display: inline-block;
+
+    transition: .2s ease;
+}
+
+
+.btn:hover {
+    transform:
+        translateY(-1px);
+}
+
+
+.btn-save {
+    background: #2563eb;
+
+    color: white;
+}
+
+
+.btn-save:hover {
+    background: #1d4ed8;
+}
+
+
+.btn-back {
+    background: #e2e8f0;
+
+    color: #334155;
+}
+
+
+.btn-back:hover {
+    background: #cbd5e1;
+}
+
+
+/* ============================================================
+   SUPER ADMIN - NO SAVE
+============================================================ */
+
+.locked-action {
+    background: #f1f5f9;
+
+    color: #94a3b8;
+
+    cursor: default;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    border:
+        1px solid #e2e8f0;
+}
+
+.locked-action:hover {
+    transform: none;
+
+    background: #f1f5f9;
+}
+
+
+/* ============================================================
+   MOBILE
+============================================================ */
+
+@media(max-width:600px) {
+
+    .permission-page {
+        margin: 15px;
+    }
+
+    .permission-title {
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+    .action-bar {
+        flex-direction: column;
+    }
+
+    .btn {
+        text-align: center;
+
+        width: 100%;
+    }
+
+    .super-admin-info {
+        font-size: 12px;
+    }
+
+}
+
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="permission-page">
+
+
+<!-- ========================================================
+     HEADER
+========================================================= -->
+
+<div class="permission-header">
+
+    <h2>
+        🔐 Permissions za {{ user.username }}
+    </h2>
+
+    <p>
+
+        {% if user.is_superuser %}
+
+            Huyu ni Super Admin wa mfumo.
+
+        {% else %}
+
+            Weka au ondoa ruhusa kulingana na
+            majukumu ya mtumiaji.
+
+        {% endif %}
+
+    </p>
+
+
+    <!-- ====================================================
+         SUPER ADMIN INFORMATION
+    ===================================================== -->
+
+    {% if user.is_superuser %}
+
+        <div class="super-admin-info">
+
+            <div class="super-admin-info-icon">
+                ●
+            </div>
+
+            <div>
+
+                <strong>
+                    Super Admin — Full Access
+                </strong>
+
+                Permissions zote zinaendelea kuwa
+                ON na haziwezi kuzimwa kupitia mfumo.
+
+            </div>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+
+<!-- ========================================================
+     PERMISSION FORM
+========================================================= -->
+
+<form method="POST">
+
+    {% csrf_token %}
+
+
+    {% for group in permission_groups %}
+
+    <div class="permission-card">
+
+
+        <!-- ==================================================
+             CATEGORY TITLE
+        =================================================== -->
+
+        <div class="permission-title">
+
+            <div class="permission-title-left">
+
+                {% if group.category == "Data Management" %}
+
+                    🗄️
+
+                {% elif group.category == "Manunuzi" %}
+
+                    🛒
+
+                {% elif group.category == "Nguruwe" %}
+
+                    🐖
+
+                {% elif group.category == "Machinjio" %}
+
+                    🔪
+
+                {% elif group.category == "Meat Stock" %}
+
+                    🥩
+
+                {% elif group.category == "Mauzo ya Siku" %}
+
+                    💰
+
+                {% elif group.category == "Mauzo ya Nyama" %}
+
+                    💰
+
+                {% elif group.category == "Sehemu za Nyama" %}
+
+                    🍖
+
+                {% elif group.category == "Chakula" %}
+
+                    🍽️
+
+                {% elif group.category == "Mauzo ya Chakula" %}
+
+                    🧾
+
+                {% elif group.category == "Profit Reports" %}
+
+                    📊
+
+                {% elif group.category == "Daily Reports" %}
+
+                    📈
+
+                {% elif group.category == "Matumizi" %}
+
+                    💸
+
+                {% else %}
+
+                    🔐
+
+                {% endif %}
+
+
+                {{ group.category }}
+
+            </div>
+
+
+            {% if user.is_superuser %}
+
+                <span class="permission-title-state">
+                    Full Access
+                </span>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- ==================================================
+             PERMISSION LIST
+        =================================================== -->
+
+        <div class="permission-list">
+
+            {% for item in group.permissions %}
+
+            <div class="permission-item">
+
+
+                <!-- ==========================================
+                     NAME + CODE
+                =========================================== -->
+
+                <div>
+
+                    <div class="permission-name">
+
+                        {{ item.label }}
+
+
+                        {% if user.is_superuser %}
+
+                            <span class="permission-always-on">
+                                • Haibadilishwi
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <div class="permission-code">
+
+                        {{ item.codename }}
+
+                    </div>
+
+                </div>
+
+
+                <!-- ==========================================
+                     SUPER ADMIN LOCKED TOGGLE
+                =========================================== -->
+
+                {% if user.is_superuser %}
+
+                    <label
+                        class="permission-checkbox locked"
+                        title="Permissions za Super Admin haziwezi kubadilishwa"
+                        aria-label="Permission ya Super Admin"
+                    >
+
+                        <input
+                            type="checkbox"
+                            name="permissions"
+                            value="{{ item.codename }}"
+                            checked
+                            disabled
+                        >
+
+                        <span class="slider"></span>
+
+                    </label>
+
+
+                {% else %}
+
+
+                <!-- ==========================================
+                     NORMAL USER TOGGLE
+
+                     KILA PERMISSION NI INDEPENDENT:
+
+                     View
+                     Add
+                     Edit
+                     Delete
+                =========================================== -->
+
+                    <label
+                        class="permission-checkbox"
+                        title="
+                            {% if item.checked %}
+                                Zima {{ item.label }} permission
+                            {% else %}
+                                Washa {{ item.label }} permission
+                            {% endif %}
+                        "
+                    >
+
+                        <input
+                            type="checkbox"
+                            name="permissions"
+                            value="{{ item.codename }}"
+                            {% if item.checked %}
+                                checked
+                            {% endif %}
+                        >
+
+                        <span class="slider"></span>
+
+                    </label>
+
+                {% endif %}
+
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+    {% endfor %}
+
+
+    <!-- ========================================================
+         ACTION BAR
+    ========================================================= -->
+
+    <div class="action-bar">
+
+
+        <!-- ====================================================
+             BACK
+        ===================================================== -->
+
+        <a
+            href="{% url 'users:user_detail' user.id %}"
+            class="btn btn-back"
+        >
+            ← Rudi
+        </a>
+
+
+        <!-- ====================================================
+             NORMAL USER SAVE
+        ===================================================== -->
+
+        {% if not user.is_superuser %}
+
+            <button
+                type="submit"
+                class="btn btn-save"
+            >
+                💾 Hifadhi Permissions
+            </button>
+
+        {% else %}
+
+
+        <!-- ====================================================
+             SUPER ADMIN LOCKED MESSAGE
+        ===================================================== -->
+
+            <span
+                class="btn locked-action"
+                title="Permissions za Super Admin haziwezi kubadilishwa"
+            >
+                Permissions za Super Admin
+            </span>
+
+        {% endif %}
+
+
+    </div>
+
+</form>
+
+</div>
+
+{% endblock %}
