@@ -2589,10 +2589,6 @@ def food_item_create(request):
 def daily_report(request, sale_id):
     """Ripoti ya mauzo ya siku"""
 
-    # ========================================================
-    # PERMISSION: VIEW DAILY REPORT
-    # ========================================================
-
     if not request.user.has_perm(
         "pigs.view_dailysalereport"
     ):
@@ -2611,11 +2607,9 @@ def daily_report(request, sale_id):
     )
 
     try:
-
         report = daily_sale.report
 
     except DailySaleReport.DoesNotExist:
-
         report = daily_sale.create_report()
 
     food_total = (
@@ -2634,6 +2628,14 @@ def daily_report(request, sale_id):
     if meat_total < Decimal("0.00"):
         meat_total = Decimal("0.00")
 
+    total_meat_weight_kg = (
+        daily_sale.pig_records
+        .aggregate(
+            total=Sum("meat_weight_sold")
+        )["total"]
+        or Decimal("0.00")
+    )
+
     total_income = (
         meat_total
         + food_total
@@ -2647,6 +2649,7 @@ def daily_report(request, sale_id):
             "report": report,
             "total_food_income": food_total,
             "total_pig_income": meat_total,
+            "total_meat_weight_kg": total_meat_weight_kg,
             "total_income": total_income,
             "now": timezone.now(),
         }
@@ -2738,11 +2741,18 @@ def expense_list(request):
         )
     )
 
+    total_expenses = (
+        expenses.aggregate(
+            total=Sum("amount")
+        )["total"] or 0
+    )
+
     return render(
         request,
         "pigs/expense_list.html",
         {
             "expenses": expenses,
+            "total_expenses": total_expenses,
         }
     )
 

@@ -1,0 +1,272 @@
+{% extends "pigs/base.html" %}
+{% load humanize %}
+
+{% block title %}
+Mauzo ya Chakula
+{% endblock %}
+
+{% block extra_css %}
+
+<style>
+
+.food-sale-page {
+    max-width: 850px;
+    margin: 0 auto;
+}
+
+.food-sale-header {
+    margin-bottom: 25px;
+    text-align: center;
+}
+
+.food-sale-header h2 {
+    margin-bottom: 8px;
+    color: #172554;
+}
+
+.food-sale-header p {
+    color: #64748b;
+}
+
+/* CARD */
+
+.food-sale-card {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 30px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+}
+
+/* INFO */
+
+.sale-date-box {
+    background: #f5f7fa;
+    border-radius: 10px;
+    padding: 15px 18px;
+    margin-bottom: 25px;
+    border-left: 4px solid #2563eb;
+}
+
+.sale-date-box strong {
+    display: block;
+    margin-top: 5px;
+    color: #172554;
+    font-size: 18px;
+}
+
+/* SECTION */
+
+.form-section {
+    margin-top: 25px;
+}
+
+.form-section h3 {
+    margin-bottom: 6px;
+    color: #172554;
+}
+
+.form-section p {
+    color: #64748b;
+    margin-bottom: 20px;
+}
+
+/* GRID */
+
+.food-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+/* FIELD */
+
+.food-field {
+    display: flex;
+    flex-direction: column;
+}
+
+.food-field label {
+    font-weight: 600;
+    margin-bottom: 7px;
+    color: #334155;
+}
+
+.food-field input {
+    width: 100%;
+    padding: 11px 12px;
+    border: 1px solid #d5d9df;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 14px;
+}
+
+.food-field input:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.10);
+}
+
+/* FULL WIDTH */
+
+.food-field.full {
+    grid-column: 1 / -1;
+}
+
+/* TOTAL INFO */
+
+.food-sale-note {
+    margin-top: 25px;
+    padding: 15px 18px;
+    border-left: 4px solid #f59e0b;
+    background: #fffbeb;
+    border-radius: 6px;
+}
+
+.food-sale-note strong {
+    display: block;
+    margin-bottom: 5px;
+    color: #92400e;
+}
+
+.food-sale-note p {
+    color: #92400e;
+    margin: 0;
+}
+
+/* ACTIONS */
+
+.food-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #e2e8f0;
+}
+
+/* ERRORS */
+
+.field-error {
+    color: #dc2626;
+    font-size: 13px;
+    margin-top: 5px;
+}
+
+/* MOBILE */
+
+@media (max-width: 650px) {
+    .food-sale-card {
+        padding: 20px;
+    }
+    .food-fields {
+        grid-template-columns: 1fr;
+    }
+    .food-field.full {
+        grid-column: auto;
+    }
+    .food-actions {
+        flex-direction: column;
+    }
+    .food-actions .button {
+        width: 100%;
+        text-align: center;
+        box-sizing: border-box;
+    }
+}
+
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+
+<div class="food-sale-page">
+
+<!-- HEADER -->
+<div class="food-sale-header">
+    <h2>🍽️ Mauzo ya Chakula</h2>
+    <p>Rekodi chakula kilichouzwa katika siku hii.</p>
+</div>
+
+<!-- MAIN CARD -->
+<div class="food-sale-card">
+
+    <!-- DATE -->
+    <div class="sale-date-box">
+        📅 Tarehe ya Mauzo
+        <strong>{{ record.daily_sale.sale_date|date:"d/m/Y" }}</strong>
+    </div>
+
+    <!-- FORM -->
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="form-section">
+            <h3>📝 Taarifa za Chakula</h3>
+            <p>Weka aina ya chakula, bei ya sahani moja na idadi ya sahani zilizouzwa.</p>
+
+            <div class="food-fields">
+
+                <!-- FOOD NAME -->
+                <div class="food-field">
+                    <label for="{{ form.food_name.id_for_label }}">
+                        Aina ya Chakula
+                    </label>
+                    {{ form.food_name }}
+                    {% if form.food_name.errors %}
+                        <div class="field-error">{{ form.food_name.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <!-- UNIT PRICE -->
+                <div class="food-field">
+                    <label for="{{ form.unit_price_input.id_for_label }}">
+                        Bei ya Sahani Moja (TSh)
+                    </label>
+                    {{ form.unit_price_input }}
+                    {% if form.unit_price_input.errors %}
+                        <div class="field-error">{{ form.unit_price_input.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <!-- QUANTITY -->
+                <div class="food-field full">
+                    <label for="{{ form.quantity.id_for_label }}">
+                        Idadi ya Sahani Zilizouzwa
+                    </label>
+                    {{ form.quantity }}
+                    {% if form.quantity.errors %}
+                        <div class="field-error">{{ form.quantity.errors }}</div>
+                    {% endif %}
+                </div>
+
+            </div>
+        </div>
+
+        <!-- NOTE -->
+        <div class="food-sale-note">
+            <strong>💡 Kumbuka</strong>
+            <p>Bei ya sahani moja itaunganishwa na idadi ya sahani ili mfumo uweze kuhesabu jumla ya mapato ya chakula.</p>
+        </div>
+
+        <!-- ACTIONS -->
+        <div class="food-actions">
+            <a href="{% url 'pigs:dashboard' %}" class="button secondary">
+                <i class="fas fa-times"></i> Ghairi
+            </a>
+            <button type="submit" class="button">
+                <i class="fas fa-save"></i> Hifadhi Mauzo
+            </button>
+        </div>
+
+    </form>
+
+</div>
+
+</div>
+
+</div>
+
+{% endblock %}
