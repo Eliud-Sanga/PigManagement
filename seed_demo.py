@@ -1,5 +1,6 @@
 import os
 import django
+import random
 
 os.environ.setdefault(
     "DJANGO_SETTINGS_MODULE",
@@ -10,7 +11,6 @@ django.setup()
 
 from datetime import date, timedelta
 from decimal import Decimal
-import random
 
 from django.db import transaction
 
@@ -21,11 +21,10 @@ from apps.pigs.models import (
     MeatStock,
     DailySale,
     PigSaleRecord,
-    MeatPartSale,
     FoodItem,
     FoodSaleRecord,
-    MeatDistribution,
     DailySaleReport,
+    BatchProfitReport,
 )
 
 
@@ -36,48 +35,26 @@ random.seed(42)
 def create_demo_data():
 
     print("\n======================================")
-    print("   PIG MANAGEMENT DEMO DATA")
+    print("       PIG MANAGEMENT DEMO DATA")
     print("======================================\n")
 
-    # ----------------------------------
-    # 1. MEAT DISTRIBUTION SETTINGS
-    # ----------------------------------
-
-    distribution, _ = MeatDistribution.objects.get_or_create(
-        id=1,
-        defaults={
-            "ribs_percentage": Decimal("40"),
-            "thighs_percentage": Decimal("50"),
-            "head_percentage": Decimal("5"),
-            "internal_organs_percentage": Decimal("5"),
-        }
-    )
-
-    distribution.ribs_percentage = Decimal("40")
-    distribution.thighs_percentage = Decimal("50")
-    distribution.head_percentage = Decimal("5")
-    distribution.internal_organs_percentage = Decimal("5")
-    distribution.save()
-
-    print("✓ Meat distribution settings ready")
-
-    # ----------------------------------
-    # 2. FOOD ITEMS
-    # ----------------------------------
+    # ========================================================
+    # FOOD ITEMS
+    # ========================================================
 
     food_data = [
-        ("Chips", Decimal("3000")),
-        ("Ugali Nyama", Decimal("5000")),
-        ("Wali", Decimal("3000")),
-        ("Ndizi Nyama", Decimal("5000")),
-        ("Chips Mayai", Decimal("5000")),
+        ("Chips", Decimal("3000.00")),
+        ("Ugali Nyama", Decimal("5000.00")),
+        ("Wali", Decimal("3000.00")),
+        ("Ndizi Nyama", Decimal("5000.00")),
+        ("Chips Mayai", Decimal("5000.00")),
     ]
 
     food_items = []
 
     for name, price in food_data:
 
-        item, _ = FoodItem.objects.get_or_create(
+        item, _ = FoodItem.objects.update_or_create(
             name=name,
             defaults={
                 "selling_price": price,
@@ -85,17 +62,16 @@ def create_demo_data():
             }
         )
 
-        item.selling_price = price
-        item.is_active = True
-        item.save()
-
         food_items.append(item)
 
-    print(f"✓ Food items ready: {len(food_items)}")
+    print(
+        f"✓ Food items created/updated: "
+        f"{len(food_items)}"
+    )
 
-    # ----------------------------------
-    # 3. PURCHASES
-    # ----------------------------------
+    # ========================================================
+    # PURCHASES
+    # ========================================================
 
     suppliers = [
         "Juma",
@@ -106,263 +82,215 @@ def create_demo_data():
         "Hassan",
     ]
 
-    start_date = date(2026, 6, 1)
+    purchase_start = date(2026, 6, 1)
 
     purchases = []
+    all_pigs = []
 
-    for month in range(3):
+    for i in range(9):
 
         purchase_date = (
-            start_date +
-            timedelta(days=month * 30)
+            purchase_start +
+            timedelta(days=i * 4)
         )
 
-        for i in range(3):
+        number_of_pigs = random.randint(
+            4,
+            7
+        )
 
-            number_of_pigs = random.randint(4, 7)
-
-            total_cost = (
-                number_of_pigs *
-                random.randint(220000, 320000)
-            )
-
-            purchase = Purchase.objects.create(
-                supplier_name=random.choice(suppliers),
-                supplier_phone="0712345678",
-                supplier_location="Njombe",
-                purchase_date=purchase_date + timedelta(days=i * 5),
-                number_of_pigs=number_of_pigs,
-                total_cost=total_cost,
-                notes="DEMO DATA",
-                pigs_created=True,
-            )
-
-            purchases.append(purchase)
-
-            for _ in range(number_of_pigs):
-
-                Pig.objects.create(
-                    purchase=purchase,
-                    gender=random.choice(
-                        ["MALE", "FEMALE"]
-                    ),
-                    purchase_price=Decimal(
-                        random.randint(220000, 320000)
-                    ),
-                    weight_kg=Decimal(
-                        random.randint(70, 120)
-                    ),
-                    notes="DEMO DATA",
+        pig_prices = [
+            Decimal(
+                random.randint(
+                    220000,
+                    320000
                 )
+            )
+            for _ in range(number_of_pigs)
+        ]
 
-    print(f"✓ Purchases created: {len(purchases)}")
+        total_cost = sum(
+            pig_prices,
+            Decimal("0.00")
+        )
 
-    # ----------------------------------
-    # 4. SELECT PIGS FOR SLAUGHTER
-    # ----------------------------------
-
-    pigs = list(
-        Pig.objects.filter(
-            status="AVAILABLE",
+        purchase = Purchase.objects.create(
+            supplier_name=random.choice(
+                suppliers
+            ),
+            supplier_phone="0712345678",
+            supplier_location="Njombe",
+            purchase_date=purchase_date,
+            number_of_pigs=number_of_pigs,
+            total_cost=total_cost,
             notes="DEMO DATA",
-        ).order_by("id")
+            pigs_created=True,
+        )
+
+        purchases.append(purchase)
+
+        for price in pig_prices:
+
+            pig = Pig.objects.create(
+                purchase=purchase,
+                gender=random.choice(
+                    [
+                        Pig.MALE,
+                        Pig.FEMALE,
+                    ]
+                ),
+                purchase_price=price,
+                notes="DEMO DATA",
+            )
+
+            all_pigs.append(pig)
+
+    print(
+        f"✓ Purchases: "
+        f"{len(purchases)}"
     )
 
-    # Leave approximately 25% alive
-    random.shuffle(pigs)
+    print(
+        f"✓ Pigs: "
+        f"{len(all_pigs)}"
+    )
+
+    # ========================================================
+    # SELECT PIGS FOR SLAUGHTER
+    # ========================================================
+
+    slaughter_pigs = all_pigs.copy()
+
+    random.shuffle(
+        slaughter_pigs
+    )
 
     slaughter_count = int(
-        len(pigs) * Decimal("0.75")
+        len(slaughter_pigs) * 0.75
     )
 
-    pigs_for_slaughter = pigs[:slaughter_count]
-
-    remaining_pigs = pigs[slaughter_count:]
-
-    print(
-        f"✓ Pigs available for slaughter: "
-        f"{len(pigs_for_slaughter)}"
+    slaughter_pigs = (
+        slaughter_pigs[:slaughter_count]
     )
 
     print(
-        f"✓ Pigs intentionally left un-slaughtered: "
-        f"{len(remaining_pigs)}"
+        f"✓ Pigs selected for slaughter: "
+        f"{len(slaughter_pigs)}"
     )
 
-    # ----------------------------------
-    # 5. SLAUGHTER BATCHES
-    # ----------------------------------
+    # ========================================================
+    # SLAUGHTER BATCHES
+    # ========================================================
 
     batches = []
 
-    batch_date = start_date
+    batch_start = date(2026, 6, 5)
 
-    for i in range(0, len(pigs_for_slaughter), 4):
+    for i in range(
+        0,
+        len(slaughter_pigs),
+        4
+    ):
 
-        selected = pigs_for_slaughter[i:i + 4]
+        selected_pigs = slaughter_pigs[
+            i:i + 4
+        ]
 
-        if not selected:
-            break
+        if not selected_pigs:
+            continue
 
         batch = SlaughterBatch.objects.create(
-            slaughter_date=batch_date,
-            total_meat_weight_kg=Decimal(
-                random.randint(120, 220)
+            slaughter_date=(
+                batch_start +
+                timedelta(days=len(batches) * 3)
             ),
             notes="DEMO DATA",
         )
 
-        batch.add_pigs(*selected)
+        batch.add_pigs(
+            selected_pigs
+        )
 
         MeatStock.objects.create(
-            slaughter_batch=batch,
-            initial_weight_kg=batch.total_meat_weight_kg,
-            remaining_weight_kg=batch.total_meat_weight_kg,
+            slaughter_batch=batch
         )
 
         batches.append(batch)
 
-        batch_date += timedelta(days=2)
-
     print(
-        f"✓ Slaughter batches created: "
+        f"✓ Slaughter batches: "
         f"{len(batches)}"
     )
 
-    # ----------------------------------
-    # 6. DAILY SALES
-    # ----------------------------------
+    # ========================================================
+    # DAILY SALES
+    # ========================================================
 
-    sale_start = date(2026, 6, 3)
+    sale_start = date(2026, 6, 6)
 
-    total_meat_sales = 0
-    total_food_sales = 0
+    meat_records_count = 0
+    food_records_count = 0
 
-    for day_number in range(85):
+    open_batches = list(
+        batches
+    )
+
+    for day_number in range(60):
 
         sale_date = (
             sale_start +
             timedelta(days=day_number)
         )
 
-        daily_sale = DailySale.objects.create(
-            sale_date=sale_date,
-            notes="DEMO DATA",
-        )
+        meat_amount = Decimal("0.00")
+        food_amount = Decimal("0.00")
+        selected_batch = None
+        meat_price = Decimal("0.00")
 
-        # ------------------------------
-        # MEAT SALES
-        # ------------------------------
+        # ----------------------------------------------------
+        # MEAT SALE
+        # ----------------------------------------------------
 
-        if batches:
+        available_batches = [
+            batch
+            for batch in open_batches
+            if not batch.is_finished()
+        ]
 
-            # 55% chance of meat sale
-            if random.random() < 0.55:
+        if (
+            available_batches
+            and random.random() < 0.70
+        ):
 
-                available_batches = []
+            selected_batch = random.choice(
+                available_batches
+            )
 
-                for batch in batches:
+            meat_price = random.choice(
+                [
+                    Decimal("12000.00"),
+                    Decimal("13000.00"),
+                    Decimal("14000.00"),
+                    Decimal("15000.00"),
+                ]
+            )
 
-                    stock = batch.stock
+            meat_amount = Decimal(
+                random.randint(
+                    80000,
+                    350000
+                )
+            )
 
-                    if (
-                        not stock.is_finished
-                        and
-                        stock.remaining_weight_kg > 0
-                    ):
-                        available_batches.append(batch)
+        # ----------------------------------------------------
+        # FOOD SALE
+        # ----------------------------------------------------
 
-                if available_batches:
+        selected_food = None
 
-                    batch = random.choice(
-                        available_batches
-                    )
+        if random.random() < 0.70:
 
-                    stock = batch.stock
-
-                    # Sell approximately 5-15% of stock
-                    requested_weight = (
-                        stock.remaining_weight_kg *
-                        Decimal(
-                            random.randint(5, 15)
-                        ) /
-                        Decimal("100")
-                    )
-
-                    if requested_weight > 0:
-
-                        # Since MeatPartSale currently
-                        # uses integer quantities,
-                        # sell one part when possible.
-                        pig_count = batch.pigs.count()
-
-                        maximum_parts = pig_count * 2
-
-                        ribs = random.randint(
-                            0,
-                            min(1, maximum_parts)
-                        )
-
-                        thighs = random.randint(
-                            0,
-                            min(1, maximum_parts)
-                        )
-
-                        head_sold = random.random() < 0.25
-
-                        organs_sold = random.random() < 0.25
-
-                        sale_record = PigSaleRecord.objects.create(
-                            daily_sale=daily_sale,
-                            slaughter_batch=batch,
-                            price_per_kg=Decimal(
-                                random.choice(
-                                    [
-                                        12000,
-                                        13000,
-                                        14000,
-                                        15000,
-                                    ]
-                                )
-                            ),
-                            meat_weight_sold=Decimal("0"),
-                            notes="DEMO DATA",
-                        )
-
-                        meat_parts = MeatPartSale.objects.create(
-                            pig_sale_record=sale_record,
-                            ribs=ribs,
-                            thighs=thighs,
-                            head_sold=head_sold,
-                            internal_organs_sold=organs_sold,
-                        )
-
-                        try:
-
-                            sold_weight = (
-                                meat_parts.apply_sale()
-                            )
-
-                            meat_parts.save()
-
-                            total_meat_sales += 1
-
-                        except ValueError:
-
-                            # If selected parts would exceed
-                            # available stock, remove the
-                            # unsuccessful demo record.
-                            meat_parts.delete()
-                            sale_record.delete()
-
-        # ------------------------------
-        # FOOD SALES
-        # ------------------------------
-
-        # 65% chance of food sales
-        if random.random() < 0.65:
-
-            item = random.choice(
+            selected_food = random.choice(
                 food_items
             )
 
@@ -371,106 +299,207 @@ def create_demo_data():
                 15
             )
 
-            FoodSaleRecord.objects.create(
-                daily_sale=daily_sale,
-                food_item=item,
-                quantity=quantity,
+            food_record_price = (
+                selected_food.selling_price
             )
 
-            total_food_sales += 1
+            food_amount = (
+                Decimal(quantity) *
+                food_record_price
+            )
 
-        # ------------------------------
-        # GENERATE DAILY REPORT
-        # ------------------------------
+        # ----------------------------------------------------
+        # TOTAL DAILY MONEY
+        # ----------------------------------------------------
+
+        total_received = (
+            meat_amount +
+            food_amount
+        )
+
+        # ----------------------------------------------------
+        # DAILY SALE
+        # ----------------------------------------------------
+
+        daily_sale = DailySale.objects.create(
+            sale_date=sale_date,
+            slaughter_batch=selected_batch,
+            total_money_received=total_received,
+            meat_price_per_kg=meat_price,
+            notes="DEMO DATA",
+        )
+
+        # ----------------------------------------------------
+        # PIG SALE RECORD
+        # ----------------------------------------------------
+
+        if (
+            selected_batch
+            and meat_amount > 0
+        ):
+
+            PigSaleRecord.objects.create(
+                daily_sale=daily_sale,
+                slaughter_batch=selected_batch,
+                price_per_kg=meat_price,
+                total_amount=meat_amount,
+                notes="DEMO DATA",
+            )
+
+            meat_records_count += 1
+
+        # ----------------------------------------------------
+        # FOOD SALE RECORD
+        # ----------------------------------------------------
+
+        if selected_food:
+
+            FoodSaleRecord.objects.create(
+                daily_sale=daily_sale,
+                food_item=selected_food,
+                quantity=quantity,
+                unit_price=(
+                    selected_food.selling_price
+                ),
+            )
+
+            food_records_count += 1
+
+        # ----------------------------------------------------
+        # CALCULATE + SAVE DAILY TOTALS
+        # ----------------------------------------------------
+
+        daily_sale.refresh_totals()
+
+        # ----------------------------------------------------
+        # DAILY REPORT
+        # ----------------------------------------------------
 
         daily_sale.create_report()
 
     print(
-        f"✓ Meat sale records created: "
-        f"{total_meat_sales}"
+        f"✓ Daily sales: "
+        f"{DailySale.objects.count()}"
     )
 
     print(
-        f"✓ Food sale records created: "
-        f"{total_food_sales}"
+        f"✓ Meat sale records: "
+        f"{meat_records_count}"
     )
 
-    # ----------------------------------
-    # 7. FINAL SUMMARY
-    # ----------------------------------
+    print(
+        f"✓ Food sale records: "
+        f"{food_records_count}"
+    )
+
+    # ========================================================
+    # FINISH SOME BATCHES
+    # ========================================================
+
+    batches_to_finish = batches[
+        :max(1, len(batches) // 3)
+    ]
+
+    finished_count = 0
+
+    for batch in batches_to_finish:
+
+        try:
+
+            batch.finish_batch()
+
+            finished_count += 1
+
+        except ValueError as error:
+
+            print(
+                f"! Could not finish "
+                f"{batch.batch_number}: "
+                f"{error}"
+            )
+
+    print(
+        f"✓ Finished batches: "
+        f"{finished_count}"
+    )
+
+    # ========================================================
+    # FINAL SUMMARY
+    # ========================================================
 
     print("\n======================================")
     print("       DEMO DATA COMPLETED")
     print("======================================")
 
     print(
-        f"Purchases       : {Purchase.objects.count()}"
+        f"Purchases        : "
+        f"{Purchase.objects.count()}"
     )
 
     print(
-        f"Pigs            : {Pig.objects.count()}"
+        f"Pigs             : "
+        f"{Pig.objects.count()}"
     )
 
     print(
-        f"Available pigs  : "
-        f"{Pig.objects.filter(status='AVAILABLE').count()}"
+        f"Available pigs   : "
+        f"{Pig.objects.filter(status=Pig.AVAILABLE).count()}"
     )
 
     print(
-        f"Slaughtered pigs: "
-        f"{Pig.objects.filter(status='SLAUGHTERED').count()}"
+        f"Slaughtered pigs : "
+        f"{Pig.objects.filter(status=Pig.SLAUGHTERED).count()}"
     )
 
     print(
-        f"Finished pigs   : "
-        f"{Pig.objects.filter(status='FINISHED').count()}"
+        f"Finished pigs    : "
+        f"{Pig.objects.filter(status=Pig.FINISHED).count()}"
     )
 
     print(
-        f"Batches         : "
+        f"Slaughter batches : "
         f"{SlaughterBatch.objects.count()}"
     )
 
     print(
-        f"Meat stocks     : "
+        f"Meat stocks      : "
         f"{MeatStock.objects.count()}"
     )
 
     print(
-        f"Daily sales     : "
+        f"Daily sales      : "
         f"{DailySale.objects.count()}"
     )
 
     print(
-        f"Meat sales      : "
+        f"Meat sales       : "
         f"{PigSaleRecord.objects.count()}"
     )
 
     print(
-        f"Food sales      : "
+        f"Food sales       : "
         f"{FoodSaleRecord.objects.count()}"
     )
 
     print(
-        f"Daily reports   : "
+        f"Daily reports    : "
         f"{DailySaleReport.objects.count()}"
     )
 
-    print("\n✓ Some pigs were intentionally left AVAILABLE.")
-    print("✓ Demo covers June, July and August 2026.")
-    print("✓ Data is ready for browser testing.\n")
+    print(
+        f"Profit reports   : "
+        f"{BatchProfitReport.objects.count()}"
+    )
+
+    print("\n✓ Demo data is ready.")
+    print("✓ Some pigs remain AVAILABLE.")
+    print("✓ Some pigs are SLAUGHTERED.")
+    print("✓ Some pigs are FINISHED.")
+    print("✓ Some batches remain open.")
+    print("✓ Some batches are FINISHED.")
+    print("✓ Daily sales contain meat and food.")
+    print("✓ Reports are generated from model logic.\n")
 
 
 if __name__ == "__main__":
-
-    import os
-    import django
-
-    os.environ.setdefault(
-        "DJANGO_SETTINGS_MODULE",
-        "pig_management.settings"
-    )
-
-    django.setup()
-
     create_demo_data()

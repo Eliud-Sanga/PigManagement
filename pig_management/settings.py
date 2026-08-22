@@ -5,13 +5,16 @@ Pig Management System
 """
 from pathlib import Path
 import os
-
+import dj_database_url
+from dotenv import load_dotenv
 
 # ============================================================
 # BASE DIRECTORY
 # ============================================================
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+load_dotenv(BASE_DIR / ".env")
 
 
 # ============================================================
@@ -71,12 +74,6 @@ INSTALLED_APPS = [
 
 
 # ============================================================
-# LOGIN/LOGOUT SETTINGS
-# ============================================================
-OGIN_URL = '/accounts/login/'
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/accounts/login/'
-
 # ============================================================
 # MIDDLEWARE
 # ============================================================
@@ -87,7 +84,7 @@ LOGOUT_REDIRECT_URL = '/accounts/login/'
 # ============================================================
 
 AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',  # ✅ TUMIA HII TU
+    'apps.users.backends.CustomUserBackend',
 ]
 
 MIDDLEWARE = [
@@ -155,10 +152,11 @@ WSGI_APPLICATION = "pig_management.wsgi.application"
 # ============================================================
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
+    "default": dj_database_url.parse(
+        os.environ.get("DATABASE_URL"),
+        conn_max_age=600,
+        ssl_require=True,
+    )
 }
 
 
@@ -295,11 +293,11 @@ SECURE_HSTS_PRELOAD = not DEBUG
 # LOGIN / AUTHENTICATION
 # ============================================================
 
-LOGIN_URL = "/admin/login/"
+LOGIN_URL = "/accounts/login/"
 
 LOGIN_REDIRECT_URL = "/"
 
-LOGOUT_REDIRECT_URL = "/"
+LOGOUT_REDIRECT_URL = "/accounts/login/"
 
 
 # ============================================================
