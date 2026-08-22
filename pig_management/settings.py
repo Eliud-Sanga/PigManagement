@@ -37,22 +37,21 @@ SECRET_KEY = os.environ.get(
 # Set DJANGO_DEBUG=False in production.
 DEBUG = os.environ.get(
     "DJANGO_DEBUG",
-    "True",
+    "False",
 ).lower() in ("true", "1", "yes")
 
-
-# ============================================================
-# ALLOWED HOSTS
-# ============================================================
 
 ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
     "192.168.0.110",
+    "home-management-system-ycto.onrender.com",
 ]
 
+
 CSRF_TRUSTED_ORIGINS = [
-    "http://192.168.0.110:8000"
+    "http://192.168.0.110:8000",
+    "https://home-management-system-ycto.onrender.com",
 ]
 
 
