@@ -9,31 +9,75 @@
 
     .expense-form-page {
         max-width: 750px;
-        margin: 30px auto;
+        margin: 28px auto;
     }
+
+    /* ============================================================
+       HEADER
+    ============================================================ */
 
     .expense-header {
         text-align: center;
-        margin-bottom: 25px;
+        margin-bottom: 24px;
     }
 
     .expense-header h2 {
         margin: 0;
         color: #172554;
         font-size: 28px;
+        font-weight: 800;
+        letter-spacing: -0.5px;
     }
 
     .expense-header p {
-        margin: 8px 0 0;
+        margin: 7px 0 0;
         color: #64748b;
+        font-size: 13px;
     }
 
+    /* ============================================================
+       MAIN CARD
+    ============================================================ */
+
     .expense-form-card {
-        background: white;
+        position: relative;
+        background: #ffffff;
+        border: 1px solid #e8edf3;
         border-radius: 16px;
         padding: 30px;
-        box-shadow: 0 5px 20px rgba(15, 23, 42, 0.08);
+        box-shadow:
+            0 8px 28px rgba(15, 23, 42, 0.06),
+            0 2px 6px rgba(15, 23, 42, 0.025);
+        overflow: hidden;
     }
+
+    /* ============================================================
+       SOFT SIDE BAND
+    ============================================================ */
+
+    .expense-form-card::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 20px;
+        bottom: 20px;
+        width: 4px;
+        border-radius: 0 6px 6px 0;
+
+        background: linear-gradient(
+            to bottom,
+            #8fa5d5 0%,
+            #8fa5d5 68%,
+            #d59a9a 68%,
+            #d59a9a 100%
+        );
+
+        opacity: 0.72;
+    }
+
+    /* ============================================================
+       FORM GROUP
+    ============================================================ */
 
     .form-group {
         margin-bottom: 20px;
@@ -42,101 +86,278 @@
     .form-group label {
         display: block;
         margin-bottom: 7px;
-        color: #172554;
-        font-weight: 600;
+        color: #334155;
+        font-size: 13px;
+        font-weight: 700;
     }
+
+    .required {
+        color: #b96a6a;
+        font-weight: 800;
+    }
+
+    /* ============================================================
+       INPUTS
+    ============================================================ */
 
     .form-group input,
     .form-group textarea {
         width: 100%;
         box-sizing: border-box;
+
         padding: 12px 14px;
-        border: 1px solid #cbd5e1;
-        border-radius: 8px;
+
+        border: 1px solid #d9e0e8;
+        border-radius: 9px;
+
+        background: #ffffff;
+        color: #1e293b;
+
         font-size: 14px;
         outline: none;
-        transition: 0.2s;
+
+        box-shadow:
+            inset 0 1px 2px rgba(15, 23, 42, 0.025);
+
+        transition:
+            border-color 0.2s ease,
+            box-shadow 0.2s ease,
+            background 0.2s ease;
+    }
+
+    .form-group input:hover,
+    .form-group textarea:hover {
+        border-color: #c5cfdb;
     }
 
     .form-group input:focus,
     .form-group textarea:focus {
-        border-color: #2563eb;
-        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.10);
+        border-color: #8da3cf;
+        background: #ffffff;
+
+        box-shadow:
+            0 0 0 3px rgba(82, 106, 159, 0.08),
+            0 2px 6px rgba(15, 23, 42, 0.035);
     }
 
     .form-group textarea {
-        min-height: 120px;
+        min-height: 115px;
         resize: vertical;
+        line-height: 1.5;
     }
+
+    /* ============================================================
+       HELP TEXT
+    ============================================================ */
 
     .form-help {
         margin-top: 5px;
-        color: #64748b;
-        font-size: 12px;
+        color: #94a3b8;
+        font-size: 11px;
+        line-height: 1.45;
     }
+
+    /* ============================================================
+       ACTION AREA
+    ============================================================ */
 
     .form-actions {
         display: flex;
         justify-content: space-between;
         align-items: center;
+
         gap: 12px;
-        margin-top: 25px;
-        padding-top: 20px;
-        border-top: 1px solid #e2e8f0;
+
+        margin-top: 26px;
+        padding-top: 19px;
+
+        border-top: 1px solid #edf1f5;
     }
 
+    /* ============================================================
+       BUTTON BASE
+    ============================================================ */
+
     .btn-expense {
-        border: none;
+        min-height: 41px;
+
         border-radius: 8px;
-        padding: 11px 20px;
-        font-size: 14px;
-        font-weight: 600;
+        padding: 9px 18px;
+
+        font-size: 12px;
+        font-weight: 700;
+
         cursor: pointer;
         text-decoration: none;
+
         display: inline-flex;
         align-items: center;
         justify-content: center;
         gap: 7px;
+
+        transition:
+            transform 0.2s ease,
+            background 0.2s ease,
+            box-shadow 0.2s ease;
     }
 
+    /* ============================================================
+       SAVE
+    ============================================================ */
+
     .btn-save {
-        background: #2563eb;
-        color: white;
+        background: #edf2fa;
+        color: #405b91;
+        border: 1px solid #dce5f3;
     }
 
     .btn-save:hover {
-        background: #1d4ed8;
+        background: #e4ebf7;
+        color: #304b80;
+        transform: translateY(-1px);
+
+        box-shadow:
+            0 4px 10px rgba(82, 106, 159, 0.10);
     }
 
+    /* ============================================================
+       BACK
+    ============================================================ */
+
     .btn-back {
-        background: #e2e8f0;
-        color: #0f172a;
+        background: #f7f8fa;
+        color: #475569;
+        border: 1px solid #e6e9ee;
     }
 
     .btn-back:hover {
-        background: #cbd5e1;
+        background: #eef1f5;
+        color: #172554;
+        transform: translateY(-1px);
     }
 
-    .required {
-        color: #dc2626;
+    /* ============================================================
+       DATE
+    ============================================================ */
+
+    #expense_date {
+        color-scheme: light;
     }
+
+    /* ============================================================
+       MOBILE
+    ============================================================ */
 
     @media (max-width: 600px) {
 
         .expense-form-page {
-            margin: 20px 0;
+            width: 100%;
+            margin: 18px auto;
+        }
+
+        .expense-header {
+            margin-bottom: 18px;
+        }
+
+        .expense-header h2 {
+            font-size: 22px;
+            letter-spacing: -0.2px;
+        }
+
+        .expense-header p {
+            font-size: 12px;
         }
 
         .expense-form-card {
-            padding: 20px;
+            padding: 21px 17px;
+            border-radius: 13px;
+
+            box-shadow:
+                0 6px 20px rgba(15, 23, 42, 0.055),
+                0 2px 5px rgba(15, 23, 42, 0.02);
+        }
+
+        .expense-form-card::before {
+            top: 15px;
+            bottom: 15px;
+            width: 3px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            font-size: 12px;
+            margin-bottom: 6px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            padding: 10px 11px;
+            font-size: 13px;
+            border-radius: 7px;
+        }
+
+        .form-group textarea {
+            min-height: 95px;
+        }
+
+        .form-help {
+            font-size: 10px;
         }
 
         .form-actions {
             flex-direction: column-reverse;
+            gap: 7px;
+
+            margin-top: 20px;
+            padding-top: 15px;
         }
 
         .btn-expense {
             width: 100%;
+            min-height: 37px;
+            padding: 8px 12px;
+            font-size: 11px;
+        }
+
+    }
+
+    /* ============================================================
+       VERY SMALL PHONES
+    ============================================================ */
+
+    @media (max-width: 380px) {
+
+        .expense-form-page {
+            margin: 14px auto;
+        }
+
+        .expense-header h2 {
+            font-size: 20px;
+        }
+
+        .expense-header p {
+            font-size: 11px;
+        }
+
+        .expense-form-card {
+            padding: 18px 14px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            font-size: 12px;
+        }
+
+        .form-group textarea {
+            min-height: 85px;
+        }
+
+        .btn-expense {
+            min-height: 35px;
+            font-size: 10.5px;
         }
 
     }

@@ -45,11 +45,11 @@ DEBUG = os.environ.get(
 ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
-    "10.138.135.32",
+    "192.168.0.110",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    "http://10.138.135.32:8000"
+    "http://192.168.0.110:8000"
 ]
 
 

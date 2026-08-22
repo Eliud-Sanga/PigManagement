@@ -10,104 +10,196 @@ Mauzo ya Siku
 <style>
 
 .sale-page {
-    max-width: 850px;
+    width: 100%;
+    max-width: 900px;
     margin: 0 auto;
-    text-align: center;
 }
 
-/* HEADER */
+/* ============================================================
+   PAGE HEADER
+============================================================ */
 
 .sale-header {
-    background: white;
-    padding: 28px;
-    border-radius: 16px;
-    margin-bottom: 20px;
-    box-shadow: 0 4px 15px rgba(15, 23, 42, 0.07);
+    position: relative;
+    background: linear-gradient(135deg, #172554 0%, #1e40af 55%, #2563eb 100%);
+    color: white;
+    padding: 30px 28px;
+    border-radius: 18px;
+    margin-bottom: 18px;
+    overflow: hidden;
+    box-shadow: 0 10px 28px rgba(30, 64, 175, 0.20);
+}
+
+.sale-header::after {
+    content: "";
+    position: absolute;
+    width: 180px;
+    height: 180px;
+    right: -70px;
+    top: -90px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.07);
 }
 
 .sale-header h2 {
+    position: relative;
+    z-index: 1;
     margin: 0;
-    color: #172554;
-    font-size: 27px;
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: .3px;
 }
 
 .sale-header p {
+    position: relative;
+    z-index: 1;
     margin: 8px 0 0;
-    color: #64748b;
+    color: #dbeafe;
+    font-size: 14px;
 }
 
-/* CARD */
+/* ============================================================
+   MAIN SALES CONTAINER
+============================================================ */
 
 .sale-card {
     background: white;
-    padding: 28px;
-    border-radius: 16px;
+    border-radius: 18px;
     margin-bottom: 20px;
-    box-shadow: 0 4px 15px rgba(15, 23, 42, 0.07);
+    box-shadow:
+        0 8px 25px rgba(15, 23, 42, 0.08),
+        0 2px 6px rgba(15, 23, 42, 0.04);
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
 }
 
-/* FORM */
+/* ============================================================
+   FORM TOP AREA
+============================================================ */
+
+.sale-form-top {
+    padding: 25px 28px 10px;
+}
+
+.form-section-title {
+    margin-bottom: 22px;
+}
+
+.form-section-title h3 {
+    margin: 0;
+    color: #172554;
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.form-section-title p {
+    margin: 5px 0 0;
+    color: #64748b;
+    font-size: 13px;
+}
+
+/* ============================================================
+   FORM
+============================================================ */
 
 .form-group {
     margin-bottom: 20px;
-    text-align: center;
 }
 
 .form-group label {
     display: block;
     margin-bottom: 8px;
-    font-weight: 600;
+    font-weight: 700;
     color: #334155;
+    font-size: 13px;
 }
 
 .form-group input,
 .form-group textarea,
 .form-group select {
     width: 100%;
-    max-width: 500px;
-    padding: 12px 14px;
+    padding: 13px 14px;
     border: 1px solid #cbd5e1;
-    border-radius: 9px;
+    border-radius: 10px;
+    background: #ffffff;
+    color: #1e293b;
     font-size: 15px;
     outline: none;
+    transition: all .2s ease;
+    box-sizing: border-box;
+}
+
+.form-group input:hover,
+.form-group textarea:hover,
+.form-group select:hover {
+    border-color: #94a3b8;
 }
 
 .form-group input:focus,
 .form-group textarea:focus,
 .form-group select:focus {
     border-color: #2563eb;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.10);
 }
 
-/* QUESTION */
+/* TOTAL MONEY INPUT */
+
+#id_total_money_received {
+    font-size: 22px;
+    font-weight: 800;
+    color: #172554;
+    padding: 16px;
+    background: #f8fafc;
+    border: 2px solid #cbd5e1;
+}
+
+#id_total_money_received:focus {
+    background: white;
+    border-color: #2563eb;
+}
+
+/* ============================================================
+   FOOD QUESTION
+============================================================ */
 
 .food-question {
-    margin-top: 25px;
-    padding: 25px;
+    margin: 28px 0 22px;
+    padding: 22px;
     background: #f8fafc;
-    border-radius: 14px;
     border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    text-align: center;
 }
 
 .food-question h3 {
-    margin: 0 0 18px;
+    margin: 0 0 5px;
     color: #172554;
+    font-size: 17px;
+    font-weight: 800;
+}
+
+.food-question p {
+    margin: 0 0 17px;
+    color: #64748b;
+    font-size: 12px;
 }
 
 .choice-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    max-width: 500px;
+    margin: 0 auto;
 }
 
 .choice-button {
-    min-width: 150px;
-    padding: 13px 22px;
-    border: none;
-    border-radius: 9px;
-    font-size: 15px;
-    font-weight: 600;
+    min-height: 48px;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 800;
     cursor: pointer;
+    transition: all .2s ease;
 }
 
 .choice-yes {
@@ -115,20 +207,63 @@ Mauzo ya Siku
     color: white;
 }
 
+.choice-yes:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+}
+
 .choice-no {
-    background: #64748b;
-    color: white;
+    background: white;
+    color: #475569;
+    border-color: #cbd5e1;
 }
 
-.choice-button:hover {
-    opacity: 0.9;
+.choice-no:hover {
+    background: #f1f5f9;
+    border-color: #94a3b8;
 }
 
-/* FOOD SECTION */
+/* ============================================================
+   FOOD SECTION
+============================================================ */
 
 #food-section {
     display: none;
-    margin-top: 20px;
+    margin: 0 28px 25px;
+}
+
+.food-card {
+    background: #f8fafc;
+    border: 1px solid #dbe3ef;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.food-card-header {
+    padding: 18px 20px;
+    background: white;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.food-card-header h3 {
+    margin: 0;
+    color: #172554;
+    font-size: 17px;
+    font-weight: 800;
+}
+
+.food-card-header p {
+    margin: 5px 0 0;
+    color: #64748b;
+    font-size: 12px;
+}
+
+/* ============================================================
+   FOOD ROWS
+============================================================ */
+
+#food-rows {
+    padding: 16px;
 }
 
 .food-row {
@@ -136,7 +271,11 @@ Mauzo ya Siku
     grid-template-columns: 2fr 1fr 1fr auto;
     gap: 10px;
     align-items: end;
-    margin-bottom: 12px;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 11px;
+    padding: 14px;
+    margin-bottom: 10px;
 }
 
 .food-field {
@@ -145,135 +284,330 @@ Mauzo ya Siku
 
 .food-field label {
     display: block;
-    margin-bottom: 5px;
-    font-size: 13px;
-    font-weight: 600;
-    color: #475569;
+    margin-bottom: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #64748b;
 }
 
 .food-field input {
     width: 100%;
-    padding: 11px;
+    padding: 11px 10px;
     border: 1px solid #cbd5e1;
     border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 14px;
+    outline: none;
 }
 
-/* REMOVE BUTTON */
+.food-field input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, .08);
+}
+
+/* ============================================================
+   REMOVE FOOD
+============================================================ */
 
 .remove-food {
+    min-height: 42px;
     border: none;
-    background: #dc2626;
-    color: white;
-    padding: 11px 13px;
+    background: #fee2e2;
+    color: #b91c1c;
+    padding: 10px 12px;
     border-radius: 8px;
     cursor: pointer;
+    font-size: 12px;
+    font-weight: 700;
+    transition: .2s ease;
 }
 
 .remove-food:hover {
-    background: #b91c1c;
+    background: #fecaca;
 }
 
-/* ADD FOOD */
+/* ============================================================
+   ADD FOOD
+============================================================ */
+
+.food-actions {
+    padding: 0 16px 16px;
+}
 
 .add-food-button {
-    margin-top: 8px;
+    width: 100%;
+    min-height: 44px;
+    border: 1px dashed #93c5fd;
+    background: #eff6ff;
+    color: #1d4ed8;
+    border-radius: 9px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: .2s ease;
 }
 
-/* SUMMARY */
+.add-food-button:hover {
+    background: #dbeafe;
+    border-color: #60a5fa;
+}
+
+/* ============================================================
+   SALES SUMMARY
+============================================================ */
 
 .sale-summary {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 15px;
-    margin-top: 25px;
+    gap: 10px;
+    padding: 0 16px 16px;
 }
 
 .summary-box {
-    background: #f8fafc;
+    position: relative;
+    overflow: hidden;
+    background: white;
     border: 1px solid #e2e8f0;
     border-radius: 12px;
-    padding: 20px;
+    padding: 16px 14px;
+    text-align: center;
+}
+
+.summary-box::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+}
+
+.summary-box:nth-child(1)::before {
+    background: #16a34a;
+}
+
+.summary-box:nth-child(2)::before {
+    background: #2563eb;
+}
+
+.summary-box:nth-child(3)::before {
+    background: #172554;
 }
 
 .summary-box span {
     display: block;
     color: #64748b;
-    font-size: 13px;
-    margin-bottom: 7px;
+    font-size: 11px;
+    font-weight: 700;
+    margin-bottom: 6px;
 }
 
 .summary-box strong {
     display: block;
     color: #172554;
-    font-size: 20px;
+    font-size: 17px;
+    font-weight: 800;
 }
 
-/* SAVE */
+#food-total {
+    color: #16a34a;
+}
+
+#meat-total {
+    color: #2563eb;
+}
+
+#daily-total {
+    color: #172554;
+}
+
+/* ============================================================
+   NOTES
+============================================================ */
+
+.notes-section {
+    padding: 0 28px;
+}
+
+.notes-section .form-group {
+    margin-bottom: 5px;
+}
+
+/* ============================================================
+   SAVE AREA
+============================================================ */
 
 .save-section {
     margin-top: 25px;
+    padding: 20px 28px 28px;
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
 }
 
 .save-button {
     width: 100%;
-    max-width: 400px;
-    padding: 14px 20px;
+    min-height: 52px;
     border: none;
-    border-radius: 10px;
+    border-radius: 11px;
     background: #172554;
     color: white;
-    font-size: 16px;
-    font-weight: 700;
+    font-size: 15px;
+    font-weight: 800;
     cursor: pointer;
+    transition: all .2s ease;
+    box-shadow: 0 5px 12px rgba(23, 37, 84, .15);
 }
 
 .save-button:hover {
     background: #1e3a8a;
+    transform: translateY(-1px);
+    box-shadow: 0 7px 16px rgba(23, 37, 84, .20);
 }
 
-/* ERRORS */
+/* ============================================================
+   ERRORS
+============================================================ */
 
 .form-errors {
     background: #fef2f2;
     color: #991b1b;
-    padding: 12px;
+    border: 1px solid #fecaca;
+    padding: 10px 12px;
     border-radius: 8px;
-    margin-bottom: 15px;
+    margin-top: 7px;
+    font-size: 12px;
 }
 
-/* MOBILE */
+/* ============================================================
+   MOBILE
+============================================================ */
 
 @media (max-width: 700px) {
+
     .sale-page {
-        padding: 0 5px;
+        max-width: 100%;
     }
+
+    .sale-header {
+        padding: 23px 18px;
+        border-radius: 14px;
+    }
+
+    .sale-header h2 {
+        font-size: 22px;
+    }
+
+    .sale-header p {
+        font-size: 12px;
+    }
+
     .sale-card {
-        padding: 20px 15px;
+        border-radius: 14px;
     }
-    .food-row {
+
+    .sale-form-top {
+        padding: 20px 16px 8px;
+    }
+
+    .form-section-title h3 {
+        font-size: 16px;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+        padding: 13px 12px;
+    }
+
+    #id_total_money_received {
+        font-size: 20px;
+    }
+
+    .food-question {
+        padding: 18px 14px;
+        margin-top: 22px;
+    }
+
+    .choice-buttons {
         grid-template-columns: 1fr;
-        text-align: center;
     }
-    .food-field {
-        text-align: center;
+
+    #food-section {
+        margin: 0 12px 20px;
     }
+
+    .food-card-header {
+        padding: 16px;
+    }
+
+    #food-rows {
+        padding: 12px;
+    }
+
+    .food-row {
+        grid-template-columns: 1fr 1fr;
+        padding: 12px;
+    }
+
+    .food-field:first-child {
+        grid-column: 1 / -1;
+    }
+
     .remove-food {
         width: 100%;
     }
+
     .sale-summary {
         grid-template-columns: 1fr;
+        padding: 0 12px 12px;
     }
-    .choice-buttons {
-        flex-direction: column;
+
+    .summary-box {
+        padding: 14px;
     }
-    .choice-button {
-        width: 100%;
+
+    .notes-section {
+        padding: 0 16px;
     }
+
+    .save-section {
+        padding: 18px 16px 22px;
+    }
+}
+
+/* ============================================================
+   SMALL PHONES
+============================================================ */
+
+@media (max-width: 430px) {
+
+    .sale-header {
+        margin-bottom: 12px;
+    }
+
+    .sale-header h2 {
+        font-size: 20px;
+    }
+
+    .food-row {
+        grid-template-columns: 1fr;
+    }
+
+    .food-field:first-child {
+        grid-column: auto;
+    }
+
+    .save-button {
+        min-height: 50px;
+        font-size: 14px;
+    }
+
 }
 
 </style>
 
 {% endblock %}
+
 
 {% block content %}
 
@@ -281,145 +615,390 @@ Mauzo ya Siku
 
 <div class="sale-page">
 
-<!-- HEADER -->
-<div class="sale-header">
-    <h2>💰 Mauzo ya Siku</h2>
-    <p>Weka taarifa za mauzo ya siku nzima.</p>
-</div>
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
 
-<!-- MAIN FORM -->
-<div class="sale-card">
+    <div class="sale-header">
 
-    <form method="POST" id="daily-sale-form">
-        {% csrf_token %}
+        <h2>
+            💰 Mauzo ya Siku
+        </h2>
 
-        <!-- HIDDEN FOOD STATE -->
-        <input type="hidden" name="food_enabled" id="food-enabled" value="{% if food_enabled %}yes{% else %}no{% endif %}">
+        <p>
+            Weka taarifa za mauzo ya siku nzima kwa urahisi.
+        </p>
 
-        <!-- FORM ERRORS -->
-        {% if form.non_field_errors %}
-        <div class="form-errors">
-            {{ form.non_field_errors }}
-        </div>
-        {% endif %}
+    </div>
 
-        <!-- DATE -->
-        <div class="form-group">
-            {{ form.sale_date.label_tag }}
-            {{ form.sale_date }}
-            {% for error in form.sale_date.errors %}
-                <div class="form-errors">{{ error }}</div>
-            {% endfor %}
-        </div>
 
-        <!-- TOTAL DAILY SALES -->
-        <div class="form-group">
-            {{ form.total_money_received.label_tag }}
-            {{ form.total_money_received }}
-            {% for error in form.total_money_received.errors %}
-                <div class="form-errors">{{ error }}</div>
-            {% endfor %}
-        </div>
+    <!-- =====================================================
+         MAIN SALES CARD
+    ====================================================== -->
 
-        <!-- FOOD QUESTION -->
-        <div class="food-question">
-            <h3>🍽️ Je, kuna mauzo ya chakula?</h3>
-            <div class="choice-buttons">
-                <button type="button" class="choice-button choice-no" onclick="hideFoodSection()">
-                    HAPANA
-                </button>
-                <button type="button" class="choice-button choice-yes" onclick="showFoodSection()">
-                    NDIO
-                </button>
-            </div>
-        </div>
+    <div class="sale-card">
 
-        <!-- FOOD SECTION -->
-        <div id="food-section" {% if not food_enabled %}style="display: none;"{% endif %}>
-            <div class="sale-card">
-                <h3>🍲 Mauzo ya Chakula</h3>
-                <p>Weka chakula vyote vilivyouzwa leo. Unaweza kuongeza zaidi ya aina moja.</p>
+        <form method="POST" id="daily-sale-form">
 
-                <div id="food-rows">
-                    {% for row in food_rows %}
-                    <div class="food-row">
-                        <div class="food-field">
-                            <label>Aina ya Chakula</label>
-                            <input type="text" name="food_name[]" value="{{ row.name }}" placeholder="Mfano: Ugali">
+            {% csrf_token %}
+
+            <input
+                type="hidden"
+                name="food_enabled"
+                id="food-enabled"
+                value="{% if food_enabled %}yes{% else %}no{% endif %}"
+            >
+
+
+            <!-- =================================================
+                 FORM TOP
+            ================================================== -->
+
+            <div class="sale-form-top">
+
+                {% if form.non_field_errors %}
+
+                <div class="form-errors">
+                    {{ form.non_field_errors }}
+                </div>
+
+                {% endif %}
+
+
+                <div class="form-section-title">
+
+                    <h3>
+                        Taarifa za Mauzo
+                    </h3>
+
+                    <p>
+                        Ingiza kiasi cha fedha kilichopatikana kwa siku hii.
+                    </p>
+
+                </div>
+
+
+                <!-- DATE -->
+
+                <div class="form-group">
+
+                    {{ form.sale_date.label_tag }}
+
+                    {{ form.sale_date }}
+
+                    {% for error in form.sale_date.errors %}
+
+                        <div class="form-errors">
+                            {{ error }}
                         </div>
-                        <div class="food-field">
-                            <label>Bei / Sahani</label>
-                            <input type="number" name="unit_price[]" value="{{ row.unit_price }}" min="0.01" step="0.01" placeholder="2000">
-                        </div>
-                        <div class="food-field">
-                            <label>Idadi</label>
-                            <input type="number" name="quantity[]" value="{{ row.quantity }}" min="1" step="1" placeholder="20" oninput="calculateFoodTotal()">
-                        </div>
-                        {% if not forloop.first %}
-                        <button type="button" class="remove-food" onclick="removeFoodRow(this)">Ondoa</button>
-                        {% endif %}
-                        {% if row.error %}
-                        <div class="form-errors">{{ row.error }}</div>
-                        {% endif %}
-                    </div>
+
                     {% endfor %}
+
                 </div>
 
-                <!-- ADD MORE FOOD -->
-                <button type="button" class="button add-food-button" onclick="addFoodRow()">
-                    + Ongeza Chakula
-                </button>
 
-                <!-- FOOD SUMMARY -->
-                <div class="sale-summary">
-                    <div class="summary-box">
-                        <span>Jumla ya Chakula</span>
-                        <strong><span id="food-total">{{ food_total_preview|floatformat:0|intcomma }}</span> TSh</strong>
+                <!-- TOTAL MONEY -->
+
+                <div class="form-group">
+
+                    {{ form.total_money_received.label_tag }}
+
+                    {{ form.total_money_received }}
+
+                    {% for error in form.total_money_received.errors %}
+
+                        <div class="form-errors">
+                            {{ error }}
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+
+                <!-- FOOD QUESTION -->
+
+                <div class="food-question">
+
+                    <h3>
+                        🍽️ Je, kuna mauzo ya chakula?
+                    </h3>
+
+                    <p>
+                        Kama umeuza chakula leo, chagua NDIO ili uweke maelezo yake.
+                    </p>
+
+                    <div class="choice-buttons">
+
+                        <button
+                            type="button"
+                            class="choice-button choice-no"
+                            onclick="hideFoodSection()"
+                        >
+                            HAPANA
+                        </button>
+
+                        <button
+                            type="button"
+                            class="choice-button choice-yes"
+                            onclick="showFoodSection()"
+                        >
+                            NDIO
+                        </button>
+
                     </div>
-                    <div class="summary-box">
-                        <span>Mauzo ya Nyama</span>
-                        <strong><span id="meat-total">{{ meat_total_preview|floatformat:0|intcomma }}</span> TSh</strong>
-                    </div>
-                    <div class="summary-box">
-                        <span>Jumla ya Siku</span>
-                        <strong><span id="daily-total">{{ daily_total_preview|floatformat:0|intcomma }}</span> TSh</strong>
-                    </div>
+
                 </div>
 
             </div>
-        </div>
 
-        <!-- NOTES -->
-        <div class="form-group">
-            {{ form.notes.label_tag }}
-            {{ form.notes }}
-            {% for error in form.notes.errors %}
-                <div class="form-errors">{{ error }}</div>
-            {% endfor %}
-        </div>
 
-        <!-- SAVE -->
-        <div class="save-section">
-            <button type="submit" class="save-button">
-                <i class="fas fa-save"></i> Hifadhi Mauzo ya Siku
-            </button>
-        </div>
+            <!-- =================================================
+                 FOOD SECTION
+            ================================================== -->
 
-    </form>
+            <div
+                id="food-section"
+                {% if not food_enabled %}style="display: none;"{% endif %}
+            >
+
+                <div class="food-card">
+
+                    <div class="food-card-header">
+
+                        <h3>
+                            🍲 Mauzo ya Chakula
+                        </h3>
+
+                        <p>
+                            Weka kila aina ya chakula kilichouzwa leo.
+                        </p>
+
+                    </div>
+
+
+                    <div id="food-rows">
+
+                        {% for row in food_rows %}
+
+                        <div class="food-row">
+
+                            <div class="food-field">
+
+                                <label>
+                                    Aina ya Chakula
+                                </label>
+
+                                <input
+                                    type="text"
+                                    name="food_name[]"
+                                    value="{{ row.name }}"
+                                    placeholder="Mfano: Ugali"
+                                >
+
+                            </div>
+
+
+                            <div class="food-field">
+
+                                <label>
+                                    Bei / Sahani
+                                </label>
+
+                                <input
+                                    type="number"
+                                    name="unit_price[]"
+                                    value="{{ row.unit_price }}"
+                                    min="0.01"
+                                    step="0.01"
+                                    placeholder="2000"
+                                >
+
+                            </div>
+
+
+                            <div class="food-field">
+
+                                <label>
+                                    Idadi
+                                </label>
+
+                                <input
+                                    type="number"
+                                    name="quantity[]"
+                                    value="{{ row.quantity }}"
+                                    min="1"
+                                    step="1"
+                                    placeholder="20"
+                                    oninput="calculateFoodTotal()"
+                                >
+
+                            </div>
+
+
+                            {% if not forloop.first %}
+
+                            <button
+                                type="button"
+                                class="remove-food"
+                                onclick="removeFoodRow(this)"
+                            >
+                                Ondoa
+                            </button>
+
+                            {% endif %}
+
+
+                            {% if row.error %}
+
+                            <div class="form-errors">
+                                {{ row.error }}
+                            </div>
+
+                            {% endif %}
+
+                        </div>
+
+                        {% endfor %}
+
+                    </div>
+
+
+                    <!-- ADD FOOD -->
+
+                    <div class="food-actions">
+
+                        <button
+                            type="button"
+                            class="add-food-button"
+                            onclick="addFoodRow()"
+                        >
+                            <i class="fas fa-plus"></i>
+                            Ongeza Aina ya Chakula
+                        </button>
+
+                    </div>
+
+
+                    <!-- SUMMARY -->
+
+                    <div class="sale-summary">
+
+                        <div class="summary-box">
+
+                            <span>
+                                Jumla ya Chakula
+                            </span>
+
+                            <strong>
+                                <span id="food-total">
+                                    {{ food_total_preview|floatformat:0|intcomma }}
+                                </span>
+                                TSh
+                            </strong>
+
+                        </div>
+
+
+                        <div class="summary-box">
+
+                            <span>
+                                Mauzo ya Nyama
+                            </span>
+
+                            <strong>
+                                <span id="meat-total">
+                                    {{ meat_total_preview|floatformat:0|intcomma }}
+                                </span>
+                                TSh
+                            </strong>
+
+                        </div>
+
+
+                        <div class="summary-box">
+
+                            <span>
+                                Jumla ya Siku
+                            </span>
+
+                            <strong>
+                                <span id="daily-total">
+                                    {{ daily_total_preview|floatformat:0|intcomma }}
+                                </span>
+                                TSh
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 NOTES
+            ================================================== -->
+
+            <div class="notes-section">
+
+                <div class="form-group">
+
+                    {{ form.notes.label_tag }}
+
+                    {{ form.notes }}
+
+                    {% for error in form.notes.errors %}
+
+                        <div class="form-errors">
+                            {{ error }}
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 SAVE
+            ================================================== -->
+
+            <div class="save-section">
+
+                <button
+                    type="submit"
+                    class="save-button"
+                >
+                    <i class="fas fa-save"></i>
+                    Hifadhi Mauzo ya Siku
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
 
 </div>
 
 </div>
 
-</div>
 
-<!-- JAVASCRIPT -->
+<!-- ============================================================
+     JAVASCRIPT
+============================================================ -->
+
 <script>
 
 let foodSectionVisible = {% if food_enabled %}true{% else %}false{% endif %};
 
 function setFoodState(enabled) {
     const hiddenInput = document.getElementById("food-enabled");
+
     if (hiddenInput) {
         hiddenInput.value = enabled ? "yes" : "no";
     }
@@ -427,107 +1006,217 @@ function setFoodState(enabled) {
 
 function showFoodSection() {
     const section = document.getElementById("food-section");
+
     section.style.display = "block";
+
     foodSectionVisible = true;
+
     setFoodState(true);
+
     calculateFoodTotal();
 }
 
 function hideFoodSection() {
     const section = document.getElementById("food-section");
+
     section.style.display = "none";
+
     foodSectionVisible = false;
+
     setFoodState(false);
+
     document.getElementById("food-total").innerText = "0";
-    document.getElementById("meat-total").innerText = formatNumber(getDailyTotal());
+
+    document.getElementById("meat-total").innerText =
+        formatNumber(getDailyTotal());
+
+    document.getElementById("daily-total").innerText =
+        formatNumber(getDailyTotal());
 }
 
 function getDailyTotal() {
-    const input = document.getElementById("id_total_money_received");
+
+    const input =
+        document.getElementById("id_total_money_received");
+
     if (!input || !input.value) {
         return 0;
     }
+
     return parseFloat(input.value) || 0;
 }
 
 function formatNumber(num) {
-    return num.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+    return num
+        .toFixed(0)
+        .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
 function calculateFoodTotal() {
+
     const dailyTotal = getDailyTotal();
 
     if (!foodSectionVisible) {
+
         document.getElementById("food-total").innerText = "0";
-        document.getElementById("meat-total").innerText = formatNumber(dailyTotal);
-        document.getElementById("daily-total").innerText = formatNumber(dailyTotal);
+
+        document.getElementById("meat-total").innerText =
+            formatNumber(dailyTotal);
+
+        document.getElementById("daily-total").innerText =
+            formatNumber(dailyTotal);
+
         return;
     }
 
-    const prices = document.querySelectorAll('input[name="unit_price[]"]');
-    const quantities = document.querySelectorAll('input[name="quantity[]"]');
+    const prices =
+        document.querySelectorAll('input[name="unit_price[]"]');
+
+    const quantities =
+        document.querySelectorAll('input[name="quantity[]"]');
+
     let total = 0;
 
     for (let i = 0; i < prices.length; i++) {
-        const price = parseFloat(prices[i].value) || 0;
-        const quantity = parseFloat(quantities[i].value) || 0;
+
+        const price =
+            parseFloat(prices[i].value) || 0;
+
+        const quantity =
+            parseFloat(quantities[i].value) || 0;
+
         total += price * quantity;
     }
 
     let meatTotal = dailyTotal - total;
+
     if (meatTotal < 0) {
         meatTotal = 0;
     }
 
-    document.getElementById("food-total").innerText = formatNumber(total);
-    document.getElementById("meat-total").innerText = formatNumber(meatTotal);
-    document.getElementById("daily-total").innerText = formatNumber(dailyTotal);
+    document.getElementById("food-total").innerText =
+        formatNumber(total);
+
+    document.getElementById("meat-total").innerText =
+        formatNumber(meatTotal);
+
+    document.getElementById("daily-total").innerText =
+        formatNumber(dailyTotal);
 }
 
 function addFoodRow() {
-    const container = document.getElementById("food-rows");
-    const row = document.createElement("div");
+
+    const container =
+        document.getElementById("food-rows");
+
+    const row =
+        document.createElement("div");
+
     row.className = "food-row";
+
     row.innerHTML = `
+
         <div class="food-field">
-            <label>Aina ya Chakula</label>
-            <input type="text" name="food_name[]" placeholder="Mfano: Ndizi">
+
+            <label>
+                Aina ya Chakula
+            </label>
+
+            <input
+                type="text"
+                name="food_name[]"
+                placeholder="Mfano: Ndizi"
+            >
+
         </div>
+
         <div class="food-field">
-            <label>Bei / Sahani</label>
-            <input type="number" name="unit_price[]" min="0.01" step="0.01" placeholder="2000">
+
+            <label>
+                Bei / Sahani
+            </label>
+
+            <input
+                type="number"
+                name="unit_price[]"
+                min="0.01"
+                step="0.01"
+                placeholder="2000"
+            >
+
         </div>
+
         <div class="food-field">
-            <label>Idadi</label>
-            <input type="number" name="quantity[]" min="1" step="1" placeholder="20">
+
+            <label>
+                Idadi
+            </label>
+
+            <input
+                type="number"
+                name="quantity[]"
+                min="1"
+                step="1"
+                placeholder="20"
+            >
+
         </div>
-        <button type="button" class="remove-food" onclick="removeFoodRow(this)">Ondoa</button>
+
+        <button
+            type="button"
+            class="remove-food"
+            onclick="removeFoodRow(this)"
+        >
+            Ondoa
+        </button>
+
     `;
+
     container.appendChild(row);
+
     attachFoodListeners();
 }
 
 function removeFoodRow(button) {
-    const row = button.parentElement;
+
+    const row =
+        button.parentElement;
+
     row.remove();
+
     calculateFoodTotal();
 }
 
 function attachFoodListeners() {
-    const inputs = document.querySelectorAll('input[name="unit_price[]"], input[name="quantity[]"]');
+
+    const inputs =
+        document.querySelectorAll(
+            'input[name="unit_price[]"], input[name="quantity[]"]'
+        );
+
     inputs.forEach(function(input) {
-        input.oninput = calculateFoodTotal;
+
+        input.oninput =
+            calculateFoodTotal;
+
     });
 }
 
-// Daily total listener
-const dailyInput = document.getElementById("id_total_money_received");
+const dailyInput =
+    document.getElementById("id_total_money_received");
+
 if (dailyInput) {
-    dailyInput.addEventListener("input", calculateFoodTotal);
+
+    dailyInput.addEventListener(
+        "input",
+        calculateFoodTotal
+    );
+
 }
 
-// Initialize
 attachFoodListeners();
+
 calculateFoodTotal();
 
 </script>

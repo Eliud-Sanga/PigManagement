@@ -8,154 +8,374 @@ Sajili Nguruwe
 
 <style>
 
-    .form-wrapper {
-        max-width: 650px;
-        margin: 0 auto;
-    }
+.form-wrapper {
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto;
+}
 
-    .form-header {
-        text-align: center;
-        margin-bottom: 25px;
+/* ============================================================
+   FORM HEADER
+============================================================ */
+
+.form-header {
+    text-align: center;
+    margin-bottom: 18px;
+}
+
+.form-header h2 {
+    margin: 0 0 7px;
+    color: #172554;
+    font-size: 25px;
+    font-weight: 800;
+    letter-spacing: .2px;
+}
+
+.form-header h2 i {
+    color: #2563eb;
+    margin-right: 6px;
+}
+
+.form-header p {
+    margin: 0;
+    color: #64748b;
+    font-size: 13px;
+}
+
+/* ============================================================
+   FORM CARD
+============================================================ */
+
+.form-card {
+    position: relative;
+    background: white;
+    padding: 28px;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 8px 25px rgba(15, 23, 42, 0.08);
+    overflow: hidden;
+}
+
+.form-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #172554, #2563eb);
+}
+
+/* ============================================================
+   INFORMATION ALERT
+============================================================ */
+
+.alert-info {
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-left: 4px solid #2563eb;
+    padding: 13px 15px;
+    border-radius: 9px;
+    margin-bottom: 24px;
+    color: #1e40af;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.alert-info i {
+    color: #2563eb;
+    font-size: 16px;
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+.alert-info strong {
+    color: #172554;
+}
+
+/* ============================================================
+   FORM GROUP
+============================================================ */
+
+.form-group {
+    margin-bottom: 19px;
+}
+
+.form-group:last-of-type {
+    margin-bottom: 0;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 7px;
+    color: #334155;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+/* ============================================================
+   FORM FIELDS
+============================================================ */
+
+input,
+textarea,
+select {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px 13px;
+    border: 1px solid #cbd5e1;
+    border-radius: 9px;
+    background: #ffffff;
+    color: #1e293b;
+    font-size: 14px;
+    outline: none;
+    transition: border-color .2s ease,
+                box-shadow .2s ease,
+                background .2s ease;
+}
+
+input:hover,
+textarea:hover,
+select:hover {
+    border-color: #94a3b8;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    border-color: #2563eb;
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.10);
+}
+
+textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+select {
+    cursor: pointer;
+}
+
+/* ============================================================
+   ERRORS
+============================================================ */
+
+.errorlist {
+    margin: 7px 0 0;
+    padding: 8px 10px 8px 28px;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 7px;
+    color: #dc2626;
+    font-size: 12px;
+}
+
+.helptext {
+    display: block;
+    margin-top: 6px;
+    color: #64748b;
+    font-size: 11px;
+    line-height: 1.4;
+}
+
+/* ============================================================
+   BUTTON AREA
+============================================================ */
+
+.buttons {
+    display: grid;
+    grid-template-columns: 1fr 1.6fr;
+    gap: 11px;
+    margin-top: 27px;
+    padding-top: 20px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.buttons .button {
+    min-height: 44px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    border: none;
+    border-radius: 9px;
+    padding: 11px 16px;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    transition: .2s ease;
+}
+
+/* ============================================================
+   SAVE BUTTON
+============================================================ */
+
+.save-button {
+    background: #2563eb;
+    color: white;
+    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.18);
+}
+
+.save-button:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(37, 99, 235, 0.22);
+}
+
+.save-button:active {
+    transform: translateY(0);
+}
+
+/* ============================================================
+   SECONDARY BUTTON
+============================================================ */
+
+.secondary {
+    background: #f1f5f9;
+    color: #334155;
+    border: 1px solid #e2e8f0 !important;
+}
+
+.secondary:hover {
+    background: #e2e8f0;
+    color: #172554;
+}
+
+/* ============================================================
+   RESPONSIVE TABLET
+============================================================ */
+
+@media (max-width: 700px) {
+
+    .form-wrapper {
+        max-width: 100%;
     }
 
     .form-header h2 {
-        margin: 0 0 8px;
-        color: #172554;
-    }
-
-    .form-header p {
-        margin: 0;
-        color: #64748b;
-        font-size: 14px;
+        font-size: 22px;
     }
 
     .form-card {
-        background: white;
-        padding: 30px;
+        padding: 23px 20px;
         border-radius: 14px;
-        box-shadow: 0 4px 15px rgba(15, 23, 42, 0.07);
+    }
+
+    .alert-info {
+        font-size: 12px;
+        padding: 12px;
+    }
+
+}
+
+/* ============================================================
+   MOBILE
+============================================================ */
+
+@media (max-width: 520px) {
+
+    .form-header {
+        margin-bottom: 15px;
+    }
+
+    .form-header h2 {
+        font-size: 20px;
+        line-height: 1.3;
+    }
+
+    .form-header p {
+        font-size: 12px;
+    }
+
+    .form-card {
+        padding: 20px 15px;
+        border-radius: 12px;
+    }
+
+    .form-card::before {
+        height: 3px;
+    }
+
+    .alert-info {
+        gap: 8px;
+        margin-bottom: 20px;
+        padding: 11px 12px;
+        font-size: 11px;
+    }
+
+    .alert-info i {
+        font-size: 14px;
     }
 
     .form-group {
-        margin-bottom: 20px;
+        margin-bottom: 16px;
     }
 
     .form-group label {
-        display: block;
-        margin-bottom: 7px;
-        font-weight: 600;
-        color: #334155;
-        font-size: 14px;
+        font-size: 12px;
+        margin-bottom: 6px;
     }
 
     input,
     textarea,
     select {
-        width: 100%;
-        padding: 12px;
-        border: 1px solid #cbd5e1;
+        padding: 11px 12px;
+        font-size: 13px;
         border-radius: 8px;
-        background: white;
-        color: #1e293b;
-        font-size: 15px;
-        outline: none;
-        transition: 0.2s ease;
-    }
-
-    input:focus,
-    textarea:focus,
-    select:focus {
-        border-color: #2563eb;
-        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.10);
     }
 
     textarea {
-        resize: vertical;
-    }
-
-    .errorlist {
-        margin: 6px 0 0;
-        padding-left: 18px;
-        color: #dc2626;
-        font-size: 13px;
-    }
-
-    .helptext {
-        display: block;
-        margin-top: 5px;
-        color: #64748b;
-        font-size: 12px;
-    }
-
-    /* ========================================================= */
-    /* ALERT / NOTIFICATION BOX - ADDED */
-    /* ========================================================= */
-    .alert-info {
-        background: #eff6ff;
-        border-left: 4px solid #2563eb;
-        padding: 12px 16px;
-        border-radius: 6px;
-        margin-bottom: 20px;
-        color: #1e40af;
-        font-size: 14px;
-    }
-
-    .alert-info i {
-        margin-right: 8px;
+        min-height: 90px;
     }
 
     .buttons {
-        display: flex;
-        gap: 12px;
-        margin-top: 28px;
+        grid-template-columns: 1fr 1.5fr;
+        gap: 8px;
+        margin-top: 23px;
+        padding-top: 17px;
     }
 
     .buttons .button {
-        flex: 1;
-        text-align: center;
-        border: none;
-        cursor: pointer;
-        display: inline-block;
-        padding: 12px 20px;
-        border-radius: 8px;
-        font-size: 14px;
-        font-weight: 600;
-        text-decoration: none;
+        min-height: 42px;
+        padding: 9px 8px;
+        font-size: 12px;
     }
 
-    .save-button {
-        background: #2563eb;
-        color: white;
+}
+
+/* ============================================================
+   VERY SMALL PHONES
+============================================================ */
+
+@media (max-width: 380px) {
+
+    .form-card {
+        padding: 18px 12px;
     }
 
-    .save-button:hover {
-        background: #1d4ed8;
+    .form-header h2 {
+        font-size: 18px;
     }
 
-    .secondary {
-        background: #e2e8f0;
-        color: #0f172a;
+    .buttons {
+        grid-template-columns: 1fr;
     }
 
-    .secondary:hover {
-        background: #cbd5e1;
+    .buttons .button {
+        width: 100%;
     }
 
-    @media (max-width: 600px) {
-        .form-card {
-            padding: 22px 18px;
-        }
-        .buttons {
-            flex-direction: column;
-        }
-        .buttons .button {
-            width: 100%;
-        }
-    }
+}
 
 </style>
 
 {% endblock %}
+
 
 {% block content %}
 
@@ -163,25 +383,51 @@ Sajili Nguruwe
 
     <div class="form-wrapper">
 
+        <!-- =====================================================
+             HEADER
+        ====================================================== -->
+
         <div class="form-header">
+
             <h2>
-                <i class="fas fa-shopping-cart"></i> Sajili Ununuzi wa Nguruwe
+                <i class="fas fa-shopping-cart"></i>
+                Sajili Ununuzi wa Nguruwe
             </h2>
+
             <p>
                 Ingiza taarifa za ununuzi wa nguruwe
             </p>
+
         </div>
+
+
+        <!-- =====================================================
+             FORM CARD
+        ====================================================== -->
 
         <div class="form-card">
 
-            <!-- ========================================================= -->
-            <!-- ADDED: ALERT MESSAGE FOR MAMA -->
-            <!-- ========================================================= -->
+            <!-- =================================================
+                 INFORMATION
+            ================================================== -->
+
             <div class="alert-info">
+
                 <i class="fas fa-info-circle"></i>
-                <strong>Kumbuka:</strong> Baada ya kuhifadhi, utaelekezwa kwenye ukurasa wa 
-                kujaza taarifa za kila nguruwe (jinsia, bei, maelezo).
+
+                <div>
+                    <strong>Kumbuka:</strong>
+                    Baada ya kuhifadhi, utaelekezwa kwenye ukurasa
+                    wa kujaza taarifa za kila nguruwe
+                    (jinsia, bei, maelezo).
+                </div>
+
             </div>
+
+
+            <!-- =================================================
+                 FORM
+            ================================================== -->
 
             <form method="post">
 
@@ -189,29 +435,50 @@ Sajili Nguruwe
 
                 {{ form.non_field_errors }}
 
+
                 {% for field in form %}
 
                     <div class="form-group">
+
                         {{ field.label_tag }}
+
                         {{ field }}
+
                         {{ field.errors }}
+
                         {% if field.help_text %}
+
                             <span class="helptext">
                                 {{ field.help_text }}
                             </span>
+
                         {% endif %}
+
                     </div>
 
                 {% endfor %}
 
+
+                <!-- =================================================
+                     ACTIONS
+                ================================================== -->
+
                 <div class="buttons">
 
-                    <a href="{% url 'pigs:pig_list' %}" class="button secondary">
-                        <i class="fas fa-arrow-left"></i> Rudi
+                    <a
+                        href="{% url 'pigs:pig_list' %}"
+                        class="button secondary"
+                    >
+                        <i class="fas fa-arrow-left"></i>
+                        Rudi
                     </a>
 
-                    <button type="submit" class="button save-button">
-                        <i class="fas fa-save"></i> Hifadhi na Endelea
+                    <button
+                        type="submit"
+                        class="button save-button"
+                    >
+                        <i class="fas fa-save"></i>
+                        Hifadhi na Endelea
                     </button>
 
                 </div>
