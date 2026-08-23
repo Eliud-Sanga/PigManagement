@@ -541,6 +541,9 @@ def refresh_daily_report(
                 "total_food_income": (
                     daily_sale.total_food_sales
                 ),
+                "total_meat_weight_kg": (
+                    daily_sale.total_meat_weight_kg
+                ),
                 "total_income": (
                     daily_sale.total_money_received
                 ),
