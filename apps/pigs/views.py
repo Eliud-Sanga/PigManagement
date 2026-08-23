@@ -3124,10 +3124,10 @@ def expense_delete(request, expense_id):
 
 @login_required
 def monthly_report(request):
-    """Ripoti ya mwezi"""
+    """Ripoti ya mwezi."""
 
     # ========================================================
-    # PERMISSION: VIEW DAILY REPORTS
+    # PERMISSION
     # ========================================================
 
     if not request.user.has_perm(
@@ -3142,7 +3142,11 @@ def monthly_report(request):
             "pigs:dashboard"
         )
 
-    today = date.today()
+    # ========================================================
+    # SELECTED MONTH
+    # ========================================================
+
+    today = timezone.localdate()
 
     try:
 
@@ -3171,6 +3175,10 @@ def monthly_report(request):
         year = today.year
         month = today.month
 
+    # ========================================================
+    # DAILY SALES
+    # ========================================================
+
     daily_sales = (
         DailySale.objects
         .filter(
@@ -3178,7 +3186,11 @@ def monthly_report(request):
             sale_date__month=month
         )
         .prefetch_related(
-            "food_records__food_item"
+            "food_records__food_item",
+            "pig_records",
+        )
+        .select_related(
+            "slaughter_batch"
         )
         .order_by(
             "sale_date",
@@ -3186,19 +3198,23 @@ def monthly_report(request):
         )
     )
 
-    total_food_income = Decimal(
-        "0.00"
-    )
+    # ========================================================
+    # MONTHLY TOTALS
+    # ========================================================
 
-    total_meat_income = Decimal(
-        "0.00"
-    )
+    total_food_income = Decimal("0.00")
+
+    total_meat_income = Decimal("0.00")
 
     total_food_plates = 0
 
     total_meat_weight_kg = Decimal("0.00")
 
     daily_rows = []
+
+    # ========================================================
+    # PROCESS DAILY SALES
+    # ========================================================
 
     for sale in daily_sales:
 
@@ -3210,28 +3226,32 @@ def monthly_report(request):
             Decimal("0.00")
         )
 
-        # ========================================================
-        # MEAT WEIGHT YA SIKU
-        # ========================================================
+        food_income = (
+            food_income.quantize(
+                Decimal("0.01")
+            )
+        )
+
+        meat_income = (
+            sale.total_meat_sales
+            or Decimal("0.00")
+        )
+
+        meat_income = (
+            meat_income.quantize(
+                Decimal("0.01")
+            )
+        )
 
         meat_weight_kg = (
             sale.total_meat_weight_kg
             or Decimal("0.00")
         )
 
-        total_meat_weight_kg += meat_weight_kg
-
-        meat_income = (
-            sale.total_money_received
-            - food_income
-        )
-
-        if meat_income < Decimal("0.00"):
-            meat_income = Decimal("0.00")
-
-        total_income = (
-            meat_income
-            + food_income
+        meat_weight_kg = (
+            meat_weight_kg.quantize(
+                Decimal("0.01")
+            )
         )
 
         food_plates = sum(
@@ -3242,16 +3262,17 @@ def monthly_report(request):
             0
         )
 
-        total_food_income += (
-            food_income
-        )
+        total_food_income += food_income
 
-        total_meat_income += (
+        total_meat_income += meat_income
+
+        total_food_plates += food_plates
+
+        total_meat_weight_kg += meat_weight_kg
+
+        total_income = (
             meat_income
-        )
-
-        total_food_plates += (
-            food_plates
+            + food_income
         )
 
         daily_rows.append({
@@ -3269,17 +3290,46 @@ def monthly_report(request):
             "food_plates": food_plates,
 
         })
-        
+
+    # ========================================================
+    # TOTAL MONTHLY INCOME
+    # ========================================================
+
     total_income = (
         total_meat_income
         + total_food_income
     )
 
+    # ========================================================
+    # MONTHLY BATCH PROFIT
+    #
+    # MUHIMU:
+    #
+    # HATUTUMII:
+    #
+    #     BatchProfitReport.finalized_date
+    #
+    # kwa sababu batch inaweza kufungwa siku nyingine.
+    #
+    # PROFIT YA BATCH INAWEKWA KWENYE:
+    #
+    #     SlaughterBatch.slaughter_date
+    #
+    # Hivyo:
+    #
+    # August 2025
+    #     -> batches zilizochinjwa August 2025
+    #
+    # September 2025
+    #     -> batches zilizochinjwa September 2025
+    #
+    # ========================================================
+
     monthly_profit = (
         BatchProfitReport.objects
         .filter(
-            finalized_date__year=year,
-            finalized_date__month=month
+            slaughter_batch__slaughter_date__year=year,
+            slaughter_batch__slaughter_date__month=month
         )
         .aggregate(
             total=Sum(
@@ -3289,25 +3339,60 @@ def monthly_report(request):
         or Decimal("0.00")
     )
 
+    monthly_profit = (
+        monthly_profit.quantize(
+            Decimal("0.01")
+        )
+    )
+
+    # ========================================================
+    # MONTHLY PROFIT BATCH COUNT
+    # ========================================================
+
+    monthly_profit_batches = (
+        BatchProfitReport.objects
+        .filter(
+            slaughter_batch__slaughter_date__year=year,
+            slaughter_batch__slaughter_date__month=month
+        )
+        .count()
+    )
+
+    # ========================================================
+    # PREVIOUS MONTH
+    # ========================================================
+
     if month == 1:
 
         previous_month = 12
+
         previous_year = year - 1
 
     else:
 
         previous_month = month - 1
+
         previous_year = year
+
+    # ========================================================
+    # NEXT MONTH
+    # ========================================================
 
     if month == 12:
 
         next_month = 1
+
         next_year = year + 1
 
     else:
 
         next_month = month + 1
+
         next_year = year
+
+    # ========================================================
+    # MONTH NAME
+    # ========================================================
 
     month_name = date(
         year,
@@ -3316,6 +3401,10 @@ def monthly_report(request):
     ).strftime(
         "%B %Y"
     )
+
+    # ========================================================
+    # CONTEXT
+    # ========================================================
 
     context = {
 
@@ -3329,7 +3418,9 @@ def monthly_report(request):
 
         "total_meat_income": total_meat_income,
 
-        "total_meat_weight_kg": total_meat_weight_kg,
+        "total_meat_weight_kg": (
+            total_meat_weight_kg
+        ),
 
         "total_food_income": total_food_income,
 
@@ -3338,6 +3429,10 @@ def monthly_report(request):
         "total_food_plates": total_food_plates,
 
         "monthly_profit": monthly_profit,
+
+        "monthly_profit_batches": (
+            monthly_profit_batches
+        ),
 
         "previous_year": previous_year,
 
