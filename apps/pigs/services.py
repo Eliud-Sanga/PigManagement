@@ -498,10 +498,13 @@ def refresh_daily_sale(
     daily_sale.total_food_sales = food_total
     daily_sale.total_meat_sales = meat_total
 
+    daily_sale.calculate_meat_weight()
+
     daily_sale.save(
         update_fields=[
             "total_food_sales",
             "total_meat_sales",
+            "total_meat_weight_kg",
             "updated_at",
         ]
     )
