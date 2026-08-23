@@ -2629,10 +2629,7 @@ def daily_report(request, sale_id):
         meat_total = Decimal("0.00")
 
     total_meat_weight_kg = (
-        daily_sale.pig_records
-        .aggregate(
-            total=Sum("meat_weight_sold")
-        )["total"]
+        daily_sale.total_meat_weight_kg
         or Decimal("0.00")
     )
 
