@@ -3198,6 +3198,21 @@ def monthly_report(request):
         )
     )
 
+    #=========================================================
+    # MONTHLY BATCHES
+    #=========================================================
+
+    monthly_batches = (
+        SlaughterBatch.objects
+        .filter(
+            sales__daily_sale__sale_date__year=year,
+            sales__daily_sale__sale_date__month=month,
+        )
+        .distinct()
+    )
+
+    total_batches = monthly_batches.count()
+
     # ========================================================
     # MONTHLY TOTALS
     # ========================================================
@@ -3418,9 +3433,7 @@ def monthly_report(request):
 
         "total_meat_income": total_meat_income,
 
-        "total_meat_weight_kg": (
-            total_meat_weight_kg
-        ),
+        "total_meat_weight_kg": total_meat_weight_kg,
 
         "total_food_income": total_food_income,
 
@@ -3430,9 +3443,7 @@ def monthly_report(request):
 
         "monthly_profit": monthly_profit,
 
-        "monthly_profit_batches": (
-            monthly_profit_batches
-        ),
+        "total_batches": total_batches,
 
         "previous_year": previous_year,
 
