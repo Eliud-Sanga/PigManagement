@@ -4,10 +4,31 @@ Main URL configuration for Pig Management System.
 
 from django.contrib import admin
 from django.urls import path, include
-from apps.users.views import login_view, logout_view
+
+from .pwa import service_worker
+
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('accounts/', include('apps.users.urls')),  # ✅ BADILISHA - INCLUDE NAMESPACE
-    path('', include('apps.pigs.urls')),
+
+    path(
+        "service-worker.js",
+        service_worker,
+        name="service_worker"
+    ),
+
+    path(
+        "admin/",
+        admin.site.urls
+    ),
+
+    path(
+        "accounts/",
+        include("apps.users.urls")
+    ),
+
+    path(
+        "",
+        include("apps.pigs.urls")
+    ),
+
 ]

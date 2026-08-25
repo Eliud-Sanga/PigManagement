@@ -1388,104 +1388,131 @@
 
 <script>
 
-document.addEventListener(
-    "DOMContentLoaded",
-    function () {
+    document.addEventListener(
+        "DOMContentLoaded",
+        function () {
 
 
-        const password =
-            document.getElementById(
-                "password"
-            );
+            const password =
+                document.getElementById(
+                    "password"
+                );
 
 
-        const passwordToggle =
-            document.getElementById(
-                "passwordToggle"
-            );
+            const passwordToggle =
+                document.getElementById(
+                    "passwordToggle"
+                );
 
 
-        if (
-            password &&
-            passwordToggle
-        ) {
+            if (
+                password &&
+                passwordToggle
+            ) {
 
-            passwordToggle.addEventListener(
-                "click",
-                function () {
+                passwordToggle.addEventListener(
+                    "click",
+                    function () {
 
-                    if (
-                        password.type ===
-                        "password"
-                    ) {
+                        if (
+                            password.type ===
+                            "password"
+                        ) {
 
-                        password.type =
-                            "text";
+                            password.type =
+                                "text";
 
-                        passwordToggle.textContent =
-                            "🙈";
+                            passwordToggle.textContent =
+                                "🙈";
 
-                        passwordToggle.setAttribute(
-                            "aria-label",
-                            "Ficha nenosiri"
-                        );
+                            passwordToggle.setAttribute(
+                                "aria-label",
+                                "Ficha nenosiri"
+                            );
 
-                    } else {
+                        } else {
 
-                        password.type =
-                            "password";
+                            password.type =
+                                "password";
 
-                        passwordToggle.textContent =
-                            "👁";
+                            passwordToggle.textContent =
+                                "👁";
 
-                        passwordToggle.setAttribute(
-                            "aria-label",
-                            "Onyesha nenosiri"
-                        );
+                            passwordToggle.setAttribute(
+                                "aria-label",
+                                "Onyesha nenosiri"
+                            );
+
+                        }
 
                     }
+                );
 
-                }
-            );
+            }
+
+
+            const form =
+                document.getElementById(
+                    "loginForm"
+                );
+
+
+            const loginButton =
+                document.getElementById(
+                    "loginButton"
+                );
+
+
+            if (
+                form &&
+                loginButton
+            ) {
+
+                form.addEventListener(
+                    "submit",
+                    function () {
+
+                        loginButton.disabled =
+                            true;
+
+                        loginButton.textContent =
+                            "Inaingia...";
+
+                    }
+                );
+
+            }
+
+            /* =====================================================
+            SERVICE WORKER
+            ===================================================== */
+
+            if ("serviceWorker" in navigator) {
+
+                navigator.serviceWorker
+                    .register("/service-worker.js")
+                    .then(function (registration) {
+
+                        console.log(
+                            "Service Worker registered:",
+                            registration.scope
+                        );
+
+                    })
+                    .catch(function (error) {
+
+                        console.error(
+                            "Service Worker registration failed:",
+                            error
+                        );
+
+                    });
+
+            }
 
         }
 
-
-        const form =
-            document.getElementById(
-                "loginForm"
-            );
-
-
-        const loginButton =
-            document.getElementById(
-                "loginButton"
-            );
-
-
-        if (
-            form &&
-            loginButton
-        ) {
-
-            form.addEventListener(
-                "submit",
-                function () {
-
-                    loginButton.disabled =
-                        true;
-
-                    loginButton.textContent =
-                        "Inaingia...";
-
-                }
-            );
-
-        }
-
-    }
-
-);
+    );
 
 </script>
 

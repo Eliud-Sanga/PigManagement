@@ -254,6 +254,12 @@ SECURE_SSL_REDIRECT = (
     not DEBUG
 )
 
+# Render terminates HTTPS before forwarding requests to Django.
+SECURE_PROXY_SSL_HEADER = (
+    "HTTP_X_FORWARDED_PROTO",
+    "https",
+)
+
 # Prevent browsers from guessing content types.
 SECURE_CONTENT_TYPE_NOSNIFF = True
 
