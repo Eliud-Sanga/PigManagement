@@ -1,0 +1,211 @@
+{% extends "control_center/base.html" %}
+{% load i18n %}
+{% block title %}{{ company.name }} | PIGS{% endblock %}
+
+{% block content %}
+<section class="cc-company-hero">
+    <div>
+        <span class="cc-console-eyebrow">{% trans "Company Policy" %}</span>
+        <h1>{{ company.name }}</h1>
+        <p>{{ company.code }} · {{ company.timezone }}</p>
+    </div>
+
+    <div class="cc-company-badges">
+        <span class="badge">{{ company.get_status_display }}</span>
+        <span class="badge">
+            {% trans "Default language" %}: {{ company.default_language|upper }}
+        </span>
+        <span class="badge {% if company.owner_user_management_enabled %}success{% else %}warning{% endif %}">
+            {% trans "Owner user management" %}:
+            {% if company.owner_user_management_enabled %}
+                {% trans "ENABLED" %}
+            {% else %}
+                {% trans "DISABLED" %}
+            {% endif %}
+        </span>
+    </div>
+</section>
+
+<section class="cc-company-policy-grid">
+    <a class="cc-policy-card" href="{% url 'users:company_edit' company.public_id %}">
+        <span class="cc-console-icon">C</span>
+        <strong>{% trans "Company Profile" %}</strong>
+        <small>{% trans "Name, contacts, address and company identity." %}</small>
+    </a>
+
+    <a class="cc-policy-card" href="{% url 'users:company_languages' company.public_id %}">
+        <span class="cc-console-icon">L</span>
+        <strong>{% trans "Language Policy" %}</strong>
+        <small>
+            {{ company.allowed_languages|join:", "|upper }}
+            · {% trans "default" %} {{ company.default_language|upper }}
+        </small>
+    </a>
+
+    <a class="cc-policy-card featured" href="{% url 'users:company_roles' company.public_id %}">
+        <span class="cc-console-icon">R</span>
+        <strong>{% trans "Roles & Permissions" %}</strong>
+        <small>{% trans "Manage Owner, Manager, Staff and custom role permission templates." %}</small>
+    </a>
+
+    <a class="cc-policy-card" href="#company-members">
+        <span class="cc-console-icon">U</span>
+        <strong>{% trans "Members & Overrides" %}</strong>
+        <small>{% trans "Manage individual memberships, grants and explicit denials." %}</small>
+    </a>
+
+    <a class="cc-policy-card" href="{% url 'users:company_audit' company.public_id %}">
+        <span class="cc-console-icon">A</span>
+        <strong>{% trans "Company Audit" %}</strong>
+        <small>{% trans "Append-only company governance and administration history." %}</small>
+    </a>
+
+    <article class="cc-policy-card cc-owner-toggle-card">
+        <span class="cc-console-icon">O</span>
+        <strong>{% trans "Owner User Management" %}</strong>
+        <small>
+            {% trans "Allow the Company Owner to request and remove users inside this company. Platform Admin approval remains required." %}
+        </small>
+
+        <form
+            method="post"
+            action="{% url 'users:company_owner_user_management_policy' company.public_id %}"
+            autocomplete="off"
+            class="cc-inline-policy-form"
+        >
+            {% csrf_token %}
+            <input
+                type="hidden"
+                name="enabled"
+                value="{% if company.owner_user_management_enabled %}0{% else %}1{% endif %}"
+            >
+            <input
+                type="password"
+                name="admin_password"
+                autocomplete="current-password"
+                placeholder="{% trans 'Platform Admin password' %}"
+                required
+            >
+            <button
+                type="submit"
+                class="btn {% if company.owner_user_management_enabled %}btn-danger{% else %}btn-primary{% endif %}"
+            >
+                {% if company.owner_user_management_enabled %}
+                    {% trans "Disable" %}
+                {% else %}
+                    {% trans "Enable" %}
+                {% endif %}
+            </button>
+        </form>
+    </article>
+</section>
+
+<section class="card wide" id="company-members">
+    <div class="page-head">
+        <div>
+            <h2>{% trans "Company Members" %}</h2>
+            <div class="muted">
+                {% trans "Role permissions form the base. Individual grants and denials can override that base for this company only." %}
+            </div>
+        </div>
+
+        <a class="btn btn-primary" href="{% url 'users:company_member_request' company.public_id %}">
+            {% trans "Add / request member" %}
+        </a>
+    </div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>{% trans "User" %}</th>
+                    <th>{% trans "Role" %}</th>
+                    <th>{% trans "Status" %}</th>
+                    <th>{% trans "Language" %}</th>
+                    <th>{% trans "Created" %}</th>
+                    <th>{% trans "Actions" %}</th>
+                </tr>
+            </thead>
+
+            <tbody>
+            {% for membership in memberships %}
+                <tr>
+                    <td>
+                        <strong>{{ membership.user.username }}</strong>
+                        <div class="muted">{{ membership.user.email }}</div>
+                    </td>
+                    <td>{{ membership.role.name }}</td>
+                    <td>{{ membership.get_status_display }}</td>
+                    <td>{{ membership.approved_language|default:membership.requested_language|upper }}</td>
+                    <td>{{ membership.created_at|date:"Y-m-d H:i" }}</td>
+                    <td>
+                        <div class="cc-table-actions">
+                            {% if membership.status == "PENDING_APPROVAL" %}
+                            <a class="btn btn-primary" href="{% url 'users:approval_review' membership.public_id %}">
+                                {% trans "Review" %}
+                            </a>
+                            {% else %}
+                            <a class="btn" href="{% url 'users:company_member_detail' membership.public_id %}">
+                                {% trans "Manage" %}
+                            </a>
+                            <a class="btn" href="{% url 'users:member_permissions' membership.public_id %}">
+                                {% trans "Permissions" %}
+                            </a>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="6">{% trans "No memberships." %}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="card wide danger-zone">
+    <div class="page-head">
+        <div>
+            <h2>{% trans "Company Lifecycle" %}</h2>
+            <div class="muted">
+                {% trans "Every lifecycle change requires the current Platform Administrator password and is audited." %}
+            </div>
+        </div>
+        <span class="badge">{{ company.get_status_display }}</span>
+    </div>
+
+    <div class="grid">
+        {% if company.status != "SUSPENDED" %}
+        <form class="card third" method="post" action="{% url 'users:company_status' company.public_id 'suspend' %}">
+            {% csrf_token %}
+            <strong>{% trans "Suspend" %}</strong>
+            <p class="muted">{% trans "Block normal business writes." %}</p>
+            <input type="password" name="admin_password" placeholder="{% trans 'Admin password' %}" autocomplete="current-password" required>
+            <button class="btn btn-warn" type="submit">{% trans "Suspend" %}</button>
+        </form>
+        {% endif %}
+
+        {% if company.status != "ACTIVE" %}
+        <form class="card third" method="post" action="{% url 'users:company_status' company.public_id 'activate' %}">
+            {% csrf_token %}
+            <strong>{% trans "Activate" %}</strong>
+            <p class="muted">{% trans "Restore operational access." %}</p>
+            <input type="password" name="admin_password" placeholder="{% trans 'Admin password' %}" autocomplete="current-password" required>
+            <button class="btn btn-primary" type="submit">{% trans "Activate" %}</button>
+        </form>
+        {% endif %}
+
+        {% if company.status != "ARCHIVED" %}
+        <form class="card third" method="post" action="{% url 'users:company_status' company.public_id 'archive' %}">
+            {% csrf_token %}
+            <strong>{% trans "Archive" %}</strong>
+            <p class="muted">{% trans "Preserve history and remove from normal operations." %}</p>
+            <input type="password" name="admin_password" placeholder="{% trans 'Admin password' %}" autocomplete="current-password" required>
+            <button class="btn btn-danger" type="submit">{% trans "Archive" %}</button>
+        </form>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

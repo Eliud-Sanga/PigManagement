@@ -1,0 +1,303 @@
+{% extends "pigs/base.html" %}
+
+{% block title %}
+Edit - {{ model_label }}
+{% endblock %}
+
+
+{% block extra_css %}
+
+<style>
+
+.data-edit-page {
+    max-width: 760px;
+    margin: 0 auto;
+    padding-bottom: 40px;
+}
+
+.data-edit-topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+}
+
+.data-edit-back {
+    padding: 9px 14px;
+    background: #e2e8f0;
+    color: #334155;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.data-edit-back:hover {
+    background: #cbd5e1;
+}
+
+.data-edit-card {
+    background: white;
+    border: 1px solid #f1f5f9;
+    border-radius: 16px;
+    padding: 25px;
+    box-shadow:
+        0 4px 18px
+        rgba(15, 23, 42, 0.07);
+}
+
+.data-edit-header {
+    margin-bottom: 22px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.data-edit-header h2 {
+    margin: 0;
+    color: #172554;
+    font-size: 23px;
+}
+
+.data-edit-header p {
+    margin: 5px 0 0;
+    color: #64748b;
+    font-size: 12px;
+}
+
+.data-edit-record {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 9px;
+    padding: 9px 12px;
+    margin-top: 12px;
+    color: #64748b;
+    font-size: 11px;
+}
+
+.data-edit-record strong {
+    color: #172554;
+}
+
+.edit-field {
+    margin-bottom: 17px;
+}
+
+.edit-field label {
+    display: block;
+    margin-bottom: 6px;
+    color: #334155;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.edit-field input,
+.edit-field select,
+.edit-field textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: white;
+    color: #1e293b;
+    font-size: 13px;
+    outline: none;
+}
+
+.edit-field textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.edit-field input:focus,
+.edit-field select:focus,
+.edit-field textarea:focus {
+    border-color: #2563eb;
+    box-shadow:
+        0 0 0 3px
+        rgba(37, 99, 235, .08);
+}
+
+.field-error {
+    margin-top: 5px;
+    color: #dc2626;
+    font-size: 11px;
+}
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 25px;
+    padding-top: 18px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.btn {
+    flex: 1;
+    border: none;
+    border-radius: 9px;
+    padding: 11px 15px;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 750;
+}
+
+.btn-save {
+    background: #2563eb;
+    color: white;
+}
+
+.btn-save:hover {
+    background: #1d4ed8;
+}
+
+.btn-cancel {
+    background: #e2e8f0;
+    color: #334155;
+}
+
+.btn-cancel:hover {
+    background: #cbd5e1;
+}
+
+@media (max-width: 600px) {
+
+    .data-edit-card {
+        padding: 18px;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+}
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container">
+
+<div class="data-edit-page">
+
+    <div class="data-edit-topbar">
+
+        <a
+            href="{% url 'users:data_management_model' model_key %}"
+            class="data-edit-back"
+        >
+            ← Rudi
+        </a>
+
+    </div>
+
+
+    <div class="data-edit-card">
+
+        <div class="data-edit-header">
+
+            <h2>
+                ✏️ Hariri {{ model_label }}
+            </h2>
+
+            <p>
+                Badilisha taarifa za record hii.
+            </p>
+
+            <div class="data-edit-record">
+
+                Record ID:
+                <strong>#{{ record.pk }}</strong>
+
+            </div>
+
+        </div>
+
+
+        <form method="post">
+
+            {% csrf_token %}
+
+
+            {% for field in form %}
+
+                <div class="edit-field">
+
+                    {{ field.label_tag }}
+
+                    {{ field }}
+
+                    {% if field.help_text %}
+
+                        <div
+                            style="
+                                margin-top:4px;
+                                color:#94a3b8;
+                                font-size:10px;
+                            "
+                        >
+                            {{ field.help_text }}
+                        </div>
+
+                    {% endif %}
+
+
+                    {% for error in field.errors %}
+
+                        <div class="field-error">
+                            {{ error }}
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            {% endfor %}
+
+
+            {% if form.non_field_errors %}
+
+                {% for error in form.non_field_errors %}
+
+                    <div class="field-error">
+                        {{ error }}
+                    </div>
+
+                {% endfor %}
+
+            {% endif %}
+
+
+            <div class="form-actions">
+
+                <a
+                    href="{% url 'users:data_management_model' model_key %}"
+                    class="btn btn-cancel"
+                >
+                    Ghairi
+                </a>
+
+                <button
+                    type="submit"
+                    class="btn btn-save"
+                >
+                    💾 Hifadhi Mabadiliko
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,73 @@
+{% extends "control_center/base.html" %}
+{% block title %}Approval · {{ membership.user.username }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Review membership</h1>
+    <div class="muted">
+      {{ membership.user.username }} → {{ membership.company.name }}
+    </div>
+  </div>
+</div>
+
+<div class="grid">
+  <section class="card half">
+    <h3>Request</h3>
+    <p><strong>Email:</strong> {{ membership.user.email }}</p>
+    <p><strong>Company:</strong> {{ membership.company.name }}</p>
+    <p><strong>Role:</strong> {{ membership.role.name }}</p>
+    <p><strong>Requested language:</strong> {{ membership.requested_language|upper }}</p>
+    <p><strong>Usable password:</strong> {{ membership.user.has_usable_password|yesno:"Yes,No" }}</p>
+
+    {% if not membership.user.has_usable_password %}
+    <div class="muted">
+      New identity: Platform Admin approves access only. A secure
+      one-time activation link will be emailed so the user chooses
+      their own password.
+    </div>
+    {% else %}
+    <div class="muted">
+      Existing identity: its global password is preserved unchanged.
+    </div>
+    {% endif %}
+  </section>
+
+  <section class="card half">
+    <h3>Approval</h3>
+    <form method="post" autocomplete="off">
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+
+      {% for field in form %}
+      <div class="field" style="margin-bottom:12px">
+        <label>{{ field.label }}</label>
+        {{ field }}
+        {{ field.errors }}
+        {% if field.help_text %}
+        <div class="muted">{{ field.help_text }}</div>
+        {% endif %}
+      </div>
+      {% endfor %}
+
+      <div class="actions">
+        <button
+          class="btn btn-danger"
+          name="decision"
+          value="reject"
+          formnovalidate
+        >
+          Reject
+        </button>
+
+        <button
+          class="btn btn-primary"
+          name="decision"
+          value="approve"
+        >
+          Approve securely
+        </button>
+      </div>
+    </form>
+  </section>
+</div>
+{% endblock %}

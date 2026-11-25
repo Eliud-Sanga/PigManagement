@@ -1,0 +1,909 @@
+{% extends "pigs/base.html" %}
+{% load humanize static %}
+
+{% block title %}
+Ripoti ya Mwezi
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/reports-f3.css' %}">
+<script src="{% static 'js/analytics-f3.js' %}" defer></script>
+
+
+<style>
+
+.monthly-report {
+    max-width: 1150px;
+    margin: 0 auto;
+}
+
+/* ============================================================
+   HEADER
+============================================================ */
+
+.report-header {
+    background: linear-gradient(135deg, #172554, #2563eb);
+    color: white;
+    border-radius: 16px;
+    padding: 24px 25px;
+    margin-bottom: 16px;
+    text-align: center;
+    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.20);
+}
+
+.report-header h2 {
+    margin: 0;
+    font-size: 25px;
+}
+
+.report-header p {
+    margin: 6px 0 0;
+    color: #dbeafe;
+    font-size: 13px;
+}
+
+/* ============================================================
+   MONTH NAVIGATION
+============================================================ */
+
+.month-navigation {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 15px;
+    background: white;
+    padding: 10px 14px;
+    border-radius: 12px;
+    margin-bottom: 18px;
+    box-shadow: 0 3px 12px rgba(15, 23, 42, 0.07);
+}
+
+.month-navigation .previous-month {
+    justify-self: start;
+}
+
+.month-navigation .next-month {
+    justify-self: end;
+}
+
+.month-navigation strong {
+    color: #172554;
+    font-size: 18px;
+    font-weight: 800;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.month-navigation .button {
+    min-width: 145px;
+    text-align: center;
+}
+
+/* ============================================================
+   DAILY SALES TABLE
+============================================================ */
+
+.report-card {
+    background: white;
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 18px;
+    box-shadow: 0 4px 15px rgba(15, 23, 42, 0.07);
+}
+
+.report-card h3 {
+    margin: 0 0 5px;
+    color: #172554;
+    text-align: center;
+    font-size: 19px;
+}
+
+.report-card p {
+    margin: 0 0 15px;
+    color: #64748b;
+    text-align: center;
+    font-size: 13px;
+}
+
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.report-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 760px;
+    font-size: 13px;
+}
+
+.report-table th {
+    background: #172554;
+    color: white;
+    padding: 12px 10px;
+    text-align: center;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .3px;
+    font-weight: 700;
+}
+
+.report-table th:first-child {
+    border-radius: 8px 0 0 0;
+}
+
+.report-table th:last-child {
+    border-radius: 0 8px 0 0;
+}
+
+.report-table td {
+    padding: 11px 10px;
+    text-align: center;
+    border-bottom: 1px solid #e2e8f0;
+    color: #334155;
+}
+
+.report-table tbody tr:hover {
+    background: #f8fafc;
+}
+
+.report-table td strong {
+    color: #172554;
+}
+
+.report-link {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 6px;
+    background: #dbeafe;
+    color: #2563eb;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.report-link:hover {
+    background: #2563eb;
+    color: white;
+}
+
+/* ============================================================
+   BOTTOM SUMMARY CARDS
+============================================================ */
+
+.report-summary {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.summary-card {
+    background: white;
+    border-radius: 10px;
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    height: 58px;
+    box-shadow: 0 3px 10px rgba(15, 23, 42, 0.06);
+    border-left: 4px solid transparent;
+}
+
+.summary-icon {
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    font-size: 19px;
+    flex-shrink: 0;
+}
+
+.summary-card span {
+    display: block;
+    color: #64748b;
+    font-size: 10px;
+    margin-bottom: 2px;
+    line-height: 1.2;
+}
+
+.summary-card strong {
+    display: block;
+    font-size: 14px;
+    color: #172554;
+    white-space: nowrap;
+    line-height: 1.2;
+}
+
+.meat-summary {
+    border-left-color: #2563eb;
+}
+
+.meat-summary .summary-icon {
+    background: #dbeafe;
+}
+
+.meat-summary strong {
+    color: #2563eb;
+}
+
+.food-summary {
+    border-left-color: #16a34a;
+}
+
+.food-summary .summary-icon {
+    background: #d1fae5;
+}
+
+.food-summary strong {
+    color: #16a34a;
+}
+
+.total-summary {
+    border-left-color: #b45309;
+}
+
+.total-summary .summary-icon {
+    background: #fef3c7;
+}
+
+.total-summary strong {
+    color: #b45309;
+}
+
+.profit-summary {
+    border-left-color: #16a34a;
+}
+
+.profit-summary .summary-icon {
+    background: #dcfce7;
+}
+
+.profit-summary strong {
+    color: #16a34a;
+}
+
+.profit-summary .profit-negative {
+    color: #dc2626 !important;
+}
+
+/* ============================================================
+   STATISTICS
+============================================================ */
+
+.statistics-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 9px;
+    margin-bottom: 15px;
+}
+
+.statistics-grid > div {
+    background: white;
+    border-radius: 9px;
+    padding: 9px 10px;
+    height: 48px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    box-shadow: 0 3px 9px rgba(15, 23, 42, 0.05);
+    border: 1px solid #e2e8f0;
+}
+
+.statistics-grid span {
+    display: block;
+    color: #64748b;
+    font-size: 10px;
+    margin-bottom: 2px;
+    line-height: 1.1;
+}
+
+.statistics-grid strong {
+    color: #172554;
+    font-size: 15px;
+    line-height: 1.1;
+}
+
+/* ============================================================
+   EMPTY
+============================================================ */
+
+.empty-report {
+    text-align: center;
+    padding: 40px 20px;
+    color: #64748b;
+}
+
+.empty-report div {
+    font-size: 42px;
+    margin-bottom: 8px;
+}
+
+.empty-report h3 {
+    margin: 0 0 6px;
+    color: #334155;
+}
+
+.empty-report p {
+    margin: 0;
+}
+
+/* ============================================================
+   ACTIONS
+============================================================ */
+
+.report-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+}
+
+.report-actions .button {
+    min-width: 150px;
+    text-align: center;
+}
+
+/* ============================================================
+   MOBILE
+============================================================ */
+
+@media (max-width: 850px) {
+
+    .report-summary {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .statistics-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+}
+
+@media (max-width: 600px) {
+
+    .monthly-report {
+        width: 100%;
+    }
+
+    .report-header {
+        padding: 20px 15px;
+    }
+
+    .report-header h2 {
+        font-size: 21px;
+    }
+
+    .month-navigation {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .month-navigation .previous-month,
+    .month-navigation .next-month {
+        justify-self: stretch;
+    }
+
+    .month-navigation .button {
+        width: 100%;
+    }
+
+    .month-navigation strong {
+        grid-row: 1;
+        font-size: 17px;
+    }
+
+    .month-navigation .previous-month {
+        grid-row: 2;
+    }
+
+    .month-navigation .next-month {
+        grid-row: 3;
+    }
+
+    .report-summary {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .summary-card {
+        padding: 8px 9px;
+        gap: 7px;
+        height: 54px;
+    }
+
+    .summary-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 17px;
+    }
+
+    .summary-card strong {
+        font-size: 12px;
+    }
+
+    .summary-card span {
+        font-size: 9px;
+    }
+
+    .statistics-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .statistics-grid > div {
+        height: 46px;
+        padding: 8px;
+    }
+
+    .statistics-grid span {
+        font-size: 9px;
+    }
+
+    .statistics-grid strong {
+        font-size: 14px;
+    }
+
+    .report-card {
+        padding: 13px;
+    }
+
+}
+
+@media (max-width: 430px) {
+
+    .report-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .statistics-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+}
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="monthly-report">
+    {# F3-REPORT-IDENTITY #}
+    {% include "pigs/includes/report_identity.html" with report_title="Ripoti ya Mwezi" report_period=month_name %}
+
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <div class="report-header no-print">
+
+        <h2>📊 Ripoti ya Mwezi</h2>
+
+        <p>
+            Muhtasari wa mauzo ya biashara kwa mwezi
+        </p>
+
+    </div>
+
+
+    <!-- =====================================================
+         MONTH NAVIGATION
+    ====================================================== -->
+
+    <div class="month-navigation no-print">
+
+        <a
+            href="?year={{ previous_year }}&month={{ previous_month }}"
+            class="button secondary previous-month"
+        >
+            <i class="fas fa-arrow-left"></i>
+            Mwezi Uliopita
+        </a>
+
+
+        <strong>
+            {{ month_name }}
+        </strong>
+
+
+        <a
+            href="?year={{ next_year }}&month={{ next_month }}"
+            class="button secondary next-month"
+        >
+            Mwezi Unaofuata
+            <i class="fas fa-arrow-right"></i>
+        </a>
+
+    </div>
+
+
+    {# F3-MONTHLY-TREND #}
+    {% if daily_rows %}
+    <section class="f3-report-chart-card">
+        <div class="f3-report-chart-head">
+            <div>
+                <h3>Mwenendo wa mapato ya kila siku</h3>
+                <p>Nyama dhidi ya chakula kwa {{ month_name }}</p>
+            </div>
+        </div>
+
+        <div
+            class="f3-chart"
+            data-f3-chart="trend"
+            data-series-one="Nyama"
+            data-series-two="Chakula"
+            aria-label="Mwenendo wa mapato ya nyama na chakula"
+        ></div>
+
+        <div class="f3-chart-data" hidden>
+            {% for row in daily_rows %}
+            <span
+                data-label="{{ row.sale.sale_date|date:'d M' }}"
+                data-value="{{ row.meat_income }}"
+                data-value2="{{ row.food_income }}"
+            ></span>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- =====================================================
+         DAILY SALES TABLE
+    ====================================================== -->
+
+    <div class="report-card">
+
+        <h3>
+            📋 Mauzo ya Kila Siku
+        </h3>
+
+        <p>
+            Taarifa ya mauzo kwa kila siku iliyokuwa na rekodi
+        </p>
+
+
+        {% if daily_rows %}
+
+        <div class="table-wrapper">
+
+            <table class="report-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Tarehe
+                        </th>
+
+                        <th>
+                            Nyama
+                        </th>
+
+                        <th>
+                            Kilo
+                        </th>
+
+                        <th>
+                            Chakula
+                        </th>
+
+                        <th>
+                            Sahani
+                        </th>
+
+                        <th>
+                            Jumla
+                        </th>
+
+                        <th>
+                            #
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for row in daily_rows %}
+
+                    <tr>
+
+                        <td>
+                            <strong>
+                                {{ row.sale.sale_date|date:"d/m/Y" }}
+                            </strong>
+                        </td>
+
+
+                        <td>
+                            TSh
+                            {{ row.meat_income|floatformat:0|intcomma }}
+                        </td>
+
+
+                        <td>
+                            {{ row.meat_weight_kg|default:0|floatformat:2 }}
+                            kg
+                        </td>
+
+
+                        <td>
+                            TSh
+                            {{ row.food_income|floatformat:0|intcomma }}
+                        </td>
+
+
+                        <td>
+                            {{ row.food_plates|default:0 }}
+                        </td>
+
+
+                        <td>
+
+                            <strong>
+                                TSh
+                                {{ row.total_income|floatformat:0|intcomma }}
+                            </strong>
+
+                        </td>
+
+
+                        <td>
+
+                            <a
+                                href="{% url 'pigs:daily_report' row.sale.id %}"
+                                class="report-link"
+                            >
+                                Angalia
+                            </a>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        {% else %}
+
+        <div class="empty-report">
+
+            <div>
+                📭
+            </div>
+
+            <h3>
+                Hakuna mauzo
+            </h3>
+
+            <p>
+                Hakuna mauzo yaliyorekodiwa kwa mwezi huu.
+            </p>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- =====================================================
+         MAIN SUMMARY CARDS
+    ====================================================== -->
+
+    <div class="report-summary">
+
+        <!-- MEAT -->
+
+        <div class="summary-card meat-summary">
+
+            <div class="summary-icon">
+                🥩
+            </div>
+
+            <div>
+
+                <span>
+                    Mapato ya Nyama
+                </span>
+
+                <strong>
+                    TSh {{ total_meat_income|floatformat:0|intcomma }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <!-- FOOD -->
+
+        <div class="summary-card food-summary">
+
+            <div class="summary-icon">
+                🍽️
+            </div>
+
+            <div>
+
+                <span>
+                    Mapato ya Chakula
+                </span>
+
+                <strong>
+                    TSh {{ total_food_income|floatformat:0|intcomma }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <!-- TOTAL -->
+
+        <div class="summary-card total-summary">
+
+            <div class="summary-icon">
+                💰
+            </div>
+
+            <div>
+
+                <span>
+                    Jumla ya Mapato
+                </span>
+
+                <strong>
+                    TSh {{ total_income|floatformat:0|intcomma }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <!-- PROFIT -->
+
+        <div class="summary-card profit-summary">
+
+            <div class="summary-icon">
+                📈
+            </div>
+
+            <div>
+
+                <span>
+                    Faida ya Mwezi
+                </span>
+
+                {% if monthly_profit >= 0 %}
+
+                    <strong>
+                        +TSh {{ monthly_profit|floatformat:0|intcomma }}
+                    </strong>
+
+                {% else %}
+
+                    <strong class="profit-negative">
+                        -TSh {{ monthly_profit|floatformat:0|intcomma }}
+                    </strong>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         MONTHLY STATISTICS
+    ====================================================== -->
+
+    <div class="statistics-grid">
+
+        <div>
+
+            <span>
+                Siku zenye Mauzo
+            </span>
+
+            <strong>
+                {{ daily_rows|length }}
+            </strong>
+
+        </div>
+
+
+        <div>
+
+            <span>
+                ⚖️ Kilo za Nyama
+            </span>
+
+            <strong>
+                {{ total_meat_weight_kg|default:0|floatformat:2 }} kg
+            </strong>
+
+        </div>
+
+
+        <div>
+
+            <span>
+                🍽️ Sahani Zilizouzwa
+            </span>
+
+            <strong>
+                {{ total_food_plates|default:0 }}
+            </strong>
+
+        </div>
+
+
+        <div>
+
+            <span>
+                🐖 Batches
+            </span>
+
+            <strong>
+                {{ total_batches|default:0 }}
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         ACTIONS
+    ====================================================== -->
+
+    <div class="report-actions no-print">
+
+        <a
+            href="{% url 'pigs:daily_sale_list' %}"
+            class="button secondary"
+        >
+            <i class="fas fa-list"></i>
+            Historia ya Mauzo
+        </a>
+
+
+        <a
+            href="{% url 'pigs:batch_profit_report_list' %}"
+            class="button secondary"
+        >
+            <i class="fas fa-chart-line"></i>
+            Ripoti za Faida
+        </a>
+
+
+        <a
+            href="{% url 'pigs:dashboard' %}"
+            class="button"
+        >
+            <i class="fas fa-home"></i>
+            Dashboard
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}

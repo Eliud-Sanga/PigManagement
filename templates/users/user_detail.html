@@ -1,0 +1,1461 @@
+{% extends "pigs/base.html" %}
+
+{% block title %}
+Maelezo ya {{ user.username }}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+
+/* ============================================================
+   USER DETAIL PAGE
+   ============================================================ */
+
+.user-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding-bottom: 40px;
+}
+
+
+/* ============================================================
+   TOP NAVIGATION
+   ============================================================ */
+
+.user-topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.user-topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.user-topbar-right {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.page-back {
+    background: #e2e8f0;
+    color: #0f172a;
+    text-decoration: none;
+    padding: 9px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: .2s ease;
+}
+
+.page-back:hover {
+    background: #cbd5e1;
+    transform: translateX(-2px);
+}
+
+.page-dashboard {
+    background: #0f172a;
+    color: white;
+    text-decoration: none;
+    padding: 9px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: .2s ease;
+}
+
+.page-dashboard:hover {
+    background: #1e293b;
+}
+
+
+/* ============================================================
+   PAGE TITLE
+   ============================================================ */
+
+.user-title {
+    text-align: center;
+    margin-bottom: 28px;
+}
+
+.user-title h2 {
+    margin: 0;
+    color: #172554;
+    font-size: 28px;
+    font-weight: 800;
+}
+
+.user-title p {
+    margin: 7px 0 0;
+    color: #64748b;
+    font-size: 14px;
+}
+
+
+/* ============================================================
+   GENERAL CARD
+   ============================================================ */
+
+.user-card {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 18px rgba(15, 23, 42, .07);
+    border: 1px solid #f1f5f9;
+}
+
+.card-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 18px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.card-title h3 {
+    margin: 0;
+    color: #172554;
+    font-size: 18px;
+    font-weight: 750;
+}
+
+.card-title p {
+    margin: 4px 0 0;
+    color: #94a3b8;
+    font-size: 12px;
+}
+
+
+/* ============================================================
+   SUPER ADMIN PROTECTION NOTICE
+   ============================================================ */
+
+.super-admin-notice {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-left: 4px solid #94a3b8;
+    color: #64748b;
+    padding: 12px 15px;
+    border-radius: 10px;
+    font-size: 13px;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.super-admin-notice strong {
+    color: #475569;
+}
+
+.super-admin-notice-icon {
+    flex-shrink: 0;
+    font-size: 17px;
+    margin-top: 1px;
+}
+
+
+/* ============================================================
+   USER PROFILE
+   ============================================================ */
+
+.profile-layout {
+    display: grid;
+    grid-template-columns: 150px 1fr;
+    gap: 25px;
+    align-items: center;
+}
+
+.profile-avatar-wrapper {
+    display: flex;
+    justify-content: center;
+}
+
+.profile-avatar {
+    width: 105px;
+    height: 105px;
+    border-radius: 50%;
+    background: #2563eb;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 42px;
+    font-weight: 800;
+    box-shadow: 0 8px 20px rgba(37, 99, 235, .22);
+}
+
+.profile-avatar.super-admin {
+    background: #64748b;
+    box-shadow: 0 8px 20px rgba(100, 116, 139, .18);
+}
+
+.profile-main h3 {
+    margin: 0 0 6px;
+    font-size: 25px;
+    color: #0f172a;
+}
+
+.profile-email {
+    color: #64748b;
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+
+.profile-badges {
+    display: flex;
+    gap: 7px;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+}
+
+
+/* ============================================================
+   BADGES
+   ============================================================ */
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 11px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.badge-success {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.badge-danger {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.badge-primary {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.badge-purple {
+    background: #e2e8f0;
+    color: #475569;
+}
+
+.badge-secondary {
+    background: #e2e8f0;
+    color: #475569;
+}
+
+.badge-lock {
+    background: #f1f5f9;
+    color: #64748b;
+}
+
+
+/* ============================================================
+   USER INFORMATION GRID
+   ============================================================ */
+
+.user-info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.info-box {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 11px 14px;
+}
+
+.info-label {
+    display: block;
+    color: #94a3b8;
+    font-size: 11px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+}
+
+.info-value {
+    color: #1e293b;
+    font-size: 14px;
+    font-weight: 650;
+}
+
+
+/* ============================================================
+   USER ACTIONS
+   ============================================================ */
+
+.user-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 18px;
+}
+
+.btn {
+    border: none;
+    text-decoration: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 9px 15px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 650;
+    transition: .2s ease;
+}
+
+.btn-primary {
+    background: #2563eb;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+}
+
+.btn-warning {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.btn-warning:hover {
+    background: #fde68a;
+}
+
+.btn-success {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.btn-success:hover {
+    background: #bbf7d0;
+}
+
+.btn-danger {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.btn-danger:hover {
+    background: #fecaca;
+}
+
+.btn-secondary {
+    background: #e2e8f0;
+    color: #334155;
+}
+
+.btn-secondary:hover {
+    background: #cbd5e1;
+}
+
+
+/* ============================================================
+   SUPER ADMIN ACTION BUTTONS
+   ============================================================ */
+
+.btn-protected {
+    background: #f1f5f9;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+}
+
+.btn-protected:hover {
+    background: #e2e8f0;
+    color: #475569;
+    transform: translateY(-1px);
+}
+
+.lock-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: #94a3b8;
+    margin-left: 1px;
+}
+
+
+/* ============================================================
+   GROUPS
+   ============================================================ */
+
+.groups-wrapper {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.group-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    padding: 7px 10px 7px 13px;
+    border-radius: 9px;
+}
+
+.group-item.super-protected {
+    background: #f8fafc;
+    border-color: #e2e8f0;
+}
+
+.group-name {
+    color: #334155;
+    font-size: 13px;
+    font-weight: 650;
+}
+
+.group-item.super-protected .group-name {
+    color: #64748b;
+}
+
+.group-remove {
+    width: 24px;
+    height: 24px;
+    border: none;
+    border-radius: 6px;
+    background: #fee2e2;
+    color: #991b1b;
+    cursor: pointer;
+}
+
+.group-add {
+    display: flex;
+    gap: 8px;
+    margin-left: auto;
+}
+
+.group-add select {
+    min-width: 150px;
+    padding: 8px 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: white;
+}
+
+.group-add-protected {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    color: #64748b;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 650;
+}
+
+
+/* ============================================================
+   PERMISSIONS HEADER
+   ============================================================ */
+
+.permission-intro {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    color: #1e40af;
+    padding: 12px 15px;
+    border-radius: 10px;
+    font-size: 13px;
+    margin-bottom: 20px;
+}
+
+.permission-intro.super-protected {
+    background: #f8fafc;
+    border-color: #e2e8f0;
+    color: #64748b;
+}
+
+.permission-intro.super-protected strong {
+    color: #475569;
+}
+
+
+/* ============================================================
+   PERMISSION CATEGORY
+   ============================================================ */
+
+.permission-category {
+    margin-bottom: 18px;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.permission-category:last-child {
+    margin-bottom: 0;
+}
+
+.permission-category-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 15px;
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.permission-category-title {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    color: #172554;
+    font-size: 14px;
+    font-weight: 750;
+}
+
+.permission-count {
+    color: #64748b;
+    font-size: 11px;
+}
+
+.permission-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+
+/* ============================================================
+   PERMISSION ROW
+   ============================================================ */
+
+.permission-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 12px 15px;
+    border-bottom: 1px solid #f1f5f9;
+    transition: .15s ease;
+}
+
+.permission-row:hover {
+    background: #fafafa;
+}
+
+.permission-row.super-protected {
+    background: #fcfcfd;
+}
+
+.permission-row.super-protected:hover {
+    background: #f8fafc;
+}
+
+.permission-row:nth-child(odd) {
+    border-right: 1px solid #f1f5f9;
+}
+
+.permission-name {
+    color: #334155;
+    font-size: 13px;
+    font-weight: 550;
+}
+
+.permission-code {
+    display: block;
+    color: #94a3b8;
+    font-size: 10px;
+    margin-top: 3px;
+}
+
+.permission-lock {
+    color: #94a3b8;
+    font-size: 10px;
+    margin-left: 5px;
+}
+
+
+/* ============================================================
+   PERMISSION STATUS
+   ============================================================ */
+
+.permission-status {
+    flex-shrink: 0;
+}
+
+.status-yes {
+    color: #15803d;
+    background: #dcfce7;
+    padding: 5px 9px;
+    border-radius: 7px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.status-no {
+    color: #64748b;
+    background: #f1f5f9;
+    padding: 5px 9px;
+    border-radius: 7px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.status-super {
+    color: #64748b;
+    background: #e2e8f0;
+    padding: 5px 9px;
+    border-radius: 7px;
+    font-size: 11px;
+    font-weight: 750;
+}
+
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 800px) {
+
+    .profile-layout {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+
+    .profile-badges,
+    .user-actions {
+        justify-content: center;
+    }
+
+    .user-info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .permission-list {
+        grid-template-columns: 1fr;
+    }
+
+    .permission-row:nth-child(odd) {
+        border-right: none;
+    }
+
+    .group-add {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .group-add select {
+        flex: 1;
+    }
+
+    .group-add-protected {
+        margin-left: 0;
+        width: 100%;
+        justify-content: center;
+    }
+
+}
+
+@media (max-width: 600px) {
+
+    .user-topbar {
+        align-items: stretch;
+    }
+
+    .user-topbar-left,
+    .user-topbar-right {
+        width: 100%;
+    }
+
+    .user-topbar-right {
+        justify-content: flex-end;
+    }
+
+    .user-title h2 {
+        font-size: 23px;
+    }
+
+    .user-card {
+        padding: 17px;
+    }
+
+    .card-title {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .group-add {
+        flex-direction: column;
+    }
+
+    .group-add select,
+    .group-add button {
+        width: 100%;
+    }
+
+    .group-add-protected {
+        text-align: center;
+    }
+
+}
+
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container">
+
+<div class="user-page">
+
+
+    <!-- ========================================================
+         TOP NAVIGATION
+         ======================================================== -->
+
+    <div class="user-topbar">
+
+        <div class="user-topbar-left">
+
+            <a
+                href="{% url 'users:user_list' %}"
+                class="page-back"
+            >
+                <i class="fas fa-arrow-left"></i>
+                Rudi
+            </a>
+
+        </div>
+
+
+        <div class="user-topbar-right">
+
+            <a
+                href="{% url 'pigs:dashboard' %}"
+                class="page-dashboard"
+            >
+                <i class="fas fa-home"></i>
+                Dashboard
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================
+         PAGE TITLE
+         ======================================================== -->
+
+    <div class="user-title">
+
+        <h2>
+            👤 Maelezo ya Mtumiaji
+        </h2>
+
+        <p>
+            Taarifa za account, groups na permissions
+            za mtumiaji
+        </p>
+
+    </div>
+
+
+    <!-- ========================================================
+         SUPER ADMIN SECURITY NOTICE
+         ======================================================== -->
+
+    {% if user.is_superuser %}
+
+        <div class="super-admin-notice">
+
+            <div class="super-admin-notice-icon">
+                •
+            </div>
+
+            <div>
+
+                <strong>
+                    Akaunti ya Super Admin imelindwa
+                </strong>
+
+                <div style="margin-top:4px;">
+
+                    Permissions, groups, status na vitendo
+                    nyeti vya account hii haviwezi
+                    kubadilishwa bila verification ya
+                    password ya Super Admin.
+
+                </div>
+
+            </div>
+
+        </div>
+
+    {% endif %}
+
+
+    <!-- ========================================================
+         USER PROFILE
+         ======================================================== -->
+
+    <div class="user-card">
+
+        <div class="profile-layout">
+
+
+            <!-- AVATAR -->
+
+            <div class="profile-avatar-wrapper">
+
+                <div
+                    class="profile-avatar
+                    {% if user.is_superuser %}
+                        super-admin
+                    {% endif %}"
+                >
+
+                    {{ user.username|first|upper }}
+
+                </div>
+
+            </div>
+
+
+            <!-- MAIN INFORMATION -->
+
+            <div class="profile-main">
+
+                <h3>
+                    {{ user.username }}
+                </h3>
+
+
+                <div class="profile-email">
+
+                    <i class="fas fa-envelope"></i>
+
+                    {{ user.email|default:"Barua pepe haijajazwa" }}
+
+                </div>
+
+
+                <!-- ==================================================
+                     BADGES
+                =================================================== -->
+
+                <div class="profile-badges">
+
+                    {% if user.is_superuser %}
+
+                        <span class="badge badge-purple">
+                            👑 Super Admin
+                        </span>
+
+                        <span class="badge badge-lock">
+                            Protected Account
+                        </span>
+
+                    {% endif %}
+
+
+                    {% if user.is_active %}
+
+                        <span class="badge badge-success">
+                            ● Inatumika
+                        </span>
+
+                    {% else %}
+
+                        <span class="badge badge-danger">
+                            ● Imesimamishwa
+                        </span>
+
+                    {% endif %}
+
+
+                    {% for group in groups %}
+
+                        <span class="badge badge-primary">
+
+                            {{ group.name }}
+
+                        </span>
+
+                    {% endfor %}
+
+                </div>
+
+
+                <!-- ==================================================
+                     USER INFORMATION
+                =================================================== -->
+
+                <div class="user-info-grid">
+
+
+                    <div class="info-box">
+
+                        <span class="info-label">
+                            Username
+                        </span>
+
+                        <span class="info-value">
+                            {{ user.username }}
+                        </span>
+
+                    </div>
+
+
+                    <div class="info-box">
+
+                        <span class="info-label">
+                            User ID
+                        </span>
+
+                        <span class="info-value">
+                            #{{ user.id }}
+                        </span>
+
+                    </div>
+
+
+                    <div class="info-box">
+
+                        <span class="info-label">
+                            Amejiunga
+                        </span>
+
+                        <span class="info-value">
+                            {{ user.date_joined|date:"d/m/Y H:i" }}
+                        </span>
+
+                    </div>
+
+
+                    <div class="info-box">
+
+                        <span class="info-label">
+                            Mwisho kuingia
+                        </span>
+
+                        <span class="info-value">
+
+                            {{ user.last_login|date:"d/m/Y H:i"|default:"Hajawahi kuingia" }}
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ==================================================
+                     USER ACTIONS
+                =================================================== -->
+
+                <div class="user-actions">
+
+                    {% if user.is_superuser %}
+
+
+                        <a
+                            href="{% url 'users:user_edit' user.id %}"
+                            class="btn btn-protected"
+                            title="Verification ya Super Admin inahitajika"
+                        >
+                            •
+                            Badilisha Mtumiaji
+
+                            <span class="lock-label">
+                                Protected
+                            </span>
+                        </a>
+
+
+                        <a
+                            href="{% url 'users:user_change_password' user.id %}"
+                            class="btn btn-protected"
+                            title="Verification ya Super Admin inahitajika"
+                        >
+                            •
+                            Badilisha Nenosiri
+
+                            <span class="lock-label">
+                                Protected
+                            </span>
+                        </a>
+
+
+                        <a
+                            href="{% url 'users:user_permissions' user.id %}"
+                            class="btn btn-protected"
+                            title="Verification ya Super Admin inahitajika"
+                        >
+                            •
+                            Simamia Permissions
+
+                            <span class="lock-label">
+                                Protected
+                            </span>
+                        </a>
+
+
+                    {% else %}
+
+
+                        <a
+                            href="{% url 'users:user_edit' user.id %}"
+                            class="btn btn-warning"
+                        >
+                            <i class="fas fa-user-edit"></i>
+                            Badilisha Mtumiaji
+                        </a>
+
+
+                        <a
+                            href="{% url 'users:user_change_password' user.id %}"
+                            class="btn btn-primary"
+                        >
+                            <i class="fas fa-key"></i>
+                            Badilisha Nenosiri
+                        </a>
+
+
+                        <a
+                            href="{% url 'users:user_permissions' user.id %}"
+                            class="btn btn-success"
+                        >
+                            <i class="fas fa-shield-alt"></i>
+                            Simamia Permissions
+                        </a>
+
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================
+         GROUPS / ROLES
+         ======================================================== -->
+
+    <div class="user-card">
+
+        <div class="card-title">
+
+            <div>
+
+                <h3>
+                    👥 Groups / Roles
+                </h3>
+
+                <p>
+                    Vikundi vinavyompa mtumiaji permissions
+                </p>
+
+            </div>
+
+
+            {% if user.is_superuser %}
+
+                <div class="group-add-protected">
+                    Super Admin Groups zimefungwa
+                </div>
+
+            {% else %}
+
+                <form
+                    method="post"
+                    action="{% url 'users:user_add_to_group' user.id %}"
+                    class="group-add"
+                >
+
+                    {% csrf_token %}
+
+                    <select
+                        name="group"
+                        required
+                    >
+
+                        <option value="">
+                            -- Chagua Role --
+                        </option>
+
+                        {% for group in all_groups %}
+
+                            <option value="{{ group.id }}">
+
+                                {% if group.name == "Admin" %}
+                                    👤 Admin
+
+                                {% elif group.name == "Manager" %}
+                                    👩 Manager
+
+                                {% elif group.name == "Viewer" %}
+                                    👀 Viewer
+
+                                {% else %}
+                                    {{ group.name }}
+
+                                {% endif %}
+
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+
+                    <button
+                        type="submit"
+                        class="btn btn-success"
+                    >
+
+                        <i class="fas fa-plus"></i>
+
+                        Ongeza
+
+                    </button>
+
+                </form>
+
+            {% endif %}
+
+        </div>
+
+
+        <div class="groups-wrapper">
+
+            {% for group in groups %}
+
+                <div
+                    class="
+                        group-item
+                        {% if user.is_superuser %}
+                            super-protected
+                        {% endif %}
+                    "
+                >
+
+                    <span class="group-name">
+
+                        {% if group.name == "Admin" %}
+
+                            👤 Admin
+
+                        {% elif group.name == "Manager" %}
+
+                            👩 Manager
+
+                        {% elif group.name == "Viewer" %}
+
+                            👀 Viewer
+
+                        {% else %}
+
+                            {{ group.name }}
+
+                        {% endif %}
+
+                    </span>
+
+
+                    {% if user.is_superuser %}
+
+                        <span
+                            class="lock-label"
+                            title="Groups za Super Admin haziwezi kubadilishwa"
+                        >
+                            •
+                        </span>
+
+                    {% else %}
+
+                        <form
+                            method="post"
+                            action="{% url 'users:user_remove_from_group' user.id group.id %}"
+                        >
+
+                            {% csrf_token %}
+
+                            <button
+                                type="submit"
+                                class="group-remove"
+                                title="Ondoa group"
+                                onclick="
+                                    return confirm(
+                                        'Je, una uhakika unataka kuondoa role hii?'
+                                    );
+                                "
+                            >
+                                ×
+                            </button>
+
+                        </form>
+
+                    {% endif %}
+
+                </div>
+
+            {% empty %}
+
+                <span style="color:#94a3b8;">
+                    Hakuna role iliyowekwa.
+                </span>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================
+         EFFECTIVE PERMISSIONS
+         ======================================================== -->
+
+    <div class="user-card">
+
+        <div class="card-title">
+
+            <div>
+
+                <h3>
+                    🔐 Permissions za Mtumiaji
+                </h3>
+
+                <p>
+                    Hali ya sasa ya permissions za mtumiaji
+                </p>
+
+            </div>
+
+        </div>
+
+
+        {% if user.is_superuser %}
+
+            <div class="permission-intro super-protected">
+
+                <i class="fas fa-shield-alt"></i>
+
+                <strong>
+                    Super Admin — Full Access
+                </strong>
+
+                <div style="margin-top:4px;">
+
+                    Permissions zote zimeonekana kama
+                    zimeruhusiwa na haziwezi kuzimwa
+                    kupitia frontend.
+
+                </div>
+
+            </div>
+
+        {% else %}
+
+            <div class="permission-intro">
+
+                <i class="fas fa-info-circle"></i>
+
+                <strong>
+                    Hali ya sasa:
+                </strong>
+
+                Data hii inasomwa moja kwa moja kutoka
+                kwenye permissions za mtumiaji na Groups
+                zake.
+
+            </div>
+
+        {% endif %}
+
+
+        <!-- ======================================================
+             PERMISSION CATEGORIES
+        ======================================================= -->
+
+        {% for category, perms in perm_categories.items %}
+
+            <div class="permission-category">
+
+
+                <!-- CATEGORY HEADER -->
+
+                <div class="permission-category-header">
+
+                    <div class="permission-category-title">
+
+                        {% if category == "add" %}
+
+                            ➕ Kuongeza
+
+                        {% elif category == "change" %}
+
+                            ✏️ Kuhariri
+
+                        {% elif category == "delete" %}
+
+                            🗑️ Kufuta
+
+                        {% elif category == "view" %}
+
+                            👁️ Kuona
+
+                        {% elif category == "can" %}
+
+                            ⚙️ Mfumo
+
+                        {% else %}
+
+                            🔐 {{ category|title }}
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <span class="permission-count">
+
+                        {{ perms|length }} permissions
+
+                    </span>
+
+                </div>
+
+
+                <!-- PERMISSION LIST -->
+
+                <div class="permission-list">
+
+                    {% for item in perms %}
+
+                        <div
+                            class="
+                                permission-row
+                                {% if user.is_superuser %}
+                                    super-protected
+                                {% endif %}
+                            "
+                        >
+
+
+                            <!-- NAME + CODE -->
+
+                            <div>
+
+                                <span class="permission-name">
+
+                                    {{ item.permission.name }}
+
+
+                                    {% if user.is_superuser %}
+
+                                        <span
+                                            class="permission-lock"
+                                            title="Super Admin permission cannot be changed"
+                                        >
+                                            •
+                                        </span>
+
+                                    {% endif %}
+
+                                </span>
+
+
+                                <span class="permission-code">
+
+                                    {{ item.permission.content_type.app_label }}.
+                                    {{ item.permission.codename }}
+
+                                </span>
+
+                            </div>
+
+
+                            <!-- =================================================
+                                 LIVE PERMISSION STATUS
+                            ================================================== -->
+
+                            <div class="permission-status">
+
+                                {% if user.is_superuser %}
+
+                                    <span class="status-super">
+                                        ✓ Full Access
+                                    </span>
+
+                                {% elif item.has_perm %}
+
+                                    <span class="status-yes">
+                                        ✓ Imeruhusiwa
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="status-no">
+                                        Haijaruhusiwa
+                                    </span>
+
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+        {% empty %}
+
+            <div style="
+                text-align:center;
+                padding:35px;
+                color:#94a3b8;
+            ">
+
+                <i
+                    class="fas fa-lock"
+                    style="font-size:40px;margin-bottom:10px;"
+                ></i>
+
+                <div>
+                    Hakuna permissions zilizopatikana.
+                </div>
+
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+</div>
+
+{% endblock %}

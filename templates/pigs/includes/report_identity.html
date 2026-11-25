@@ -1,0 +1,49 @@
+<section class="f3-report-identity" aria-label="Report identity">
+    <div class="f3-report-brand">
+        {% if request.company.logo %}
+        <div class="f3-report-logo">
+            <img src="{{ request.company.logo.url }}" alt="">
+        </div>
+        {% else %}
+        <div class="f3-report-logo f3-report-logo-fallback">
+            {{ request.company.name|first|default:"P"|upper }}
+        </div>
+        {% endif %}
+
+        <div>
+            <div class="f3-report-company">
+                {{ request.company.name|default:"Home Management" }}
+            </div>
+
+            <div class="f3-report-contact">
+                {% if request.company.phone %}{{ request.company.phone }}{% endif %}
+                {% if request.company.email %}
+                    {% if request.company.phone %} · {% endif %}
+                    {{ request.company.email }}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="f3-report-meta">
+        <h1>{{ report_title }}</h1>
+
+        {% if report_period %}
+        <div>{{ report_period }}</div>
+        {% endif %}
+
+        {% if report_date %}
+        <div>{{ report_date|date:"d M Y" }}</div>
+        {% endif %}
+
+        {% if report_batch %}
+        <div>Batch {{ report_batch }}</div>
+        {% endif %}
+    </div>
+
+    {% if request.company.address %}
+    <div class="f3-report-address">
+        {{ request.company.address }}
+    </div>
+    {% endif %}
+</section>

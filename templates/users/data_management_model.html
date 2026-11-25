@@ -1,0 +1,1202 @@
+{% extends "pigs/base.html" %}
+
+{% block title %}
+Data Management - {{ model_label }}
+{% endblock %}
+
+
+{% block extra_css %}
+
+<style>
+
+/* ============================================================
+   DATA MODEL MANAGEMENT PAGE
+============================================================ */
+
+.data-model-page {
+    max-width: 1250px;
+    margin: 0 auto;
+    padding-bottom: 40px;
+}
+
+
+/* ============================================================
+   TOP BAR
+============================================================ */
+
+.data-model-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+}
+
+
+.data-model-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+
+    padding: 9px 14px;
+
+    border-radius: 8px;
+
+    background: #e2e8f0;
+    color: #334155;
+
+    text-decoration: none;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    transition: .2s ease;
+}
+
+
+.data-model-back:hover {
+    background: #cbd5e1;
+    transform: translateX(-2px);
+}
+
+
+.data-model-access {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    padding: 7px 11px;
+
+    border-radius: 20px;
+
+    font-size: 11px;
+    font-weight: 750;
+
+    white-space: nowrap;
+}
+
+
+.data-model-access.super {
+    background: #ede9fe;
+    color: #6d28d9;
+}
+
+
+.data-model-access.normal {
+    background: #dcfce7;
+    color: #166534;
+}
+
+
+/* ============================================================
+   HEADER
+============================================================ */
+
+.data-model-header {
+    background: white;
+
+    border-radius: 16px;
+
+    padding: 21px 23px;
+
+    margin-bottom: 15px;
+
+    border: 1px solid #f1f5f9;
+
+    box-shadow:
+        0 4px 18px
+        rgba(15, 23, 42, 0.07);
+}
+
+
+.data-model-header-main {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 20px;
+}
+
+
+.data-model-title-area h2 {
+    margin: 0;
+
+    color: #172554;
+
+    font-size: 24px;
+
+    font-weight: 800;
+}
+
+
+.data-model-title-area p {
+    margin: 5px 0 0;
+
+    color: #64748b;
+
+    font-size: 12px;
+}
+
+
+.data-model-record-count {
+    flex-shrink: 0;
+
+    min-width: 78px;
+
+    text-align: center;
+
+    padding: 8px 12px;
+
+    background: #f8fafc;
+
+    border:
+        1px solid #e2e8f0;
+
+    border-radius: 10px;
+}
+
+
+.data-model-record-count strong {
+    display: block;
+
+    color: #172554;
+
+    font-size: 20px;
+
+    font-weight: 800;
+}
+
+
+.data-model-record-count span {
+    color: #94a3b8;
+
+    font-size: 9px;
+
+    font-weight: 700;
+
+    text-transform: uppercase;
+}
+
+
+/* ============================================================
+   SMALL ACCESS SUMMARY
+============================================================ */
+
+.data-model-access-summary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    margin-bottom: 15px;
+
+    flex-wrap: wrap;
+}
+
+
+.access-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+
+    padding: 5px 9px;
+
+    border-radius: 16px;
+
+    font-size: 10px;
+
+    font-weight: 700;
+}
+
+
+.access-chip.edit {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+
+.access-chip.delete {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+
+.access-chip.full {
+    background: #ede9fe;
+    color: #6d28d9;
+}
+
+
+/* ============================================================
+   SEARCH BAR
+============================================================ */
+
+.data-model-toolbar {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 12px;
+
+    margin-bottom: 15px;
+
+    flex-wrap: wrap;
+}
+
+
+.data-model-search {
+    flex: 1;
+
+    min-width: 220px;
+}
+
+
+.data-model-search input {
+    width: 100%;
+
+    padding: 10px 12px;
+
+    border:
+        1px solid #cbd5e1;
+
+    border-radius: 9px;
+
+    background: white;
+
+    color: #334155;
+
+    font-size: 13px;
+
+    outline: none;
+
+    transition: .2s ease;
+}
+
+
+.data-model-search input:focus {
+    border-color: #2563eb;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(37, 99, 235, .08);
+}
+
+
+.data-model-toolbar-info {
+    color: #64748b;
+
+    font-size: 11px;
+
+    white-space: nowrap;
+}
+
+
+/* ============================================================
+   TABLE CARD
+============================================================ */
+
+.data-model-card {
+    background: white;
+
+    border:
+        1px solid #f1f5f9;
+
+    border-radius: 16px;
+
+    overflow: hidden;
+
+    box-shadow:
+        0 4px 18px
+        rgba(15, 23, 42, 0.07);
+}
+
+
+/* ============================================================
+   TABLE WRAPPER
+============================================================ */
+
+.data-model-table-wrapper {
+    width: 100%;
+
+    overflow-x: auto;
+}
+
+
+/* ============================================================
+   TABLE
+============================================================ */
+
+.data-model-table {
+    width: 100%;
+
+    border-collapse: collapse;
+
+    min-width: 900px;
+}
+
+
+.data-model-table th {
+    background: #f8fafc;
+
+    color: #475569;
+
+    font-size: 10px;
+
+    font-weight: 750;
+
+    text-transform: uppercase;
+
+    letter-spacing: .25px;
+
+    padding: 13px 14px;
+
+    border-bottom:
+        1px solid #e2e8f0;
+
+    text-align: left;
+
+    white-space: nowrap;
+}
+
+
+.data-model-table td {
+    padding: 12px 14px;
+
+    border-bottom:
+        1px solid #f1f5f9;
+
+    color: #334155;
+
+    font-size: 12px;
+
+    vertical-align: middle;
+}
+
+
+.data-model-table tbody tr {
+    transition: .15s ease;
+}
+
+
+.data-model-table tbody tr:hover {
+    background: #fafcff;
+}
+
+
+.data-model-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+
+/* ============================================================
+   RECORD ID
+============================================================ */
+
+.record-id {
+    color: #64748b;
+
+    font-size: 11px;
+
+    font-weight: 750;
+
+    white-space: nowrap;
+}
+
+
+/* ============================================================
+   RECORD VALUES
+============================================================ */
+
+.record-value {
+    display: block;
+
+    color: #334155;
+
+    max-width: 240px;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+}
+
+
+.record-value.primary {
+    color: #172554;
+
+    font-weight: 700;
+}
+
+
+.record-value.muted {
+    color: #94a3b8;
+}
+
+
+/* ============================================================
+   STATUS BADGES
+============================================================ */
+
+.value-status {
+    display: inline-flex;
+
+    align-items: center;
+
+    padding: 4px 8px;
+
+    border-radius: 16px;
+
+    font-size: 10px;
+
+    font-weight: 750;
+
+    white-space: nowrap;
+}
+
+
+.value-status.available {
+    background: #dcfce7;
+    color: #166534;
+}
+
+
+.value-status.slaughtered {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+
+.value-status.finished {
+    background: #e2e8f0;
+    color: #475569;
+}
+
+
+/* ============================================================
+   ACTIONS
+============================================================ */
+
+.action-cell {
+    text-align: right;
+
+    white-space: nowrap;
+
+    min-width: 135px;
+}
+
+
+.record-actions {
+    display: flex;
+
+    justify-content: flex-end;
+
+    align-items: center;
+
+    gap: 6px;
+}
+
+
+.record-action {
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 4px;
+
+    border: none;
+
+    text-decoration: none;
+
+    padding: 6px 9px;
+
+    border-radius: 7px;
+
+    font-size: 10px;
+
+    font-weight: 750;
+
+    transition: .18s ease;
+}
+
+
+.record-action:hover {
+    transform: translateY(-1px);
+}
+
+
+.record-action.edit {
+    background: #fef3c7;
+
+    color: #92400e;
+}
+
+
+.record-action.edit:hover {
+    background: #fde68a;
+}
+
+
+.record-action.delete {
+    background: #fee2e2;
+
+    color: #991b1b;
+}
+
+
+.record-action.delete:hover {
+    background: #fecaca;
+}
+
+
+.record-action.locked {
+    background: #f1f5f9;
+
+    color: #94a3b8;
+
+    cursor: default;
+}
+
+
+.record-action.locked:hover {
+    transform: none;
+}
+
+
+/* ============================================================
+   EMPTY STATE
+============================================================ */
+
+.data-model-empty {
+    text-align: center;
+
+    padding: 55px 20px;
+
+    color: #94a3b8;
+}
+
+
+.data-model-empty-icon {
+    font-size: 42px;
+
+    margin-bottom: 10px;
+}
+
+
+.data-model-empty h3 {
+    margin: 0 0 6px;
+
+    color: #475569;
+
+    font-size: 18px;
+}
+
+
+.data-model-empty p {
+    margin: 0;
+
+    font-size: 12px;
+
+    line-height: 1.5;
+}
+
+
+/* ============================================================
+   FOOTER
+============================================================ */
+
+.data-model-footer {
+    padding: 11px 15px;
+
+    background: #f8fafc;
+
+    border-top:
+        1px solid #e2e8f0;
+
+    color: #94a3b8;
+
+    font-size: 10px;
+
+    line-height: 1.5;
+}
+
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+
+@media (max-width: 800px) {
+
+    .data-model-header-main {
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+
+    .data-model-record-count {
+        align-self: flex-start;
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .data-model-page {
+        padding-bottom: 25px;
+    }
+
+
+    .data-model-title-area h2 {
+        font-size: 21px;
+    }
+
+
+    .data-model-toolbar {
+        align-items: stretch;
+
+        flex-direction: column;
+    }
+
+
+    .data-model-search {
+        min-width: 0;
+
+        width: 100%;
+    }
+
+
+    .data-model-toolbar-info {
+        white-space: normal;
+    }
+
+
+    .record-actions {
+        justify-content: flex-start;
+    }
+
+}
+
+
+/* ============================================================
+   PRINT
+============================================================ */
+
+@media print {
+
+    .data-model-topbar,
+    .data-model-toolbar,
+    .data-model-access-summary,
+    .action-cell,
+    .data-model-footer {
+        display: none !important;
+    }
+
+
+    .data-model-card {
+        box-shadow: none !important;
+
+        border:
+            1px solid #e2e8f0 !important;
+    }
+
+}
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container">
+
+<div class="data-model-page">
+
+
+    <!-- ========================================================
+         TOP BAR
+    ========================================================= -->
+
+    <div class="data-model-topbar">
+
+        <a
+            href="{% url 'users:data_management' %}"
+            class="data-model-back"
+        >
+            ← Data Management
+        </a>
+
+
+        {% if is_super_admin %}
+
+            <div class="data-model-access super">
+                👑 Super Admin · Full Access
+            </div>
+
+        {% else %}
+
+            <div class="data-model-access normal">
+                🛡️ Access Granted
+            </div>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- ========================================================
+         HEADER
+    ========================================================= -->
+
+    <div class="data-model-header">
+
+        <div class="data-model-header-main">
+
+            <div class="data-model-title-area">
+
+                <h2>
+
+                    {% if model_key == "purchase" %}
+                        🛒
+
+                    {% elif model_key == "pig" %}
+                        🐖
+
+                    {% elif model_key == "slaughterbatch" %}
+                        🔪
+
+                    {% elif model_key == "meatstock" %}
+                        🥩
+
+                    {% elif model_key == "dailysale" %}
+                        💰
+
+                    {% elif model_key == "pigsalerecord" %}
+                        🍖
+
+                    {% elif model_key == "meatpartsale" %}
+                        🦴
+
+                    {% elif model_key == "fooditem" %}
+                        🍽️
+
+                    {% elif model_key == "foodsalerecord" %}
+                        🧾
+
+                    {% elif model_key == "batchprofitreport" %}
+                        📊
+
+                    {% elif model_key == "dailysalereport" %}
+                        📈
+
+                    {% elif model_key == "expense" %}
+                        💸
+
+                    {% else %}
+                        📁
+
+                    {% endif %}
+
+                    {{ model_label }}
+
+                </h2>
+
+
+                <p>
+                    Records za {{ model_label }}
+                </p>
+
+            </div>
+
+
+            <div class="data-model-record-count">
+
+                <strong>
+                    {{ record_count }}
+                </strong>
+
+                <span>
+                    Records
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================
+         ACCESS SUMMARY
+    ========================================================= -->
+
+    <div class="data-model-access-summary">
+
+        {% if is_super_admin %}
+
+            <span class="access-chip full">
+                👑 Full Access
+            </span>
+
+        {% else %}
+
+            {% if can_edit %}
+
+                <span class="access-chip edit">
+                    ✏️ Edit
+                </span>
+
+            {% endif %}
+
+
+            {% if can_delete %}
+
+                <span class="access-chip delete">
+                    🗑️ Delete
+                </span>
+
+            {% endif %}
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- ========================================================
+         SEARCH
+    ========================================================= -->
+
+    <div class="data-model-toolbar">
+
+        <form
+            method="get"
+            class="data-model-search"
+        >
+
+            <input
+                type="text"
+                name="q"
+                value="{{ search_query }}"
+                placeholder="🔎 Tafuta kwenye records..."
+                autocomplete="off"
+            >
+
+        </form>
+
+
+        <div class="data-model-toolbar-info">
+
+            {% if search_query %}
+
+                Matokeo:
+
+                <strong>
+                    {{ record_count }}
+                </strong>
+
+            {% else %}
+
+                Records:
+
+                <strong>
+                    {{ record_count }}
+                </strong>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================
+         TABLE
+    ========================================================= -->
+
+    <div class="data-model-card">
+
+        {% if display_records %}
+
+            <div class="data-model-table-wrapper">
+
+                <table class="data-model-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                ID
+                            </th>
+
+
+                            {% for field in model_fields %}
+
+                                <th>
+                                    {{ field.label }}
+                                </th>
+
+                            {% endfor %}
+
+
+                            {% if can_edit or can_delete %}
+
+                                <th style="text-align:right;">
+                                    Vitendo
+                                </th>
+
+                            {% endif %}
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                    {% for record in display_records %}
+
+                        <tr>
+
+                            <!-- =================================
+                                 ID
+                            ================================== -->
+
+                            <td>
+
+                                <span class="record-id">
+                                    #{{ record.id }}
+                                </span>
+
+                            </td>
+
+
+                            <!-- =================================
+                                 FIELDS
+                            ================================== -->
+
+                            {% for item in record.values %}
+
+                                <td>
+
+                                    {% if item.value == "-" %}
+
+                                        <span class="record-value muted">
+                                            -
+                                        </span>
+
+                                    {% else %}
+
+                                        {% if item.field_name == "status" %}
+
+                                            {% with value=item.value|stringformat:"s"|lower %}
+
+                                                {% if value == "available" %}
+
+                                                    <span class="value-status available">
+                                                        Bado hajachinjwa
+                                                    </span>
+
+                                                {% elif value == "slaughtered" %}
+
+                                                    <span class="value-status slaughtered">
+                                                        Amechinjwa
+                                                    </span>
+
+                                                {% elif value == "finished" %}
+
+                                                    <span class="value-status finished">
+                                                        Nyama imeisha
+                                                    </span>
+
+                                                {% else %}
+
+                                                    <span
+                                                        class="record-value"
+                                                        title="{{ item.value }}"
+                                                    >
+                                                        {{ item.value }}
+                                                    </span>
+
+                                                {% endif %}
+
+                                            {% endwith %}
+
+                                        {% else %}
+
+                                            <span
+                                                class="
+                                                    record-value
+                                                    {% if forloop.first %}
+                                                        primary
+                                                    {% endif %}
+                                                "
+                                                title="{{ item.value }}"
+                                            >
+                                                {{ item.value }}
+                                            </span>
+
+                                        {% endif %}
+
+                                    {% endif %}
+
+                                </td>
+
+                            {% endfor %}
+
+
+                            <!-- =================================
+                                 ACTIONS
+                            ================================== -->
+
+                            {% if can_edit or can_delete %}
+
+                                <td class="action-cell">
+
+                                    <div class="record-actions">
+
+                                        {% if can_edit %}
+
+                                            <a
+                                                href="{% url 'users:data_management_edit' model_key record.id %}"
+                                                class="record-action edit"
+                                                title="Hariri record"
+                                            >
+                                                ✏️ Edit
+                                            </a>
+
+                                        {% endif %}
+
+
+                                        {% if can_delete %}
+
+                                            <a
+                                                href="{% url 'users:data_management_delete' model_key record.id %}"
+                                                class="record-action delete"
+                                                title="Futa record"
+                                            >
+                                                🗑️ Delete
+                                            </a>
+
+                                        {% endif %}
+
+                                    </div>
+
+                                </td>
+
+                            {% endif %}
+
+                        </tr>
+
+                    {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+        {% else %}
+
+
+            <!-- =============================================
+                 EMPTY STATE
+            ============================================== -->
+
+            <div class="data-model-empty">
+
+                {% if search_query %}
+
+                    <div class="data-model-empty-icon">
+                        🔎
+                    </div>
+
+                    <h3>
+                        Hakuna record iliyopatikana
+                    </h3>
+
+                    <p>
+                        Hakuna {{ model_label }}
+                        inayolingana na
+                        <strong>"{{ search_query }}"</strong>.
+                    </p>
+
+                {% else %}
+
+                    <div class="data-model-empty-icon">
+                        📂
+                    </div>
+
+                    <h3>
+                        Hakuna records
+                    </h3>
+
+                    <p>
+                        Hakuna {{ model_label }}
+                        zilizopo kwa sasa.
+                    </p>
+
+                {% endif %}
+
+            </div>
+
+        {% endif %}
+
+
+        <!-- ====================================================
+             FOOTER
+        ===================================================== -->
+
+        <div class="data-model-footer">
+
+            {% if is_super_admin %}
+
+                👑 Super Admin · Full access
+
+            {% else %}
+
+                🔐 Permissions:
+                
+                {% if can_view %}
+                    View
+                {% endif %}
+
+                {% if can_view and can_edit %}
+                    ·
+                {% endif %}
+
+                {% if can_edit %}
+                    Edit
+                {% endif %}
+
+                {% if can_delete and can_view %}
+                    ·
+                {% elif can_delete and can_edit %}
+                    ·
+                {% endif %}
+
+                {% if can_delete %}
+                    Delete
+                {% endif %}
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+</div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends "control_center/base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Language Policy" %} · {{ company.name }}{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <span class="cc-console-eyebrow">{% trans "Company Policy" %}</span>
+        <h1>{% trans "Language Policy" %}</h1>
+        <div class="muted">
+            {{ company.name }} ·
+            {% trans "New companies default to Kiswahili. Platform Admin may change the company default to any enabled language." %}
+        </div>
+    </div>
+</div>
+
+<section class="cc-policy-explainer">
+    <strong>{% trans "How language resolution works" %}</strong>
+    <p>
+        {% trans "A user's own language preference is used first when that language is allowed by the company. Otherwise the approved membership language is used, then the company default." %}
+    </p>
+</section>
+
+<form class="panel" method="post" autocomplete="off">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+
+    <div class="fields">
+        {% for field in form %}
+        <div class="field {% if field.name == 'allowed_languages' or field.name == 'admin_password' %}full{% endif %}">
+            <label for="{{ field.id_for_label }}">
+                {% if field.name == "allowed_languages" %}
+                    {% trans "Allowed languages" %}
+                {% elif field.name == "default_language" %}
+                    {% trans "Company default language" %}
+                {% elif field.name == "admin_password" %}
+                    {% trans "Platform Admin password" %}
+                {% else %}
+                    {{ field.label }}
+                {% endif %}
+            </label>
+            {{ field }}
+            {{ field.errors }}
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="actions">
+        <a class="btn" href="{% url 'users:company_detail' company.public_id %}">
+            {% trans "Cancel" %}
+        </a>
+        <button class="btn btn-primary" type="submit">
+            {% trans "Confirm password & save language policy" %}
+        </button>
+    </div>
+</form>
+{% endblock %}

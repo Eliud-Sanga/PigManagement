@@ -1,0 +1,26 @@
+{% load i18n %}
+<!doctype html>
+<html lang="{{ LANGUAGE_CODE|default:'sw' }}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Maintenance | PIGS</title>
+<style>
+body{margin:0;min-height:100vh;display:grid;place-items:center;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:#0f172a;color:#f8fafc}
+main{width:min(92vw,680px);padding:28px;border:1px solid #334155;border-radius:20px;background:#172033;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+h1{margin-top:0;font-size:clamp(28px,6vw,44px)}p{line-height:1.65;color:#cbd5e1}.time{padding:14px;border-radius:12px;background:#0f172a;margin-top:16px}.admin{margin-top:20px}a{color:#93c5fd}
+</style>
+</head>
+<body>
+<main>
+    <h1>System Maintenance</h1>
+    <p>{{ policy.maintenance_message }}</p>
+    <div class="time">
+        {% if policy.maintenance_starts_at %}<p><strong>Starts:</strong> {{ policy.maintenance_starts_at }}</p>{% endif %}
+        {% if policy.maintenance_ends_at %}<p><strong>Expected end:</strong> {{ policy.maintenance_ends_at }}</p>{% else %}<p>Maintenance has no automatic end time configured.</p>{% endif %}
+    </div>
+    <p class="admin">Platform Administrator? <a href="{% url 'users:login' %}">Sign in</a></p>
+</main>
+</body>
+</html>

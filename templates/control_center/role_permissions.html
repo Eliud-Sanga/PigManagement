@@ -1,0 +1,74 @@
+{% extends "control_center/base.html" %}
+{% load i18n %}
+{% block title %}{{ role.name }} · {% trans "Permissions" %}{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <span class="cc-console-eyebrow">{% trans "Role Policy" %}</span>
+        <h1>{{ role.name }} · {% trans "Permissions" %}</h1>
+        <div class="muted">
+            {{ company.name }} · {{ role.code }}
+            {% if role.is_reserved %} · {% trans "reserved role" %}{% endif %}
+        </div>
+    </div>
+</div>
+
+<section class="cc-policy-explainer">
+    <strong>{% trans "Role permissions are the company baseline" %}</strong>
+    <p>
+        {% trans "Individual membership grants or denials may further adjust access without changing this role for every user." %}
+    </p>
+</section>
+
+<form class="panel" method="post" autocomplete="off">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+
+    <div class="permission-search-row">
+        <label for="permission-search">{% trans "Find a permission" %}</label>
+        <input
+            id="permission-search"
+            type="search"
+            placeholder="{% trans 'Search permission name or code' %}"
+            data-permission-search
+        >
+    </div>
+
+    {% for field in form %}
+    <div class="field" style="margin-bottom:16px">
+        <label>{{ field.label }}</label>
+        {% if field.name == "permissions" %}
+            <div class="permission-box" data-permission-box>{{ field }}</div>
+        {% else %}
+            {{ field }}
+        {% endif %}
+        {{ field.errors }}
+    </div>
+    {% endfor %}
+
+    <div class="actions">
+        <a class="btn" href="{% url 'users:company_roles' company.public_id %}">
+            {% trans "Cancel" %}
+        </a>
+        <button class="btn btn-primary" type="submit">
+            {% trans "Confirm password & save role permissions" %}
+        </button>
+    </div>
+</form>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const input = document.querySelector("[data-permission-search]");
+    const box = document.querySelector("[data-permission-box]");
+    if (!input || !box) return;
+
+    input.addEventListener("input", function () {
+        const q = input.value.trim().toLowerCase();
+        box.querySelectorAll("li").forEach(function (item) {
+            item.hidden = q && !item.textContent.toLowerCase().includes(q);
+        });
+    });
+});
+</script>
+{% endblock %}

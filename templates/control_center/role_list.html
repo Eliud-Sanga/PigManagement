@@ -1,0 +1,9 @@
+{% extends "control_center/base.html" %}
+{% block title %}Roles · {{ company.name }}{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Role templates</h1><div class="muted">{{ company.name }} · Roles provide base permissions only.</div></div><a class="btn btn-primary" href="{% url 'users:role_create' company.public_id %}">Create custom role</a></div>
+<div class="table-wrap"><table><thead><tr><th>Role</th><th>Type</th><th>Permissions</th><th>Members</th><th>Status</th><th></th></tr></thead><tbody>
+{% for role in roles %}<tr><td><strong>{{ role.name }}</strong><div class="muted code">{{ role.code }}</div></td><td>{% if role.is_reserved %}<span class="badge">Reserved</span>{% else %}Custom{% endif %}</td><td>{{ role.permissions.count }}</td><td>{{ role.member_count }}</td><td>{{ role.is_active|yesno:"Active,Inactive" }}</td><td><a class="btn" href="{% url 'users:role_permissions' role.id %}">Permissions</a></td></tr>{% endfor %}
+</tbody></table></div>
+<div class="actions"><a class="btn" href="{% url 'users:company_detail' company.public_id %}">Back to company</a></div>
+{% endblock %}

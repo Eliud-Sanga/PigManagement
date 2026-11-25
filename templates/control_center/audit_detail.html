@@ -1,0 +1,41 @@
+{% extends "control_center/base.html" %}
+{% block title %}Audit Event | PIGS{% endblock %}
+{% block content %}
+<div class="page-head">
+    <div>
+        <h1>{{ event.action }}</h1>
+        <div class="muted">{{ event.event_id }}</div>
+    </div>
+    <a class="btn" href="{% url 'users:audit_logs' %}">Back to logs</a>
+</div>
+<div class="grid">
+    <section class="card half">
+        <h3>Event</h3>
+        <p><strong>Time:</strong> {{ event.occurred_at|date:"Y-m-d H:i:s T" }}</p>
+        <p><strong>Category:</strong> {{ event.get_category_display }}</p>
+        <p><strong>Severity:</strong> {{ event.severity }}</p>
+        <p><strong>Result:</strong> {{ event.result }}</p>
+        <p><strong>Reason:</strong> {{ event.reason_code|default:"—" }}</p>
+    </section>
+    <section class="card half">
+        <h3>Request</h3>
+        <p><strong>IP:</strong> {{ event.ip_address|default:"—" }}</p>
+        <p><strong>Path:</strong> {{ event.request_method }} {{ event.request_path|default:"—" }}</p>
+        <p><strong>Browser key:</strong> {{ event.browser_key_hash|default:"—" }}</p>
+        <p><strong>User agent:</strong> {{ event.user_agent|default:"—" }}</p>
+    </section>
+    <section class="card wide">
+        <h3>Identity</h3>
+        <p><strong>Actor:</strong> {{ event.actor_identifier|default:"—" }}</p>
+        <p><strong>Subject:</strong> {{ event.subject_identifier|default:"—" }}</p>
+        <p><strong>Attempted identifier:</strong> {{ event.attempted_identifier|default:"—" }}</p>
+        <p><strong>Description:</strong> {{ event.description|default:"—" }}</p>
+    </section>
+    <section class="card wide">
+        <h3>Metadata</h3>
+        <pre>{{ event.metadata }}</pre>
+        <p class="muted">Previous hash: {{ event.previous_hash|default:"GENESIS" }}</p>
+        <p class="muted">Event hash: {{ event.event_hash }}</p>
+    </section>
+</div>
+{% endblock %}

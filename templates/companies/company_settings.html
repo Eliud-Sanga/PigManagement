@@ -1,0 +1,71 @@
+{% extends "pigs/base.html" %}
+{% load static %}
+{% block title %}Company Settings | PIGS{% endblock %}
+
+{% block content %}
+<div class="f2-settings-shell">
+<div class="f2-settings-head"><div>
+<h1 class="f2-settings-title">Company Settings</h1>
+<p class="f2-settings-subtitle">Manage the business identity customers and staff see.</p>
+</div></div>
+
+<div class="f2-settings-grid">
+<aside class="f2-identity-card">
+<div class="f2-company-logo">
+{% if company.logo %}<img src="{{ company.logo.url }}" alt="{{ company.name }}">
+{% else %}{{ company.name|first|upper }}{% endif %}
+</div>
+<div>
+<h2>{{ company.name }}</h2>
+<div class="f2-muted">{{ company.code }}</div>
+<span class="f2-badge">{{ membership.role.name }}</span>
+</div>
+</aside>
+
+<section class="f2-settings-card">
+<h2 class="f2-section-title">Business profile</h2>
+<p class="f2-section-help">Company code, governance and language policy remain protected Platform Admin controls.</p>
+
+<form method="post" enctype="multipart/form-data" autocomplete="off" data-f2-confirm-form>
+{% csrf_token %}
+{{ form.non_field_errors }}
+<div class="f2-fields">
+{% for field in form %}
+{% if field.name != "current_password" %}
+<div class="f2-field {% if field.name == 'address' or field.name == 'logo' %}full{% endif %}">
+<label for="{{ field.id_for_label }}">{{ field.label }}</label>
+{{ field }}
+{{ field.errors }}
+</div>
+{% else %}
+{{ field }}
+{% endif %}
+{% endfor %}
+</div>
+
+<div class="f2-actions">
+{% if company.owner_user_management_enabled %}
+<a class="f2-action secondary" href="{% url 'users:company_users' %}">Manage company users</a>
+{% endif %}
+<a class="f2-action secondary" href="{% url 'users:profile_settings' %}">Personal settings</a>
+<button type="submit" class="f2-action primary">Save company profile</button>
+</div>
+</form>
+
+<div class="f2-confirm-overlay" data-f2-confirm-overlay aria-hidden="true">
+<div class="f2-confirm-dialog" role="dialog" aria-modal="true">
+<div class="f2-confirm-icon">✓</div>
+<h3>Confirm company change</h3>
+<p>Enter your current password before company information is updated.</p>
+<input type="password" autocomplete="current-password" placeholder="Current password" data-f2-popup-password>
+<div class="f2-confirm-actions">
+<button type="button" class="f2-confirm-cancel" data-f2-confirm-cancel>Cancel</button>
+<button type="button" class="f2-confirm-save" data-f2-confirm-save>Confirm & save</button>
+</div>
+</div>
+</div>
+</section>
+</div>
+</div>
+<script src="{% static 'js/profile-f2.js' %}" defer></script>
+{% endblock %}

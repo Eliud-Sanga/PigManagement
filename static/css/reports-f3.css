@@ -1,0 +1,58 @@
+.f3-report-identity{display:none}
+.f3-report-chart-card{padding:17px;margin:0 0 16px;background:var(--pigs-surface);border:1px solid var(--pigs-line);border-radius:15px;box-shadow:var(--pigs-shadow-sm)}
+.f3-report-chart-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px}
+.f3-report-chart-head h3{margin:0;color:var(--pigs-heading);font-size:16px}.f3-report-chart-head p{margin:3px 0 0;color:var(--pigs-muted);font-size:11px}
+.f3-report-chart-card .f3-chart{min-height:235px}
+.f3-print-button{border:0;cursor:pointer;background:#172554!important;color:#fff!important}
+.f3-profit-list{width:min(100%,1150px);margin:0 auto}
+@media(max-width:680px){
+    .f3-report-chart-card{padding:12px;border-radius:12px}
+    .f3-report-chart-card .f3-chart{min-height:195px}
+    body.pigs-app .f3-responsive-table{min-width:0!important;border-collapse:separate!important;border-spacing:0 10px!important}
+    body.pigs-app .f3-responsive-table thead{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+    body.pigs-app .f3-responsive-table,
+    body.pigs-app .f3-responsive-table tbody,
+    body.pigs-app .f3-responsive-table tr,
+    body.pigs-app .f3-responsive-table td{display:block!important;width:100%!important}
+    body.pigs-app .f3-responsive-table tr{margin-bottom:10px;border:1px solid var(--pigs-line);border-radius:13px;overflow:hidden;background:var(--pigs-surface);box-shadow:0 2px 8px rgba(15,23,42,.05)}
+    body.pigs-app .f3-responsive-table td{display:grid!important;grid-template-columns:minmax(96px,42%) minmax(0,1fr)!important;gap:10px;align-items:center;min-height:42px;padding:9px 11px!important;border-bottom:1px solid var(--pigs-line)!important;white-space:normal!important;text-align:right!important;background:var(--pigs-surface)!important;overflow-wrap:anywhere}
+    body.pigs-app .f3-responsive-table td:last-child{border-bottom:0!important}
+    body.pigs-app .f3-responsive-table td::before{content:attr(data-label);font-size:10px;font-weight:900;letter-spacing:.03em;text-transform:uppercase;color:var(--pigs-muted);text-align:left}
+    body.pigs-app .f3-responsive-table td a{justify-self:end}
+}
+@media print{
+    @page{size:A4 portrait;margin:11mm 10mm 14mm}
+    html,body{width:100%!important;max-width:none!important;background:#fff!important}
+    body.pigs-app main.container{max-width:none!important;margin:0!important;padding:0!important}
+    .f3-report-identity{display:grid!important;grid-template-columns:1fr auto;gap:8px 18px;align-items:center;padding:0 0 10px;margin:0 0 12px;border-bottom:2px solid #172554;color:#172554;page-break-inside:avoid}
+    .f3-report-brand{display:flex;align-items:center;gap:10px}
+    .f3-report-logo{width:42px;height:42px;border-radius:9px;overflow:hidden;border:1px solid #cbd5e1;display:grid;place-items:center;font-size:18px;font-weight:900}
+    .f3-report-logo img{width:100%;height:100%;object-fit:cover}
+    .f3-report-logo-fallback{background:#172554;color:#fff}
+    .f3-report-company{font-size:14px;font-weight:900}
+    .f3-report-contact,.f3-report-address{font-size:9px;color:#475569}
+    .f3-report-meta{text-align:right}
+    .f3-report-meta h1{margin:0;color:#172554;font-size:17px}
+    .f3-report-meta div{font-size:9px;color:#475569;margin-top:2px}
+    .f3-report-address{grid-column:1/-1}
+    .daily-report>.report-header,
+    .monthly-report>.report-header,
+    .profit-report>.page-header,
+    .f3-profit-list>.page-header,
+    .month-navigation,
+    .report-actions,
+    .top-actions,
+    .f3-print-button{display:none!important}
+    .f3-report-chart-card,.report-card,.report-section,.table-card,.final-profit-card{box-shadow:none!important;border:1px solid #dbe3ef!important;page-break-inside:avoid;break-inside:avoid;margin-bottom:8px!important}
+    .f3-report-chart-card{padding:10px!important}.f3-report-chart-card .f3-chart{min-height:160px}.f3-chart svg{max-height:175px}
+    body.pigs-app .f3-responsive-table{display:table!important;width:100%!important;min-width:0!important;border-collapse:collapse!important}
+    body.pigs-app .f3-responsive-table thead{display:table-header-group!important;position:static!important;width:auto!important;height:auto!important;clip:auto!important;overflow:visible!important}
+    body.pigs-app .f3-responsive-table tbody{display:table-row-group!important}
+    body.pigs-app .f3-responsive-table tr{display:table-row!important;border:0!important;box-shadow:none!important;margin:0!important}
+    body.pigs-app .f3-responsive-table th,
+    body.pigs-app .f3-responsive-table td{display:table-cell!important;width:auto!important;padding:5px 6px!important;font-size:8.5px!important;white-space:normal!important;text-align:center!important;border:1px solid #dbe3ef!important;background:#fff!important;color:#1e293b!important}
+    body.pigs-app .f3-responsive-table th{background:#f1f5f9!important;font-weight:800!important}
+    body.pigs-app .f3-responsive-table td::before{display:none!important}
+    .summary-grid,.report-summary,.statistics-grid,.profit-summary-grid{page-break-inside:avoid;break-inside:avoid}
+    a{color:inherit!important;text-decoration:none!important}
+}

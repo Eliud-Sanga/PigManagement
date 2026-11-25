@@ -1,0 +1,40 @@
+{% load static i18n %}
+<!doctype html>
+<html lang="{{ LANGUAGE_CODE|default:'sw' }}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="color-scheme" content="light dark">
+<title>Login | PIGS</title>
+<link rel="stylesheet" href="{% static 'css/auth-recovery-v1.css' %}">
+<script src="{% static 'js/auth-recovery-v1.js' %}" defer></script>
+</head>
+<body class="auth-page">
+<main class="auth-shell">
+<section class="auth-brand-panel" aria-label="PIGS">
+<div class="auth-brand-mark"><span class="auth-brand-icon">P</span><span>PIGS</span></div>
+<div class="auth-brand-copy"><span>Secure Business Management</span><h2>Biashara yako, data yako, udhibiti wako.</h2><p>Ingia kwenye workspace yako kwa usalama. Platform governance na company operations zimewekwa tofauti ili kulinda biashara na users.</p></div>
+<div class="auth-trust-row"><span>Secure login</span><span>Audit trail</span><span>Role based access</span></div>
+</section>
+<section class="auth-card">
+<div class="auth-mobile-brand">PIGS · Secure Access</div>
+<div class="auth-kicker">Welcome back</div>
+<h1>Ingia kwenye mfumo</h1>
+<p class="auth-intro">Tumia username au email pamoja na password yako.</p>
+{% if maintenance_active %}<div class="auth-maintenance"><strong>Maintenance mode active.</strong><br>{{ policy.maintenance_message }}{% if policy.maintenance_ends_at %}<br>Expected end: {{ policy.maintenance_ends_at }}{% endif %}<br><small>Platform Administrator anaweza kuendelea kuingia.</small></div>{% endif %}
+{% if browser_locked_until %}<div class="auth-locked">Login temporarily locked until {{ browser_locked_until }}.</div>{% endif %}
+{% if messages %}{% for message in messages %}<div class="auth-message {% if message.tags %}{{ message.tags }}{% endif %}">{{ message }}</div>{% endfor %}{% endif %}
+<form method="post" autocomplete="on">{% csrf_token %}
+<div class="auth-fields">
+<div class="auth-field"><label for="identifier">Username or email</label><input id="identifier" name="identifier" value="{{ request.POST.identifier|default:'' }}" autocomplete="username" required autofocus></div>
+<div class="auth-field"><label for="password">Password</label><div class="auth-password-wrap"><input id="password" type="password" name="password" autocomplete="current-password" required><button type="button" class="auth-password-toggle" data-password-toggle="password" aria-label="Show password">Show</button></div></div>
+</div>
+<div class="auth-row"><label class="auth-remember"><input type="checkbox" name="remember_me"> Keep me signed in</label><a class="auth-link" href="{% url 'users:password_recovery' %}">Forgot password?</a></div>
+<button type="submit" class="auth-primary">Secure login</button>
+</form>
+<div class="auth-footer">Login and recovery attempts are security-audited. Passwords and verification codes are never written to logs.</div>
+</section>
+</main>
+</body>
+</html>

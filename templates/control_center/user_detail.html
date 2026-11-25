@@ -1,0 +1,27 @@
+{% extends "control_center/base.html" %}
+{% block title %}{{ target.username }} | PIGS{% endblock %}
+{% block content %}
+<div class="page-head">
+    <div><h1>{{ target.username }}</h1><div class="muted">{{ target.email }}</div></div>
+    <div class="actions">
+        <a class="btn" href="{% url 'users:user_edit' target.id %}">Edit identity</a>
+        <a class="btn" href="{% url 'users:user_change_password' target.id %}">Change/reset password</a>
+    </div>
+</div>
+<div class="grid">
+    <section class="card half">
+        <h3>Identity</h3>
+        <p><strong>Name:</strong> {{ target.get_full_name|default:"—" }}</p>
+        <p><strong>Status:</strong> {{ target.is_active|yesno:"Active,Inactive" }}</p>
+        <p><strong>Platform Admin:</strong> {{ target.is_platform_admin|yesno:"Yes,No" }}</p>
+        <p><strong>Language:</strong> {{ target.preferred_language|upper }}</p>
+        <p><strong>Theme:</strong> {{ target.theme_preference }}</p>
+    </section>
+    <section class="card half">
+        <h3>Company memberships</h3>
+        {% for membership in target.company_memberships.all %}
+            <p><span class="badge">{{ membership.company.name }}</span> {{ membership.role.name }} · {{ membership.status }}</p>
+        {% empty %}<p class="muted">No company membership.</p>{% endfor %}
+    </section>
+</div>
+{% endblock %}

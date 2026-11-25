@@ -1,0 +1,521 @@
+{% extends "pigs/base.html" %}
+
+{% block title %}
+{% if expense %}Hariri Matumizi{% else %}Rekodi Matumizi{% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+
+    .expense-form-page {
+        max-width: 750px;
+        margin: 28px auto;
+    }
+
+    /* ============================================================
+       HEADER
+    ============================================================ */
+
+    .expense-header {
+        text-align: center;
+        margin-bottom: 24px;
+    }
+
+    .expense-header h2 {
+        margin: 0;
+        color: #172554;
+        font-size: 28px;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+    }
+
+    .expense-header p {
+        margin: 7px 0 0;
+        color: #64748b;
+        font-size: 13px;
+    }
+
+    /* ============================================================
+       MAIN CARD
+    ============================================================ */
+
+    .expense-form-card {
+        position: relative;
+        background: #ffffff;
+        border: 1px solid #e8edf3;
+        border-radius: 16px;
+        padding: 30px;
+        box-shadow:
+            0 8px 28px rgba(15, 23, 42, 0.06),
+            0 2px 6px rgba(15, 23, 42, 0.025);
+        overflow: hidden;
+    }
+
+    /* ============================================================
+       SOFT SIDE BAND
+    ============================================================ */
+
+    .expense-form-card::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 20px;
+        bottom: 20px;
+        width: 4px;
+        border-radius: 0 6px 6px 0;
+
+        background: linear-gradient(
+            to bottom,
+            #8fa5d5 0%,
+            #8fa5d5 68%,
+            #d59a9a 68%,
+            #d59a9a 100%
+        );
+
+        opacity: 0.72;
+    }
+
+    /* ============================================================
+       FORM GROUP
+    ============================================================ */
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 7px;
+        color: #334155;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .required {
+        color: #b96a6a;
+        font-weight: 800;
+    }
+
+    /* ============================================================
+       INPUTS
+    ============================================================ */
+
+    .form-group input,
+    .form-group textarea {
+        width: 100%;
+        box-sizing: border-box;
+
+        padding: 12px 14px;
+
+        border: 1px solid #d9e0e8;
+        border-radius: 9px;
+
+        background: #ffffff;
+        color: #1e293b;
+
+        font-size: 14px;
+        outline: none;
+
+        box-shadow:
+            inset 0 1px 2px rgba(15, 23, 42, 0.025);
+
+        transition:
+            border-color 0.2s ease,
+            box-shadow 0.2s ease,
+            background 0.2s ease;
+    }
+
+    .form-group input:hover,
+    .form-group textarea:hover {
+        border-color: #c5cfdb;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+        border-color: #8da3cf;
+        background: #ffffff;
+
+        box-shadow:
+            0 0 0 3px rgba(82, 106, 159, 0.08),
+            0 2px 6px rgba(15, 23, 42, 0.035);
+    }
+
+    .form-group textarea {
+        min-height: 115px;
+        resize: vertical;
+        line-height: 1.5;
+    }
+
+    /* ============================================================
+       HELP TEXT
+    ============================================================ */
+
+    .form-help {
+        margin-top: 5px;
+        color: #94a3b8;
+        font-size: 11px;
+        line-height: 1.45;
+    }
+
+    /* ============================================================
+       ACTION AREA
+    ============================================================ */
+
+    .form-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        gap: 12px;
+
+        margin-top: 26px;
+        padding-top: 19px;
+
+        border-top: 1px solid #edf1f5;
+    }
+
+    /* ============================================================
+       BUTTON BASE
+    ============================================================ */
+
+    .btn-expense {
+        min-height: 41px;
+
+        border-radius: 8px;
+        padding: 9px 18px;
+
+        font-size: 12px;
+        font-weight: 700;
+
+        cursor: pointer;
+        text-decoration: none;
+
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+
+        transition:
+            transform 0.2s ease,
+            background 0.2s ease,
+            box-shadow 0.2s ease;
+    }
+
+    /* ============================================================
+       SAVE
+    ============================================================ */
+
+    .btn-save {
+        background: #edf2fa;
+        color: #405b91;
+        border: 1px solid #dce5f3;
+    }
+
+    .btn-save:hover {
+        background: #e4ebf7;
+        color: #304b80;
+        transform: translateY(-1px);
+
+        box-shadow:
+            0 4px 10px rgba(82, 106, 159, 0.10);
+    }
+
+    /* ============================================================
+       BACK
+    ============================================================ */
+
+    .btn-back {
+        background: #f7f8fa;
+        color: #475569;
+        border: 1px solid #e6e9ee;
+    }
+
+    .btn-back:hover {
+        background: #eef1f5;
+        color: #172554;
+        transform: translateY(-1px);
+    }
+
+    /* ============================================================
+       DATE
+    ============================================================ */
+
+    #expense_date {
+        color-scheme: light;
+    }
+
+    /* ============================================================
+       MOBILE
+    ============================================================ */
+
+    @media (max-width: 600px) {
+
+        .expense-form-page {
+            width: 100%;
+            margin: 18px auto;
+        }
+
+        .expense-header {
+            margin-bottom: 18px;
+        }
+
+        .expense-header h2 {
+            font-size: 22px;
+            letter-spacing: -0.2px;
+        }
+
+        .expense-header p {
+            font-size: 12px;
+        }
+
+        .expense-form-card {
+            padding: 21px 17px;
+            border-radius: 13px;
+
+            box-shadow:
+                0 6px 20px rgba(15, 23, 42, 0.055),
+                0 2px 5px rgba(15, 23, 42, 0.02);
+        }
+
+        .expense-form-card::before {
+            top: 15px;
+            bottom: 15px;
+            width: 3px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            font-size: 12px;
+            margin-bottom: 6px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            padding: 10px 11px;
+            font-size: 13px;
+            border-radius: 7px;
+        }
+
+        .form-group textarea {
+            min-height: 95px;
+        }
+
+        .form-help {
+            font-size: 10px;
+        }
+
+        .form-actions {
+            flex-direction: column-reverse;
+            gap: 7px;
+
+            margin-top: 20px;
+            padding-top: 15px;
+        }
+
+        .btn-expense {
+            width: 100%;
+            min-height: 37px;
+            padding: 8px 12px;
+            font-size: 11px;
+        }
+
+    }
+
+    /* ============================================================
+       VERY SMALL PHONES
+    ============================================================ */
+
+    @media (max-width: 380px) {
+
+        .expense-form-page {
+            margin: 14px auto;
+        }
+
+        .expense-header h2 {
+            font-size: 20px;
+        }
+
+        .expense-header p {
+            font-size: 11px;
+        }
+
+        .expense-form-card {
+            padding: 18px 14px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            font-size: 12px;
+        }
+
+        .form-group textarea {
+            min-height: 85px;
+        }
+
+        .btn-expense {
+            min-height: 35px;
+            font-size: 10.5px;
+        }
+
+    }
+
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="expense-form-page">
+
+    <div class="expense-header">
+
+        <h2>
+            {% if expense %}
+                ✏️ Hariri Matumizi
+            {% else %}
+                💰 Rekodi Matumizi
+            {% endif %}
+        </h2>
+
+        <p>
+            Hifadhi kumbukumbu ya matumizi ya biashara
+        </p>
+
+    </div>
+
+
+    <div class="expense-form-card">
+
+        <form method="post">
+
+            {% csrf_token %}
+
+            <!-- DATE -->
+
+            <div class="form-group">
+
+                <label for="expense_date">
+                    📅 Tarehe <span class="required">*</span>
+                </label>
+
+                <input
+                    type="date"
+                    id="expense_date"
+                    name="expense_date"
+                    value="{% if expense %}{{ expense.expense_date|date:'Y-m-d' }}{% else %}{% now 'Y-m-d' %}{% endif %}"
+                    required
+                >
+
+                <div class="form-help">
+                    Tarehe ya leo imewekwa moja kwa moja. Unaweza kuibadilisha.
+                </div>
+
+            </div>
+
+
+            <!-- TITLE -->
+
+            <div class="form-group">
+
+                <label for="title">
+                    📝 Jina la Matumizi <span class="required">*</span>
+                </label>
+
+                <input
+                    type="text"
+                    id="title"
+                    name="title"
+                    value="{{ expense.title|default:'' }}"
+                    placeholder="Mfano: Usafiri, Mshahara, Umeme..."
+                    maxlength="200"
+                    required
+                >
+
+            </div>
+
+
+            <!-- AMOUNT -->
+
+            <div class="form-group">
+
+                <label for="amount">
+                    💰 Kiasi <span class="required">*</span>
+                </label>
+
+                <input
+                    type="number"
+                    id="amount"
+                    name="amount"
+                    value="{{ expense.amount|default:'' }}"
+                    placeholder="Mfano: 15000"
+                    min="0"
+                    step="0.01"
+                    required
+                >
+
+                <div class="form-help">
+                    Weka kiasi kwa TSh.
+                </div>
+
+            </div>
+
+
+            <!-- DESCRIPTION -->
+
+            <div class="form-group">
+
+                <label for="description">
+                    📄 Maelezo
+                </label>
+
+                <textarea
+                    id="description"
+                    name="description"
+                    placeholder="Andika maelezo ya ziada kuhusu matumizi haya..."
+                >{{ expense.description|default:'' }}</textarea>
+
+                <div class="form-help">
+                    Sehemu hii ni hiari.
+                </div>
+
+            </div>
+
+
+            <!-- ACTIONS -->
+
+            <div class="form-actions">
+
+                <a
+                    href="{% url 'pigs:expense_list' %}"
+                    class="btn-expense btn-back"
+                >
+                    <i class="fas fa-arrow-left"></i>
+                    Rudi
+                </a>
+
+                <button
+                    type="submit"
+                    class="btn-expense btn-save"
+                >
+                    <i class="fas fa-save"></i>
+
+                    {% if expense %}
+                        Hifadhi Mabadiliko
+                    {% else %}
+                        Hifadhi Rekodi
+                    {% endif %}
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

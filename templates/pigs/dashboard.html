@@ -1,0 +1,310 @@
+{% extends "pigs/base.html" %}
+{% load humanize static %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard-f3.css' %}">
+<script src="{% static 'js/analytics-f3.js' %}" defer></script>
+{% endblock %}
+
+{% block content %}
+<div class="f3-dashboard">
+
+    <section class="f3-dashboard-hero">
+        <div class="f3-hero-copy">
+            <div class="f3-eyebrow">
+                {% if request.company %}
+                    {{ request.company.name }}
+                {% else %}
+                    Pig Business
+                {% endif %}
+            </div>
+
+            <h1>
+                Karibu, {{ user.get_short_name|default:user.username }}
+            </h1>
+
+            <p>
+                Muhtasari wa biashara · {{ today|date:"d M Y" }}
+            </p>
+        </div>
+
+        {% if request.company.logo %}
+        <div class="f3-hero-logo">
+            <img
+                src="{{ request.company.logo.url }}"
+                alt="{{ request.company.name }}"
+                loading="lazy"
+            >
+        </div>
+        {% endif %}
+    </section>
+
+    <section
+        class="f3-kpi-grid"
+        aria-label="Business summary"
+    >
+        <article class="f3-kpi-card f3-kpi-primary">
+            <span class="f3-kpi-label">Mauzo ya leo</span>
+            <strong>
+                TSh {{ today_income|floatformat:0|intcomma }}
+            </strong>
+            <small>Mapato yaliyorekodiwa leo</small>
+        </article>
+
+        <article class="f3-kpi-card">
+            <span class="f3-kpi-label">Faida ya mwezi</span>
+            <strong class="{% if monthly_profit < 0 %}f3-negative{% endif %}">
+                TSh {{ monthly_profit|floatformat:0|intcomma }}
+            </strong>
+            <small>Faida ya batch iliyokamilika mwezi huu</small>
+        </article>
+
+        <article class="f3-kpi-card">
+            <span class="f3-kpi-label">Matumizi ya mwezi</span>
+            <strong>
+                TSh {{ monthly_expenses|floatformat:0|intcomma }}
+            </strong>
+            <small>Expenses za mwezi huu</small>
+        </article>
+
+        <article class="f3-kpi-card">
+            <span class="f3-kpi-label">Stock active</span>
+            <strong>{{ active_meat_stock }}</strong>
+            <small>Batch zenye nyama bado</small>
+        </article>
+    </section>
+
+    <section class="f3-dashboard-grid">
+        <article class="f3-panel f3-panel-chart">
+            <div class="f3-panel-head">
+                <div>
+                    <span class="f3-eyebrow">Siku 14</span>
+                    <h2>Mauzo dhidi ya matumizi</h2>
+                </div>
+                {% if perms.pigs.view_dailysalereport %}
+                <a
+                    href="{% url 'pigs:monthly_report' %}"
+                    class="f3-text-link"
+                >
+                    Ripoti ya mwezi
+                </a>
+                {% endif %}
+            </div>
+
+            <div
+                class="f3-chart"
+                data-f3-chart="trend"
+                data-series-one="Mauzo"
+                data-series-two="Matumizi"
+                aria-label="Mwenendo wa mauzo na matumizi kwa siku 14"
+            ></div>
+
+            <div class="f3-chart-data" hidden>
+                {% for point in dashboard_trend %}
+                <span
+                    data-label="{{ point.date|date:'d M' }}"
+                    data-value="{{ point.sales }}"
+                    data-value2="{{ point.expenses }}"
+                ></span>
+                {% endfor %}
+            </div>
+        </article>
+
+        <article class="f3-panel">
+            <div class="f3-panel-head">
+                <div>
+                    <span class="f3-eyebrow">Stock</span>
+                    <h2>Batch active</h2>
+                </div>
+                {% if perms.pigs.view_meatstock %}
+                <a
+                    href="{% url 'pigs:meat_list' %}"
+                    class="f3-text-link"
+                >
+                    Angalia zote
+                </a>
+                {% endif %}
+            </div>
+
+            <div class="f3-stack-list">
+                {% for stock in active_batches %}
+                <div class="f3-stack-item">
+                    <div>
+                        <strong>
+                            {{ stock.slaughter_batch.batch_number }}
+                        </strong>
+                        <span>
+                            {{ stock.slaughter_batch.slaughter_date|date:"d M Y" }}
+                        </span>
+                    </div>
+                    <span class="f3-status-pill">Active</span>
+                </div>
+                {% empty %}
+                <div class="f3-empty-compact">
+                    Hakuna batch active kwa sasa.
+                </div>
+                {% endfor %}
+            </div>
+        </article>
+    </section>
+
+    <section class="f3-dashboard-grid f3-dashboard-grid-lower">
+        <article class="f3-panel">
+            <div class="f3-panel-head">
+                <div>
+                    <span class="f3-eyebrow">Biashara</span>
+                    <h2>Muhtasari</h2>
+                </div>
+            </div>
+
+            <div class="f3-mini-grid">
+                <div>
+                    <span>Nguruwe</span>
+                    <strong>{{ total_pigs }}</strong>
+                    <small>{{ available_pigs }} available</small>
+                </div>
+                <div>
+                    <span>Mauzo yote</span>
+                    <strong>{{ total_daily_sales }}</strong>
+                    <small>daily sale records</small>
+                </div>
+                <div>
+                    <span>Mapato yote</span>
+                    <strong>
+                        TSh {{ total_business_income|floatformat:0|intcomma }}
+                    </strong>
+                    <small>business income</small>
+                </div>
+                <div>
+                    <span>Matumizi yote</span>
+                    <strong>
+                        TSh {{ total_expenses|floatformat:0|intcomma }}
+                    </strong>
+                    <small>recorded expenses</small>
+                </div>
+            </div>
+        </article>
+
+        <article class="f3-panel">
+            <div class="f3-panel-head">
+                <div>
+                    <span class="f3-eyebrow">Karibuni</span>
+                    <h2>Activity</h2>
+                </div>
+            </div>
+
+            <div class="f3-activity-list">
+                {% for sale in recent_sales %}
+                <a
+                    href="{% url 'pigs:daily_sale_detail' sale.id %}"
+                    class="f3-activity-item"
+                >
+                    <span class="f3-activity-icon">S</span>
+                    <span class="f3-activity-copy">
+                        <strong>Mauzo · {{ sale.sale_date|date:"d M" }}</strong>
+                        <small>
+                            TSh {{ sale.total_money_received|floatformat:0|intcomma }}
+                        </small>
+                    </span>
+                </a>
+                {% endfor %}
+
+                {% for expense in recent_expenses %}
+                <a
+                    href="{% url 'pigs:expense_list' %}"
+                    class="f3-activity-item"
+                >
+                    <span class="f3-activity-icon f3-expense-icon">E</span>
+                    <span class="f3-activity-copy">
+                        <strong>{{ expense.title }}</strong>
+                        <small>
+                            TSh {{ expense.amount|floatformat:0|intcomma }}
+                            · {{ expense.expense_date|date:"d M" }}
+                        </small>
+                    </span>
+                </a>
+                {% endfor %}
+
+                {% if not recent_sales and not recent_expenses %}
+                <div class="f3-empty-compact">
+                    Hakuna activity ya karibuni.
+                </div>
+                {% endif %}
+            </div>
+        </article>
+    </section>
+
+    <section class="f3-quick-section">
+        <div class="f3-section-head">
+            <div>
+                <span class="f3-eyebrow">Shortcuts</span>
+                <h2>Fanya kazi haraka</h2>
+            </div>
+        </div>
+
+        <div class="f3-quick-grid">
+            {% if perms.pigs.view_pig %}
+            <a href="{% url 'pigs:pig_list' %}" class="f3-quick-card">
+                <span class="f3-quick-icon">P</span>
+                <strong>Nguruwe</strong>
+                <small>Angalia livestock</small>
+            </a>
+            {% endif %}
+
+            {% if perms.pigs.add_slaughterbatch %}
+            <a href="{% url 'pigs:slaughter_create' %}" class="f3-quick-card">
+                <span class="f3-quick-icon">B</span>
+                <strong>Machinjio</strong>
+                <small>Anzisha batch</small>
+            </a>
+            {% endif %}
+
+            {% if perms.pigs.add_dailysale %}
+            <a href="{% url 'pigs:daily_sale_create' %}" class="f3-quick-card">
+                <span class="f3-quick-icon">S</span>
+                <strong>Anza Mauzo</strong>
+                <small>Rekodi mauzo</small>
+            </a>
+            {% endif %}
+
+            {% if perms.pigs.view_meatstock %}
+            <a href="{% url 'pigs:meat_list' %}" class="f3-quick-card">
+                <span class="f3-quick-icon">M</span>
+                <strong>Nyama</strong>
+                <small>Stock na batch</small>
+            </a>
+            {% endif %}
+
+            {% if perms.pigs.add_expense %}
+            <a href="{% url 'pigs:expense_create' %}" class="f3-quick-card">
+                <span class="f3-quick-icon">E</span>
+                <strong>Matumizi</strong>
+                <small>Ongeza expense</small>
+            </a>
+            {% endif %}
+
+            {% if perms.pigs.view_dailysalereport %}
+            <a href="{% url 'pigs:monthly_report' %}" class="f3-quick-card">
+                <span class="f3-quick-icon">R</span>
+                <strong>Ripoti</strong>
+                <small>Monthly performance</small>
+            </a>
+            {% endif %}
+
+            {% if request.company_membership.role.code == "OWNER" %}
+            <a
+                href="{% url 'users:company_hub' %}"
+                class="f3-quick-card"
+            >
+                <span class="f3-quick-icon">C</span>
+                <strong>Kampuni</strong>
+                <small>Company settings</small>
+            </a>
+            {% endif %}
+        </div>
+    </section>
+
+</div>
+{% endblock %}

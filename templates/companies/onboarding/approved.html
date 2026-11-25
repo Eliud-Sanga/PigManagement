@@ -1,0 +1,40 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Registration approved · Home Management</title>
+  <link rel="stylesheet" href="{% static 'css/onboarding-stage1.css' %}">
+</head>
+<body class="onboard-body">
+<main class="onboard-shell narrow">
+  <section class="onboard-card centered">
+    <div class="success-mark">✓</div>
+    <div class="step">Platform approval complete</div>
+    <h1>Your company registration has been approved</h1>
+    <p class="lead">
+      <strong>{{ invitation.company_name }}</strong> is approved.
+      This secure link has unlocked Owner account completion.
+    </p>
+    <div class="bound-email">
+      <span>Approved Owner email</span>
+      <strong>{{ invitation.email }}</strong>
+      <small>The Owner identity remains bound to this email.</small>
+    </div>
+
+    <!-- PIGS-COMPANY-ONBOARDING-STAGE3-CONTINUE -->
+    <a class="onboard-submit"
+       style="display:flex;align-items:center;justify-content:center;text-decoration:none"
+       href="{% url 'users:company_onboarding_complete' invitation.public_id token %}">
+      Continue Owner account setup
+    </a>
+
+    <p class="security-note">
+      No business access has been activated yet. Owner identity and password
+      setup will complete provisioning in the next secure step.
+    </p>
+  </section>
+</main>
+</body>
+</html>

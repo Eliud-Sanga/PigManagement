@@ -1,0 +1,38 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Register your company · Home Management</title>
+  <link rel="stylesheet" href="{% static 'css/onboarding-stage1.css' %}">
+</head>
+<body class="onboard-body">
+<main class="onboard-shell">
+  <section class="onboard-brand"><div class="brand-mark">H</div><div><strong>Home Management</strong><span>Secure company onboarding</span></div></section>
+  <section class="onboard-card">
+    <div class="step">Invitation verified</div>
+    <h1>Register your company</h1>
+    <p class="lead">This request will be reviewed by the Platform Administrator before any account or business access is created.</p>
+    <div class="bound-email"><span>Invited Owner email</span><strong>{{ invitation.email }}</strong><small>This email is locked to the secure invitation.</small></div>
+    <form method="post" autocomplete="off">
+      {% csrf_token %}{{ form.non_field_errors }}
+      <div class="onboard-fields">
+      {% for field in form %}
+        {% if field.is_hidden %}
+          {{ field }}
+        {% else %}
+          <div class="onboard-field {% if field.name == "company_address" or field.name == "allowed_languages" %}wide{% endif %}">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}{{ field.errors }}
+            {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
+          </div>
+        {% endif %}
+      {% endfor %}
+      </div>
+      <button class="onboard-submit" type="submit">Submit company for review</button>
+    </form>
+    <p class="security-note">Protected by an expiring invitation, server-side validation, CSRF protection and access isolation.</p>
+  </section>
+</main>
+</body>
+</html>

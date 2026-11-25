@@ -1,0 +1,37 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Company activated · Home Management</title>
+  <link rel="stylesheet" href="{% static 'css/onboarding-stage1.css' %}">
+</head>
+<body class="onboard-body">
+<main class="onboard-shell narrow">
+  <section class="onboard-card centered">
+    <div class="success-mark">✓</div>
+    <div class="step">Onboarding complete</div>
+    <h1>Your company is ready</h1>
+    <p class="lead">
+      <strong>{{ invitation.company_name }}</strong> has been activated and
+      your Owner membership is ready.
+    </p>
+
+    <form method="post"
+          action="{% url 'users:company_onboarding_login_now' invitation.public_id %}">
+      {% csrf_token %}
+      <input type="hidden" name="login_token" value="{{ login_token }}">
+      <button class="onboard-submit" type="submit">
+        Login now
+      </button>
+    </form>
+
+    <p class="security-note">
+      The Login now handoff is short-lived and single-use. If you close this
+      page, you can still sign in normally with your account credentials.
+    </p>
+  </section>
+</main>
+</body>
+</html>

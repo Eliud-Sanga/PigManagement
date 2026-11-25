@@ -1,0 +1,951 @@
+{% extends "pigs/base.html" %}
+{% load humanize %}
+
+{% block title %}
+Orodha ya Nguruwe
+{% endblock %}
+
+{% block extra_css %}
+<style>
+
+.pigs-page {
+    width: 100%;
+    max-width: 1150px;
+    margin: 0 auto;
+}
+
+/* ============================================================
+   PAGE HEADER
+============================================================ */
+
+.page-header {
+    background: white;
+    border-radius: 16px;
+    padding: 20px 22px;
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    box-shadow: 0 4px 15px rgba(15, 23, 42, 0.07);
+    border: 1px solid #e2e8f0;
+}
+
+.page-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.page-title-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    background: #dbeafe;
+    color: #2563eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 21px;
+    flex-shrink: 0;
+}
+
+.page-title h2 {
+    margin: 0;
+    color: #172554;
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.page-title p {
+    margin: 4px 0 0;
+    color: #64748b;
+    font-size: 13px;
+}
+
+.page-header-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+/* ============================================================
+   BUTTONS
+============================================================ */
+
+.btn {
+    min-height: 40px;
+    padding: 9px 15px;
+    border-radius: 8px;
+    border: none;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: .2s ease;
+    white-space: nowrap;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+.btn-primary {
+    background: #2563eb;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #1d4ed8;
+}
+
+.btn-secondary {
+    background: #64748b;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #475569;
+}
+
+.btn-edit {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.btn-edit:hover {
+    background: #fde68a;
+}
+
+.btn-info {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.btn-info:hover {
+    background: #bfdbfe;
+}
+
+.btn-delete {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.btn-delete:hover {
+    background: #fecaca;
+}
+
+.btn-delete-batch {
+    background: #dc2626;
+    color: white;
+}
+
+.btn-delete-batch:hover {
+    background: #b91c1c;
+}
+
+/* ============================================================
+   PURCHASE CARD
+============================================================ */
+
+.purchase-card {
+    background: white;
+    border-radius: 15px;
+    margin-bottom: 16px;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 15px rgba(15, 23, 42, 0.07);
+}
+
+/* ============================================================
+   PURCHASE HEADER
+============================================================ */
+
+.purchase-header {
+    padding: 15px 18px;
+    background: linear-gradient(135deg, #f8fafc, #ffffff);
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.purchase-main-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.purchase-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: #dbeafe;
+    color: #2563eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.purchase-details {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.purchase-title {
+    color: #172554;
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.purchase-meta {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    flex-wrap: wrap;
+    color: #64748b;
+    font-size: 12px;
+}
+
+.purchase-meta-divider {
+    color: #cbd5e1;
+}
+
+.purchase-actions {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    flex-wrap: wrap;
+}
+
+/* ============================================================
+   COUNT BADGE
+============================================================ */
+
+.pig-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: #2563eb;
+    color: white;
+    padding: 4px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+/* ============================================================
+   BADGES
+============================================================ */
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.badge-primary {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.badge-success {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.badge-warning {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.badge-danger {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.badge-secondary {
+    background: #e2e8f0;
+    color: #475569;
+}
+
+.badge-pink {
+    background: #fce7f3;
+    color: #9d174d;
+}
+
+/* ============================================================
+   TABLE AREA
+============================================================ */
+
+.purchase-body {
+    padding: 0;
+}
+
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+}
+
+.pig-table {
+    width: 100%;
+    min-width: 700px;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 13px;
+}
+
+.pig-table th {
+    background: #f8fafc;
+    color: #475569;
+    padding: 11px 14px;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .3px;
+    border-bottom: 1px solid #e2e8f0;
+    white-space: nowrap;
+}
+
+.pig-table th:first-child {
+    text-align: left;
+    padding-left: 18px;
+}
+
+.pig-table td {
+    padding: 12px 14px;
+    text-align: center;
+    color: #334155;
+    border-bottom: 1px solid #eef2f7;
+    background: white;
+    white-space: nowrap;
+}
+
+.pig-table td:first-child {
+    text-align: left;
+    padding-left: 18px;
+}
+
+.pig-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.pig-table tbody tr:hover td {
+    background: #f8fafc;
+}
+
+.tag-number {
+    color: #172554;
+    font-weight: 800;
+    font-size: 13px;
+}
+
+.price {
+    color: #172554;
+    font-weight: 700;
+}
+
+/* ============================================================
+   ACTIONS INSIDE TABLE
+============================================================ */
+
+.row-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.row-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 7px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    text-decoration: none;
+    cursor: pointer;
+    transition: .2s ease;
+    font-size: 12px;
+}
+
+.row-btn:hover {
+    transform: translateY(-1px);
+}
+
+.row-btn-edit {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.row-btn-edit:hover {
+    background: #bfdbfe;
+}
+
+.row-btn-delete {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.row-btn-delete:hover {
+    background: #fecaca;
+}
+
+.locked {
+    color: #94a3b8;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* ============================================================
+   EMPTY STATE
+============================================================ */
+
+.empty-card {
+    background: white;
+    border-radius: 15px;
+    padding: 50px 20px;
+    text-align: center;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 15px rgba(15, 23, 42, 0.07);
+}
+
+.empty-icon {
+    width: 65px;
+    height: 65px;
+    margin: 0 auto 14px;
+    border-radius: 16px;
+    background: #f1f5f9;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+}
+
+.empty-card h3 {
+    margin: 0 0 6px;
+    color: #334155;
+    font-size: 17px;
+}
+
+.empty-card p {
+    margin: 0 0 16px;
+    color: #94a3b8;
+    font-size: 13px;
+}
+
+/* ============================================================
+   MOBILE
+============================================================ */
+
+@media (max-width: 750px) {
+
+    .page-header {
+        align-items: stretch;
+    }
+
+    .page-header-actions {
+        width: 100%;
+    }
+
+    .page-header-actions .btn {
+        flex: 1;
+    }
+
+    .purchase-header {
+        align-items: stretch;
+    }
+
+    .purchase-actions {
+        width: 100%;
+    }
+
+    .purchase-actions .btn {
+        flex: 1;
+    }
+
+}
+
+/* ============================================================
+   SMALL MOBILE
+============================================================ */
+
+@media (max-width: 520px) {
+
+    .page-header {
+        padding: 15px;
+        border-radius: 13px;
+    }
+
+    .page-title-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 17px;
+    }
+
+    .page-title h2 {
+        font-size: 19px;
+    }
+
+    .page-title p {
+        font-size: 11px;
+    }
+
+    .page-header-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .page-header-actions .btn {
+        width: 100%;
+        padding: 8px 6px;
+        font-size: 11px;
+    }
+
+    .purchase-card {
+        border-radius: 12px;
+    }
+
+    .purchase-header {
+        padding: 13px;
+    }
+
+    .purchase-main-info {
+        align-items: flex-start;
+    }
+
+    .purchase-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+    }
+
+    .purchase-actions {
+        display: grid;
+        grid-template-columns: 1fr;
+    }
+
+    .purchase-actions .btn {
+        width: 100%;
+    }
+
+    .pig-table {
+        min-width: 650px;
+    }
+
+    .pig-table th,
+    .pig-table td {
+        padding: 9px 10px;
+        font-size: 11px;
+    }
+
+    .pig-table th:first-child,
+    .pig-table td:first-child {
+        padding-left: 13px;
+    }
+
+}
+
+/* ============================================================
+   VERY SMALL PHONES
+============================================================ */
+
+@media (max-width: 380px) {
+
+    .page-header-actions {
+        grid-template-columns: 1fr;
+    }
+
+    .purchase-meta {
+        gap: 5px;
+    }
+
+    .purchase-header {
+        padding: 11px;
+    }
+
+    .pig-table {
+        min-width: 620px;
+    }
+
+}
+
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="pigs-page">
+
+    <!-- ============================================================
+         PAGE HEADER
+    ============================================================ -->
+
+    <div class="page-header">
+
+        <div class="page-title">
+
+            <div class="page-title-icon">
+                <i class="fas fa-piggy-bank"></i>
+            </div>
+
+            <div>
+                <h2>Orodha ya Nguruwe</h2>
+                <p>Nguruwe zote zilizonunuliwa</p>
+            </div>
+
+        </div>
+
+        <div class="page-header-actions">
+
+            <a
+                href="{% url 'pigs:dashboard' %}"
+                class="btn btn-secondary"
+            >
+                <i class="fas fa-arrow-left"></i>
+                Rudi Dashboard
+            </a>
+
+            <a
+                href="{% url 'pigs:purchase_create' %}"
+                class="btn btn-primary"
+            >
+                <i class="fas fa-plus"></i>
+                Nunua Nguruwe
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- ============================================================
+         PURCHASES
+    ============================================================ -->
+
+    {% for purchase in purchases %}
+
+        <div class="purchase-card">
+
+            <!-- PURCHASE HEADER -->
+
+            <div class="purchase-header">
+
+                <div class="purchase-main-info">
+
+                    <div class="purchase-icon">
+                        <i class="fas fa-box"></i>
+                    </div>
+
+                    <div class="purchase-details">
+
+                        <div class="purchase-title">
+                            Ununuzi #{{ purchase.id }}
+                        </div>
+
+                        <div class="purchase-meta">
+
+                            <span>
+                                <i class="far fa-calendar"></i>
+                                {{ purchase.purchase_date|date:"d/m/Y" }}
+                            </span>
+
+                            <span class="purchase-meta-divider">
+                                •
+                            </span>
+
+                            <span>
+                                <i class="fas fa-user"></i>
+                                {{ purchase.supplier_name }}
+                            </span>
+
+                            <span class="pig-count">
+                                <i class="fas fa-piggy-bank"></i>
+                                {{ purchase.pigs.count }}
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="purchase-actions">
+
+                    <a
+                        href="{% url 'pigs:pig_bulk_edit' purchase.id %}"
+                        class="btn btn-edit"
+                    >
+                        <i class="fas fa-edit"></i>
+                        Edit Zote
+                    </a>
+
+                    {% if user.is_superuser %}
+
+                        <button
+                            onclick="openDeleteModal(
+                                '{% url 'pigs:purchase_delete' purchase.id %}',
+                                'Je, una uhakika unataka kufuta ununuzi #{{ purchase.id }} na nguruwe zake zote? Kitendo hiki hakiwezi kurudishwa!'
+                            )"
+                            class="btn btn-delete-batch"
+                        >
+                            <i class="fas fa-trash-alt"></i>
+                            Futa Ununuzi Wote
+                        </button>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <!-- PURCHASE TABLE -->
+
+            <div class="purchase-body">
+
+                <div class="table-wrapper">
+
+                    <table class="pig-table">
+
+                        <thead>
+
+                            <tr>
+                                <th>Tag</th>
+                                <th>Jinsia</th>
+                                <th>Bei</th>
+                                <th>Status</th>
+                                <th>Vitendo</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            {% for pig in purchase.pigs.all %}
+
+                                <tr>
+
+                                    <!-- TAG -->
+
+                                    <td>
+                                        <span class="tag-number">
+                                            {{ pig.tag_number }}
+                                        </span>
+                                    </td>
+
+
+                                    <!-- GENDER -->
+
+                                    <td>
+
+                                        {% if pig.gender == 'MALE' %}
+
+                                            <span class="badge badge-primary">
+                                                Dume
+                                            </span>
+
+                                        {% elif pig.gender == 'FEMALE' %}
+
+                                            <span class="badge badge-pink">
+                                                Jike
+                                            </span>
+
+                                        {% else %}
+
+                                            <span class="badge badge-secondary">
+                                                Haijajazwa
+                                            </span>
+
+                                        {% endif %}
+
+                                    </td>
+
+
+                                    <!-- PRICE -->
+
+                                    <td>
+
+                                        {% if pig.purchase_price %}
+
+                                            <span class="price">
+                                                TSh
+                                                {{ pig.purchase_price|floatformat:0|intcomma }}
+                                            </span>
+
+                                        {% else %}
+
+                                            <span class="text-muted">
+                                                -
+                                            </span>
+
+                                        {% endif %}
+
+                                    </td>
+
+
+                                    <!-- STATUS -->
+
+                                    <td>
+
+                                        {% if pig.status == 'AVAILABLE' %}
+
+                                            <span class="badge badge-success">
+                                                Hajachinjwa
+                                            </span>
+
+                                        {% elif pig.status == 'SLAUGHTERED' %}
+
+                                            <span class="badge badge-warning">
+                                                Amechinjwa
+                                            </span>
+
+                                        {% else %}
+
+                                            <span class="badge badge-danger">
+                                                Nyama imeisha
+                                            </span>
+
+                                        {% endif %}
+
+                                    </td>
+
+
+                                    <!-- ACTIONS -->
+
+                                    <td>
+
+                                        {% if pig.status == 'AVAILABLE' %}
+
+                                            <div class="row-actions">
+
+                                                <a
+                                                    href="{% url 'pigs:pig_detail' pig.id %}"
+                                                    class="row-btn row-btn-edit"
+                                                    title="Edit Nguruwe"
+                                                >
+                                                    <i class="fas fa-edit">Edit</i>
+                                                </a>
+
+                                                {% if user.is_superuser %}
+
+                                                    <button
+                                                        onclick="openDeleteModal(
+                                                            '{% url 'pigs:pig_delete' pig.id %}',
+                                                            'Je, una uhakika unataka kufuta nguruwe {{ pig.tag_number }}? Kitendo hiki hakiwezi kurudishwa!'
+                                                        )"
+                                                        class="row-btn row-btn-delete"
+                                                        title="Futa Nguruwe"
+                                                    >
+                                                        <i class="fas fa-trash">Futa</i>
+                                                    </button>
+
+                                                {% endif %}
+
+                                            </div>
+
+                                        {% else %}
+
+                                            <span class="locked">
+                                                <i class="fas fa-lock"></i>
+                                                Imefungwa
+                                            </span>
+
+                                        {% endif %}
+
+                                    </td>
+
+                                </tr>
+
+                            {% empty %}
+
+                                <tr>
+
+                                    <td colspan="5">
+
+                                        <div class="empty-state">
+                                            Hakuna nguruwe katika ununuzi huu
+                                        </div>
+
+                                    </td>
+
+                                </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    {% empty %}
+
+        <!-- ========================================================
+             EMPTY STATE
+        ========================================================= -->
+
+        <div class="empty-card">
+
+            <div class="empty-icon">
+                <i class="fas fa-piggy-bank"></i>
+            </div>
+
+            <h3>Hakuna Nguruwe</h3>
+
+            <p>
+                Hakuna nguruwe zilizonunuliwa bado.
+            </p>
+
+            <a
+                href="{% url 'pigs:purchase_create' %}"
+                class="btn btn-primary"
+            >
+                <i class="fas fa-plus"></i>
+                Nunua Nguruwe
+            </a>
+
+        </div>
+
+    {% endfor %}
+
+
+    <!-- ============================================================
+         DELETE MODAL
+    ============================================================ -->
+
+    {% include "pigs/delete_modal.html" %}
+
+</div>
+
+{% endblock %}

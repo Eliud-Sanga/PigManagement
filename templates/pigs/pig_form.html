@@ -1,0 +1,149 @@
+{% extends "pigs/base.html" %}
+
+{% block title %}
+Sajili Nguruwe
+{% endblock %}
+
+{% block extra_css %}
+
+<style>
+
+    .page-header {
+        text-align: center;
+        margin-bottom: 25px;
+    }
+
+    .page-header h2 {
+        margin-bottom: 8px;
+    }
+
+    .page-header p {
+        color: #64748b;
+        margin: 0;
+    }
+
+    .form-card {
+        max-width: 650px;
+        margin: 0 auto;
+        background: white;
+        padding: 30px;
+        border-radius: 14px;
+        box-shadow: 0 4px 15px rgba(15, 23, 42, 0.07);
+    }
+
+    form p {
+        margin-bottom: 18px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 7px;
+        font-weight: 600;
+    }
+
+    input,
+    select,
+    textarea {
+        width: 100%;
+        padding: 11px 12px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        font-size: 14px;
+        background: white;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+        outline: none;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.10);
+    }
+
+    textarea {
+        resize: vertical;
+    }
+
+    .errorlist {
+        color: #dc2626;
+        margin: 5px 0;
+        padding-left: 20px;
+        font-size: 13px;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 25px;
+    }
+
+    .form-actions .button {
+        flex: 1;
+        text-align: center;
+    }
+
+    @media (max-width: 600px) {
+
+        .form-card {
+            padding: 22px;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+
+    }
+
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+```
+<h2>
+    Sajili Nguruwe
+</h2>
+
+<p>
+    Ingiza taarifa za nguruwe
+</p>
+```
+
+</div>
+
+<div class="form-card">
+
+```
+<form method="post">
+
+    {% csrf_token %}
+
+    {{ form.as_p }}
+
+
+    <div class="form-actions">
+
+        <a
+            href="{% url 'pig_list' %}"
+            class="button secondary"
+        >
+            Rudi
+        </a>
+
+        <button
+            type="submit"
+            class="button"
+        >
+            Hifadhi
+        </button>
+
+    </div>
+
+</form>
+
+</div>
+
+{% endblock %}

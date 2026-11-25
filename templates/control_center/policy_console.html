@@ -1,0 +1,100 @@
+{% extends "control_center/base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Policy Console" %} | PIGS{% endblock %}
+
+{% block content %}
+<section class="cc-f3-hero">
+    <div>
+        <div class="muted">{% trans "Platform Policy" %}</div>
+        <h1>{% trans "Policy Console" %}</h1>
+        <p>
+            {% trans "Central rules for authentication, sessions, companies, permissions, languages and maintenance." %}
+        </p>
+    </div>
+    <a class="btn btn-primary" href="{% url 'users:security_settings' %}">
+        {% trans "Edit security & session policy" %}
+    </a>
+</section>
+
+<section class="cc-policy-summary">
+    <article>
+        <span>{% trans "Idle logout" %}</span>
+        <strong>{{ policy.idle_timeout_minutes }} min</strong>
+        <small>{% trans "Inactive authenticated session" %}</small>
+    </article>
+    <article>
+        <span>{% trans "Maximum session" %}</span>
+        <strong>{{ policy.absolute_session_timeout_minutes }} min</strong>
+        <small>{% trans "Absolute session lifetime" %}</small>
+    </article>
+    <article>
+        <span>{% trans "Owner delegation" %}</span>
+        <strong>{{ owner_delegation_enabled }}/{{ company_total }}</strong>
+        <small>{% trans "Companies with Owner user management enabled" %}</small>
+    </article>
+    <article>
+        <span>{% trans "Maintenance" %}</span>
+        <strong>
+            {% if maintenance_active %}
+                {% trans "ACTIVE" %}
+            {% else %}
+                {% trans "OFF" %}
+            {% endif %}
+        </strong>
+        <small>{% trans "Installation-wide maintenance policy" %}</small>
+    </article>
+</section>
+
+<div class="cc-console-grid policy-grid">
+    <a class="cc-console-card featured" href="{% url 'users:security_settings' %}">
+        <span class="cc-console-icon">S</span>
+        <strong>{% trans "Session & Login Policy" %}</strong>
+        <small>{% trans "Idle logout, maximum lifetime, login lockout and trusted-device lifetime." %}</small>
+    </a>
+
+    <a class="cc-console-card" href="{% url 'users:company_list' %}">
+        <span class="cc-console-icon">L</span>
+        <strong>{% trans "Language Policy" %}</strong>
+        <small>
+            {{ sw_default_companies }} {% trans "companies default to Kiswahili" %} ·
+            {{ en_default_companies }} {% trans "default to English" %}
+        </small>
+    </a>
+
+    <a class="cc-console-card" href="{% url 'users:company_list' %}">
+        <span class="cc-console-icon">O</span>
+        <strong>{% trans "Owner User Management" %}</strong>
+        <small>{% trans "Enable or disable delegated user management per company." %}</small>
+    </a>
+
+    <a class="cc-console-card" href="{% url 'users:company_list' %}">
+        <span class="cc-console-icon">R</span>
+        <strong>{% trans "Roles & Permissions" %}</strong>
+        <small>{% trans "Role base permissions plus individual user grants and denials." %}</small>
+    </a>
+
+    <a class="cc-console-card" href="{% url 'users:approvals' %}">
+        <span class="cc-console-icon">A</span>
+        <strong>{% trans "Approval Policy" %}</strong>
+        <small>{{ pending_memberships }} {% trans "membership requests awaiting review" %}</small>
+    </a>
+
+    <a class="cc-console-card" href="{% url 'users:security_settings' %}">
+        <span class="cc-console-icon">M</span>
+        <strong>{% trans "Maintenance Policy" %}</strong>
+        <small>{% trans "Schedule maintenance and publish a controlled user message." %}</small>
+    </a>
+
+    <a class="cc-console-card" href="{% url 'users:audit_logs' %}">
+        <span class="cc-console-icon">A</span>
+        <strong>{% trans "Audit Policy" %}</strong>
+        <small>{% trans "Review immutable, hash-chained security history." %}</small>
+    </a>
+
+    <a class="cc-console-card" href="{% url 'users:profile_settings' %}">
+        <span class="cc-console-icon">P</span>
+        <strong>{% trans "Administrator Preferences" %}</strong>
+        <small>{% trans "Language, appearance and personal account settings." %}</small>
+    </a>
+</div>
+{% endblock %}

@@ -1,0 +1,44 @@
+LANGUAGE_SW = "sw"
+LANGUAGE_EN = "en"
+
+SUPPORTED_LANGUAGE_CODES = {
+    LANGUAGE_SW,
+    LANGUAGE_EN,
+}
+
+SUPPORTED_LANGUAGE_CHOICES = (
+    (LANGUAGE_SW, "Kiswahili"),
+    (LANGUAGE_EN, "English"),
+)
+
+DEFAULT_COMPANY_LANGUAGES = [
+    LANGUAGE_SW,
+    LANGUAGE_EN,
+]
+
+
+ROLE_OWNER = "OWNER"
+ROLE_MANAGER = "MANAGER"
+ROLE_STAFF = "STAFF"
+ROLE_VIEWER = "VIEWER"
+
+
+PERMISSION_MANAGE_COMPANY_USERS = "manage_company_users"
+PERMISSION_MANAGE_COMPANY_ROLES = "manage_company_roles"
+PERMISSION_MANAGE_MEMBER_PERMISSIONS = "manage_member_permissions"
+
+DELEGABLE_COMPANY_PERMISSION_CODENAMES = frozenset(
+    {
+        PERMISSION_MANAGE_COMPANY_USERS,
+        PERMISSION_MANAGE_COMPANY_ROLES,
+        PERMISSION_MANAGE_MEMBER_PERMISSIONS,
+    }
+)
+
+LOCAL_PERMISSION_APP_LABELS = frozenset(
+    {
+        "pigs",
+        "transport",
+        "companies",
+    }
+)

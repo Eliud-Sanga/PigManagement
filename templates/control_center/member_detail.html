@@ -1,0 +1,90 @@
+{% extends "control_center/base.html" %}
+{% block title %}{{ membership.user.username }} · {{ membership.company.name }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>{{ membership.user.username }}</h1><div class="muted">{{ membership.company.name }} · {{ membership.role.name }} · {{ membership.get_status_display }}</div></div>
+  <div class="actions" style="margin-top:0">
+    <a class="btn" href="{% url 'users:company_member_edit' membership.public_id %}">Role / language</a>
+    <a class="btn" href="{% url 'users:member_permissions' membership.public_id %}">Permission overrides</a>
+    <a class="btn" href="{% url 'users:user_detail' membership.user.id %}">Global identity</a>
+  </div>
+</div>
+<div class="grid">
+<section class="card third"><div class="muted">Role</div><div class="metric" style="font-size:22px">{{ membership.role.name }}</div></section>
+<section class="card third"><div class="muted">Status</div><div class="metric" style="font-size:22px">{{ membership.get_status_display }}</div></section>
+<section class="card third"><div class="muted">Approved language</div><div class="metric" style="font-size:22px">{{ membership.approved_language|default:"—"|upper }}</div></section>
+
+<section class="card wide">
+
+{% if activation_pending %}
+<section class="card wide" style="margin-top:18px">
+  <div class="page-head">
+    <div>
+      <h2>Secure account activation pending</h2>
+      <div class="muted">
+        Membership is approved, but the identity remains inactive until
+        the user chooses their own password.
+      </div>
+    </div>
+    <span class="badge warning">Activation pending</span>
+  </div>
+
+  {% if activation %}
+  <p class="muted">
+    Expires: {{ activation.expires_at }} ·
+    Sent: {{ activation.sent_at|default:"not confirmed" }} ·
+    Resends: {{ activation.resend_count }}
+  </p>
+  {% endif %}
+
+  <form
+    method="post"
+    action="{% url 'users:company_member_activation_resend' membership.public_id %}"
+    autocomplete="off"
+    class="cc-inline-policy-form"
+  >
+    {% csrf_token %}
+    <input
+      type="password"
+      name="admin_password"
+      autocomplete="current-password"
+      placeholder="Platform Admin password"
+      required
+    >
+    <button class="btn btn-primary" type="submit">
+      Rotate & resend activation
+    </button>
+  </form>
+</section>
+{% endif %}
+
+<h2>Effective permission calculation</h2>
+<div class="grid">
+  <div class="card third"><strong>Role base</strong><div class="permission-list">{% for code in base_codes %}<span class="badge code">{{ code }}</span>{% empty %}<span class="muted">None</span>{% endfor %}</div></div>
+  <div class="card third"><strong>Extra grants</strong><div class="permission-list">{% for code in grant_codes %}<span class="badge success code">{{ code }}</span>{% empty %}<span class="muted">None</span>{% endfor %}</div></div>
+  <div class="card third"><strong>Explicit denials</strong><div class="permission-list">{% for code in denial_codes %}<span class="badge danger code">{{ code }}</span>{% empty %}<span class="muted">None</span>{% endfor %}</div></div>
+</div>
+<h3>Effective permissions</h3>
+<div class="permission-list">{% for code in effective_codes %}<span class="badge code">{{ code }}</span>{% empty %}<span class="muted">No effective permissions in the current lifecycle state.</span>{% endfor %}</div>
+</section>
+
+<section class="card wide danger-zone">
+<h2>Membership lifecycle</h2>
+{% if is_last_active_owner %}<p class="warning"><strong>Protected:</strong> this is the last active Owner. It cannot be suspended, archived, or changed away from Owner until another active Owner exists.</p>{% endif %}
+<div class="grid">
+{% if membership.status == "ACTIVE" %}
+<form class="card half" method="post" action="{% url 'users:membership_status' membership.public_id 'suspend' %}">
+{% csrf_token %}<strong>Suspend</strong><input style="margin-top:10px" type="password" name="admin_password" placeholder="Admin password" autocomplete="current-password" required><button class="btn btn-warn" style="margin-top:10px">Suspend</button>
+</form>
+<form class="card half" method="post" action="{% url 'users:membership_status' membership.public_id 'archive' %}">
+{% csrf_token %}<strong>Archive</strong><input style="margin-top:10px" type="password" name="admin_password" placeholder="Admin password" autocomplete="current-password" required><button class="btn btn-danger" style="margin-top:10px">Archive</button>
+</form>
+{% else %}
+<form class="card half" method="post" action="{% url 'users:membership_status' membership.public_id 'activate' %}">
+{% csrf_token %}<strong>Activate</strong><input style="margin-top:10px" type="password" name="admin_password" placeholder="Admin password" autocomplete="current-password" required><button class="btn btn-primary" style="margin-top:10px">Activate</button>
+</form>
+{% endif %}
+</div>
+</section>
+</div>
+{% endblock %}

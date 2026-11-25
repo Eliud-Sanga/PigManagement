@@ -1,0 +1,279 @@
+{% extends "pigs/base.html" %}
+{% load static i18n %}
+{% block title %}Company | PIGS{% endblock %}
+
+{% block content %}
+<div class="company-hub-shell">
+    <section class="company-hub-hero">
+        <div class="company-hub-brand">
+            <div class="company-hub-logo">
+                {% if company.logo %}
+                    <img src="{{ company.logo.url }}" alt="{{ company.name }}">
+                {% else %}
+                    {{ company.name|first|upper }}
+                {% endif %}
+            </div>
+
+            <div class="company-hub-heading">
+                <span class="company-hub-eyebrow">{% trans "Company workspace" %}</span>
+                <h1>{{ company.name }}</h1>
+                <p>
+                    {{ company.code }}
+                    · {{ membership.role.name }}
+                    · {{ company.get_status_display }}
+                </p>
+            </div>
+        </div>
+
+        <div class="company-hub-statuses">
+            <span class="company-pill success">{% trans "Active company" %}</span>
+            {% if company.owner_user_management_enabled %}
+                <span class="company-pill success">{% trans "Owner user management enabled" %}</span>
+            {% else %}
+                <span class="company-pill controlled">{% trans "User management controlled by Platform Admin" %}</span>
+            {% endif %}
+        </div>
+    </section>
+
+    <section class="company-hub-metrics" aria-label="Company summary">
+        <article>
+            <span>{% trans "Active members" %}</span>
+            <strong>{{ active_members }}</strong>
+            <small>Users currently active in this company</small>
+        </article>
+
+        <article>
+            <span>{% trans "Pending approval" %}</span>
+            <strong>{{ pending_members }}</strong>
+            <small>Membership requests awaiting Platform Admin</small>
+        </article>
+
+        <article>
+            <span>{% trans "Active roles" %}</span>
+            <strong>{{ role_count }}</strong>
+            <small>Company-local role templates</small>
+        </article>
+
+        <article>
+            <span>{% trans "Your access" %}</span>
+            <strong>{{ effective_permission_count }}</strong>
+            <small>Effective company permissions</small>
+        </article>
+    </section>
+
+    {% if is_owner %}
+    <section class="company-hub-section">
+        <div class="company-hub-section-head">
+            <div>
+                <span class="company-hub-eyebrow">{% trans "Owner controls" %}</span>
+                <h2>{% trans "Manage your company" %}</h2>
+            </div>
+            <p>
+                Business-plane controls apply only to {{ company.name }}.
+                Platform governance remains protected.
+            </p>
+        </div>
+
+        <div class="company-hub-grid">
+            <article class="company-hub-card featured">
+                <div class="company-card-icon">C</div>
+                <div>
+                    <span class="company-card-kicker">{% trans "Company profile" %}</span>
+                    <h3>{% trans "Business identity" %}</h3>
+                    <p>
+                        Update company name, contact details, address and logo.
+                        Company code and governance policy stay protected.
+                    </p>
+                </div>
+                <a class="company-card-action primary"
+                   href="{% url 'users:owner_company_settings' %}">
+                    {% trans "Edit company profile" %}
+                </a>
+            </article>
+
+            <article class="company-hub-card">
+                <div class="company-card-icon">U</div>
+                <div>
+                    <span class="company-card-kicker">{% trans "Team & users" %}</span>
+                    <h3>{% trans "Company accounts" %}</h3>
+
+                    {% if can_manage_users %}
+                    <p>
+                        Create Manager/Staff user requests, review company
+                        memberships and remove users from this company only.
+                    </p>
+                    {% elif has_manage_users_permission %}
+                    <p>
+                        Your Owner role has user-management permission, but
+                        Platform Admin has not enabled delegated user management
+                        for this company yet.
+                    </p>
+                    {% else %}
+                    <p>
+                        User management is not available in your effective
+                        company permissions.
+                    </p>
+                    {% endif %}
+                </div>
+
+                {% if can_manage_users %}
+                <div class="company-card-actions">
+                    <a class="company-card-action primary"
+                       href="{% url 'users:company_users' %}">
+                        {% trans "Manage team" %}
+                    </a>
+                    <a class="company-card-action secondary"
+                       href="{% url 'users:company_user_request' %}">
+                        Add user
+                    </a>
+                </div>
+                {% else %}
+                <span class="company-card-disabled">
+                    {% trans "Platform Admin enablement required" %}
+                </span>
+                {% endif %}
+            </article>
+
+            <article class="company-hub-card">
+                <div class="company-card-icon">R</div>
+                <div>
+                    <span class="company-card-kicker">{% trans "Roles & access" %}</span>
+                    <h3>{% trans "Permission governance" %}</h3>
+                    <p>
+                        Your access is calculated from the company role,
+                        explicit grants and explicit denials.
+                        Reserved role templates remain Platform Admin governed.
+                    </p>
+                </div>
+                <div class="company-card-meta">
+                    {% if can_manage_roles %}
+                        Role-management permission present
+                    {% else %}
+                        Role-management permission restricted
+                    {% endif %}
+                    ·
+                    {% if can_manage_member_permissions %}
+                        Member overrides permitted
+                    {% else %}
+                        Member overrides restricted
+                    {% endif %}
+                </div>
+            </article>
+
+            <article class="company-hub-card">
+                <div class="company-card-icon">D</div>
+                <div>
+                    <span class="company-card-kicker">{% trans "Business data" %}</span>
+                    <h3>{% trans "Company records" %}</h3>
+                    <p>
+                        Return to business operations or open controlled data
+                        management where your effective permissions allow it.
+                    </p>
+                </div>
+                <div class="company-card-actions">
+                    <a class="company-card-action primary"
+                       href="{% url 'pigs:dashboard' %}">
+                        {% trans "Business dashboard" %}
+                    </a>
+                    {% if can_manage_data %}
+                    <a class="company-card-action secondary"
+                       href="{% url 'users:data_management' %}">
+                        {% trans "Data management" %}
+                    </a>
+                    {% endif %}
+                </div>
+            </article>
+
+            <article class="company-hub-card">
+                <div class="company-card-icon">A</div>
+                <div>
+                    <span class="company-card-kicker">{% trans "My account" %}</span>
+                    <h3>{% trans "Personal settings" %}</h3>
+                    <p>
+                        Update your own profile, language, appearance and
+                        security settings without changing company identity.
+                    </p>
+                </div>
+                <a class="company-card-action secondary"
+                   href="{% url 'users:profile_settings' %}">
+                    My account
+                </a>
+            </article>
+
+            <article class="company-hub-card">
+                <div class="company-card-icon">G</div>
+                <div>
+                    <span class="company-card-kicker">{% trans "Governance" %}</span>
+                    <h3>{% trans "Protected company policy" %}</h3>
+                    <p>
+                        Status: {{ company.get_status_display }}<br>
+                        Languages: {{ company.allowed_languages|join:", "|upper }}<br>
+                        Default: {{ company.default_language|upper }}<br>
+                        Timezone: {{ company.timezone }}
+                    </p>
+                </div>
+                <span class="company-card-disabled">
+                    {% trans "Platform Admin controlled" %}
+                </span>
+            </article>
+        </div>
+    </section>
+    {% else %}
+    <section class="company-hub-section">
+        <div class="company-hub-section-head">
+            <div>
+                <span class="company-hub-eyebrow">{% trans "Company access" %}</span>
+                <h2>{% trans "Your workspace" %}</h2>
+            </div>
+            <p>
+                You are signed in as {{ membership.role.name }}.
+                Management controls are shown only when your company role
+                and effective permissions allow them.
+            </p>
+        </div>
+
+        <div class="company-hub-grid compact">
+            <article class="company-hub-card">
+                <div class="company-card-icon">B</div>
+                <div>
+                    <span class="company-card-kicker">Business</span>
+                    <h3>Company dashboard</h3>
+                    <p>Continue with the business operations permitted by your role.</p>
+                </div>
+                <a class="company-card-action primary"
+                   href="{% url 'pigs:dashboard' %}">
+                    {% trans "Open dashboard" %}
+                </a>
+            </article>
+
+            <article class="company-hub-card">
+                <div class="company-card-icon">A</div>
+                <div>
+                    <span class="company-card-kicker">Account</span>
+                    <h3>{% trans "Personal settings" %}</h3>
+                    <p>Manage your own profile and preferences.</p>
+                </div>
+                <a class="company-card-action secondary"
+                   href="{% url 'users:profile_settings' %}">
+                    My account
+                </a>
+            </article>
+
+            <article class="company-hub-card">
+                <div class="company-card-icon">I</div>
+                <div>
+                    <span class="company-card-kicker">{% trans "Company information" %}</span>
+                    <h3>{{ company.name }}</h3>
+                    <p>
+                        Role: {{ membership.role.name }}<br>
+                        Default language: {{ company.default_language|upper }}<br>
+                        Timezone: {{ company.timezone }}
+                    </p>
+                </div>
+                <span class="company-card-disabled">{% trans "Read-only summary" %}</span>
+            </article>
+        </div>
+    </section>
+    {% endif %}
+</div>
+{% endblock %}

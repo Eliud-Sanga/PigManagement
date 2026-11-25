@@ -1,0 +1,27 @@
+{% extends "control_center/base.html" %}
+{% block title %}Invite Company Owner · PIGS{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Invite Company Owner</h1>
+    <div class="muted">The recipient receives a private, expiring registration link.</div>
+  </div>
+</div>
+<form class="panel" method="post" autocomplete="off">
+  {% csrf_token %}
+  {{ form.non_field_errors }}
+  <div class="fields">
+    {% for field in form %}
+    <div class="field {% if field.name == "admin_password" %}full{% endif %}">
+      <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+      {{ field }}{{ field.errors }}
+      {% if field.help_text %}<div class="muted">{{ field.help_text }}</div>{% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  <div class="actions">
+    <a class="btn" href="{% url 'users:owner_invitation_list' %}">Cancel</a>
+    <button class="btn btn-primary">Confirm password & send invitation</button>
+  </div>
+</form>
+{% endblock %}

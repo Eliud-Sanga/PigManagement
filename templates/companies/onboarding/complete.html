@@ -1,0 +1,72 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Complete Owner account · Home Management</title>
+  <link rel="stylesheet" href="{% static 'css/onboarding-stage1.css' %}">
+</head>
+<body class="onboard-body">
+<main class="onboard-shell">
+  <section class="onboard-brand">
+    <div class="brand-mark">H</div>
+    <div>
+      <strong>Home Management</strong>
+      <span>Owner account completion</span>
+    </div>
+  </section>
+
+  <section class="onboard-card">
+    <div class="step">Final secure step</div>
+    <h1>Complete your Owner account</h1>
+    <p class="lead">
+      Company approval is complete. Your account and company will be activated
+      together only after this step succeeds.
+    </p>
+
+    <div class="bound-email">
+      <span>Approved Owner email</span>
+      <strong>{{ invitation.email }}</strong>
+      <small>This email cannot be changed during onboarding.</small>
+    </div>
+
+    {% if existing_user %}
+      <div class="bound-email">
+        <span>Existing Home Management identity</span>
+        <strong>{{ existing_user.username }}</strong>
+        <small>
+          Your existing username, profile identity and usable password are
+          protected from silent changes. Confirm your existing password below.
+        </small>
+      </div>
+    {% endif %}
+
+    <form method="post" autocomplete="off">
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+      <div class="onboard-fields">
+      {% for field in form %}
+        {% if not field.field.disabled or field.name == "username" or field.name == "first_name" or field.name == "last_name" or field.name == "phone" %}
+        <div class="onboard-field">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {{ field.errors }}
+          {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
+        </div>
+        {% endif %}
+      {% endfor %}
+      </div>
+      <button class="onboard-submit" type="submit">
+        Activate Company & Owner account
+      </button>
+    </form>
+
+    <p class="security-note">
+      Provisioning is atomic: if any validation or security check fails,
+      neither the Company nor Owner access is partially created.
+    </p>
+  </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,100 @@
+{% extends "control_center/base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Permission Overrides" %}{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <span class="cc-console-eyebrow">{% trans "Individual Policy" %}</span>
+        <h1>{% trans "Permission Overrides" %}</h1>
+        <div class="muted">
+            {{ membership.user.username }} · {{ membership.company.name }} · {{ membership.role.name }}
+        </div>
+    </div>
+</div>
+
+<div class="grid">
+    <section class="card half">
+        <h3>{% trans "Role baseline" %}</h3>
+        <div class="permission-list">
+            {% for code in base_codes %}
+                <span class="badge code">{{ code }}</span>
+            {% empty %}
+                <span class="muted">{% trans "None" %}</span>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="card half">
+        <h3>{% trans "Effective permissions" %}</h3>
+        <div class="permission-list">
+            {% for code in effective_codes %}
+                <span class="badge success code">{{ code }}</span>
+            {% empty %}
+                <span class="muted">{% trans "None" %}</span>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="card wide">
+        <section class="cc-policy-explainer">
+            <strong>{% trans "Explicit deny wins" %}</strong>
+            <p>
+                {% trans "Use grants for exceptional extra access and denials to remove a permission from this individual even when the role normally allows it." %}
+            </p>
+        </section>
+
+        <form method="post" autocomplete="off">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+
+            <div class="permission-search-row">
+                <label for="member-permission-search">{% trans "Find a permission" %}</label>
+                <input
+                    id="member-permission-search"
+                    type="search"
+                    placeholder="{% trans 'Search permission name or code' %}"
+                    data-permission-search
+                >
+            </div>
+
+            <div class="fields">
+                {% for field in form %}
+                <div class="field {% if field.name == 'admin_password' %}full{% endif %}">
+                    <label>{{ field.label }}</label>
+                    {% if field.name == "admin_password" %}
+                        {{ field }}
+                    {% else %}
+                        <div class="permission-box" data-permission-box>{{ field }}</div>
+                    {% endif %}
+                    {{ field.errors }}
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="actions">
+                <a class="btn" href="{% url 'users:company_member_detail' membership.public_id %}">
+                    {% trans "Cancel" %}
+                </a>
+                <button class="btn btn-primary" type="submit">
+                    {% trans "Confirm password & save overrides" %}
+                </button>
+            </div>
+        </form>
+    </section>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const input = document.querySelector("[data-permission-search]");
+    if (!input) return;
+
+    input.addEventListener("input", function () {
+        const q = input.value.trim().toLowerCase();
+        document.querySelectorAll("[data-permission-box] li").forEach(function (item) {
+            item.hidden = q && !item.textContent.toLowerCase().includes(q);
+        });
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,9 @@
+{% extends "control_center/base.html" %}
+{% block title %}Companies | PIGS{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Companies</h1><div class="muted">Global company registry for this PIGS system.</div></div><a class="btn btn-primary" href="{% url 'users:company_create' %}">Create company</a></div>
+<form class="panel" method="get" style="margin-bottom:16px"><div class="fields"><div class="field"><label>Search</label><input name="q" value="{{ query }}" placeholder="Name, code, email, phone"></div><div class="field"><label>Status</label><select name="status"><option value="">All statuses</option>{% for value,label in statuses %}<option value="{{ value }}" {% if selected_status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div></div><div class="actions"><button class="btn btn-primary">Filter</button></div></form>
+<div class="table-wrap"><table><thead><tr><th>Company</th><th>Status</th><th>Languages</th><th>Members</th><th>Current</th><th></th></tr></thead><tbody>
+{% for company in companies %}<tr><td><strong>{{ company.name }}</strong><div class="muted code">{{ company.code }}</div></td><td><span class="badge">{{ company.get_status_display }}</span></td><td>{{ company.allowed_languages|join:", "|upper }} · default {{ company.default_language|upper }}</td><td>{{ company.active_membership_count }} active / {{ company.membership_count }} total</td><td>{% if request.company and request.company.pk == company.pk %}<span class="badge success">Selected</span>{% else %}—{% endif %}</td><td><a class="btn" href="{% url 'users:company_detail' company.public_id %}">Manage</a></td></tr>{% empty %}<tr><td colspan="6">No companies yet.</td></tr>{% endfor %}
+</tbody></table></div>
+{% endblock %}

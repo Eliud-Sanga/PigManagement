@@ -1,0 +1,374 @@
+{% extends "pigs/base.html" %}
+
+{% block title %}
+Maelezo ya Matumizi
+{% endblock %}
+
+{% block extra_css %}
+<style>
+
+    .expense-detail-page {
+        max-width: 800px;
+        margin: 30px auto;
+    }
+
+    .expense-detail-header {
+        text-align: center;
+        margin-bottom: 25px;
+    }
+
+    .expense-detail-header h2 {
+        margin: 0;
+        color: #172554;
+        font-size: 28px;
+    }
+
+    .expense-detail-header p {
+        margin: 8px 0 0;
+        color: #64748b;
+    }
+
+    .expense-detail-card {
+        background: white;
+        border-radius: 16px;
+        padding: 30px;
+        box-shadow: 0 5px 20px rgba(15, 23, 42, 0.08);
+    }
+
+    .expense-icon {
+        width: 75px;
+        height: 75px;
+        margin: 0 auto 20px;
+
+        background: #dbeafe;
+        color: #2563eb;
+
+        border-radius: 50%;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        font-size: 30px;
+    }
+
+    .expense-title {
+        text-align: center;
+        color: #172554;
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 25px;
+    }
+
+    .expense-amount {
+        background: #172554;
+        color: white;
+
+        border-radius: 14px;
+
+        padding: 22px;
+
+        text-align: center;
+
+        margin-bottom: 25px;
+    }
+
+    .expense-amount span {
+        display: block;
+        color: #dbeafe;
+        font-size: 13px;
+        margin-bottom: 6px;
+    }
+
+    .expense-amount strong {
+        font-size: 28px;
+    }
+
+    .expense-info {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+        margin-bottom: 25px;
+    }
+
+    .info-box {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 16px;
+    }
+
+    .info-box .label {
+        display: block;
+        color: #64748b;
+        font-size: 12px;
+        margin-bottom: 6px;
+    }
+
+    .info-box .value {
+        display: block;
+        color: #172554;
+        font-size: 15px;
+        font-weight: 600;
+    }
+
+    .description-box {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 18px;
+        margin-bottom: 25px;
+    }
+
+    .description-box h4 {
+        margin: 0 0 10px;
+        color: #172554;
+    }
+
+    .description-box p {
+        margin: 0;
+        color: #475569;
+        line-height: 1.6;
+        white-space: pre-wrap;
+    }
+
+    .no-description {
+        color: #94a3b8 !important;
+        font-style: italic;
+    }
+
+    .detail-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        padding-top: 20px;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .action-group {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .expense-btn {
+        border: none;
+        border-radius: 8px;
+        padding: 10px 17px;
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: none;
+        cursor: pointer;
+
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+    }
+
+    .btn-back {
+        background: #e2e8f0;
+        color: #0f172a;
+    }
+
+    .btn-back:hover {
+        background: #cbd5e1;
+    }
+
+    .btn-edit {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+
+    .btn-edit:hover {
+        background: #bfdbfe;
+    }
+
+    .btn-delete {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .btn-delete:hover {
+        background: #fecaca;
+    }
+
+    @media (max-width: 600px) {
+
+        .expense-detail-page {
+            margin: 20px 0;
+        }
+
+        .expense-detail-card {
+            padding: 20px;
+        }
+
+        .expense-info {
+            grid-template-columns: 1fr;
+        }
+
+        .detail-actions {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .action-group {
+            width: 100%;
+            flex-direction: column;
+        }
+
+        .expense-btn {
+            width: 100%;
+        }
+
+    }
+
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="expense-detail-page">
+
+    <div class="expense-detail-header">
+
+        <h2>
+            📋 Maelezo ya Matumizi
+        </h2>
+
+        <p>
+            Taarifa kamili ya kumbukumbu ya matumizi
+        </p>
+
+    </div>
+
+
+    <div class="expense-detail-card">
+
+        <div class="expense-icon">
+            <i class="fas fa-receipt"></i>
+        </div>
+
+
+        <div class="expense-title">
+            {{ expense.title }}
+        </div>
+
+
+        <div class="expense-amount">
+
+            <span>
+                Kiasi Kilichotumika
+            </span>
+
+            <strong>
+                TSh {{ expense.amount|floatformat:0 }}
+            </strong>
+
+        </div>
+
+
+        <div class="expense-info">
+
+            <div class="info-box">
+
+                <span class="label">
+                    📅 Tarehe
+                </span>
+
+                <span class="value">
+                    {{ expense.expense_date|date:"d/m/Y" }}
+                </span>
+
+            </div>
+
+
+            <div class="info-box">
+
+                <span class="label">
+                    🕐 Ilihifadhiwa
+                </span>
+
+                <span class="value">
+                    {{ expense.created_at|date:"d/m/Y H:i" }}
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="description-box">
+
+            <h4>
+                📄 Maelezo
+            </h4>
+
+            {% if expense.description %}
+
+                <p>
+                    {{ expense.description }}
+                </p>
+
+            {% else %}
+
+                <p class="no-description">
+                    Hakuna maelezo yaliyowekwa.
+                </p>
+
+            {% endif %}
+
+        </div>
+
+
+        <div class="detail-actions">
+
+            <a
+                href="{% url 'pigs:expense_list' %}"
+                class="expense-btn btn-back"
+            >
+                <i class="fas fa-arrow-left"></i>
+                Rudi
+            </a>
+
+
+            <div class="action-group">
+
+                <a
+                    href="{% url 'pigs:expense_create' %}?edit={{ expense.id }}"
+                    class="expense-btn btn-edit"
+                >
+                    <i class="fas fa-edit"></i>
+                    Hariri
+                </a>
+
+                <form
+                    method="post"
+                    action="{% url 'pigs:expense_delete' expense.id %}"
+                    style="margin: 0;"
+                >
+
+                    {% csrf_token %}
+
+                    <button
+                        type="submit"
+                        class="expense-btn btn-delete"
+                        onclick="return confirm('Je, una uhakika unataka kufuta rekodi hii ya matumizi?')"
+                    >
+                        <i class="fas fa-trash"></i>
+                        Futa
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

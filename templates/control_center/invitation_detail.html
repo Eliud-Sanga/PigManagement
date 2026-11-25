@@ -1,0 +1,121 @@
+{% extends "control_center/base.html" %}
+{% block title %}Owner invitation · {{ invitation.email }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>Owner invitation</h1><div class="muted">{{ invitation.email }}</div></div>
+  <a class="btn" href="{% url 'users:owner_invitation_list' %}">Back</a>
+</div>
+<div class="cards">
+  <section class="card third"><div class="muted">Status</div><div class="metric" style="font-size:22px">{{ invitation.get_status_display }}</div></section>
+  <section class="card third"><div class="muted">Expires</div><div class="metric" style="font-size:18px">{{ invitation.expires_at|date:"Y-m-d H:i" }}</div></section>
+  <section class="card third"><div class="muted">Resends</div><div class="metric" style="font-size:22px">{{ invitation.resend_count }}</div></section>
+</div>
+<div class="panel" style="margin-top:18px">
+  <h2>Registration request</h2>
+  <div class="fields">
+    <div class="field"><label>Company</label><div>{{ invitation.company_name|default:"Not submitted yet" }}</div></div>
+    <div class="field"><label>Code</label><div>{{ invitation.company_code|default:"—" }}</div></div>
+    <div class="field"><label>Email</label><div>{{ invitation.company_email|default:"—" }}</div></div>
+    <div class="field"><label>Phone</label><div>{{ invitation.company_phone|default:"—" }}</div></div>
+    <div class="field full"><label>Address</label><div>{{ invitation.company_address|default:"—"|linebreaksbr }}</div></div>
+  </div>
+</div>
+{% if invitation.status == "SENT" or invitation.status == "OPENED" or invitation.status == "EXPIRED" %}
+<div class="cards" style="margin-top:18px">
+  <form class="card" method="post" action="{% url 'users:owner_invitation_resend' invitation.public_id %}" autocomplete="off">
+    {% csrf_token %}
+    <h3>Resend invitation</h3>
+    <p class="muted">Rotates the token. The previous link stops working.</p>
+    <input type="password" name="admin_password" autocomplete="current-password" placeholder="Current admin password" required>
+    <button class="btn btn-primary" style="margin-top:10px">Rotate & resend</button>
+  </form>
+  <form class="card" method="post" action="{% url 'users:owner_invitation_revoke' invitation.public_id %}" autocomplete="off">
+    {% csrf_token %}
+    <h3>Revoke invitation</h3>
+    <p class="muted">Immediately prevents future registration with this link.</p>
+    <input type="password" name="admin_password" autocomplete="current-password" placeholder="Current admin password" required>
+    <button class="btn btn-danger" style="margin-top:10px">Revoke invitation</button>
+  </form>
+</div>
+{% endif %}
+
+<!-- PIGS-COMPANY-ONBOARDING-STAGE2-CONTROLS -->
+{% if invitation.status == "SUBMITTED" %}
+<div class="cards" style="margin-top:18px">
+  <form class="card" method="post"
+        action="{% url 'users:owner_invitation_approve' invitation.public_id %}"
+        autocomplete="off">
+    {% csrf_token %}
+    <h3>Approve registration</h3>
+    <p class="muted">
+      Approval unlocks a separate secure Owner setup link.
+      It does not create the Company or grant business access yet.
+    </p>
+    {% for field in approval_form %}
+      <div class="field" style="margin-top:10px">
+        <label>{{ field.label }}</label>{{ field }}{{ field.errors }}
+      </div>
+    {% endfor %}
+    <button class="btn btn-primary" style="margin-top:12px">
+      Confirm & approve
+    </button>
+  </form>
+
+  <form class="card" method="post"
+        action="{% url 'users:owner_invitation_reject' invitation.public_id %}"
+        autocomplete="off">
+    {% csrf_token %}
+    <h3>Reject registration</h3>
+    <p class="muted">
+      Record a review reason. No company or account will be created.
+    </p>
+    {% for field in rejection_form %}
+      <div class="field" style="margin-top:10px">
+        <label>{{ field.label }}</label>{{ field }}{{ field.errors }}
+      </div>
+    {% endfor %}
+    <button class="btn btn-danger" style="margin-top:12px">
+      Confirm & reject
+    </button>
+  </form>
+</div>
+{% elif invitation.status == "APPROVED" %}
+<form class="panel" style="margin-top:18px" method="post"
+      action="{% url 'users:owner_invitation_continuation_resend' invitation.public_id %}"
+      autocomplete="off">
+  {% csrf_token %}
+  <h3>Owner setup link</h3>
+  <p class="muted">
+    Rotate the continuation token and send a fresh secure link.
+    Previous continuation links become invalid.
+  </p>
+  <input type="password" name="admin_password"
+         autocomplete="current-password"
+         placeholder="Current admin password" required>
+  <button class="btn btn-primary" style="margin-top:10px">
+    Rotate & resend continuation
+  </button>
+</form>
+{% elif invitation.status == "REJECTED" %}
+<div class="panel" style="margin-top:18px">
+  <h3>Registration rejected</h3>
+  <p>{{ invitation.decision_reason }}</p>
+</div>
+{% endif %}
+
+<div class="panel" style="margin-top:18px">
+  <h2>Onboarding audit trail</h2>
+  <div style="overflow:auto">
+    <table>
+      <thead><tr><th>Time</th><th>Action</th><th>Result</th><th>Description</th></tr></thead>
+      <tbody>
+      {% for event in events %}
+        <tr><td>{{ event.created_at|date:"Y-m-d H:i:s" }}</td><td>{{ event.action }}</td><td>{{ event.result }}</td><td>{{ event.description }}</td></tr>
+      {% empty %}
+        <tr><td colspan="4">No events.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

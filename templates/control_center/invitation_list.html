@@ -1,0 +1,32 @@
+{% extends "control_center/base.html" %}
+{% block title %}Owner invitations · PIGS{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Owner invitations</h1>
+    <div class="muted">Secure company-registration links controlled by Platform Admin.</div>
+  </div>
+  <a class="btn btn-primary" href="{% url 'users:owner_invitation_create' %}">Invite Company Owner</a>
+</div>
+<div class="panel">
+  <div style="overflow:auto">
+    <table>
+      <thead><tr><th>Owner email</th><th>Status</th><th>Company request</th><th>Expires</th><th>Created</th><th></th></tr></thead>
+      <tbody>
+      {% for invite in invitations %}
+        <tr>
+          <td><strong>{{ invite.email }}</strong></td>
+          <td>{{ invite.get_status_display }}</td>
+          <td>{{ invite.company_name|default:"—" }}</td>
+          <td>{{ invite.expires_at|date:"Y-m-d H:i" }}</td>
+          <td>{{ invite.created_at|date:"Y-m-d H:i" }}</td>
+          <td><a class="btn" href="{% url 'users:owner_invitation_detail' invite.public_id %}">Review</a></td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="6" class="muted">No Owner invitations yet.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

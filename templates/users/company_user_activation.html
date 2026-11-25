@@ -1,0 +1,150 @@
+{% load static %}
+<!doctype html>
+<html lang="{{ language|default:'sw' }}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<meta name="color-scheme" content="light dark">
+<title>Account Activation | PIGS</title>
+<link rel="stylesheet" href="{% static 'css/auth-recovery-v1.css' %}">
+<script src="{% static 'js/auth-recovery-v1.js' %}" defer></script>
+</head>
+
+<body class="auth-page">
+<main class="auth-shell">
+<section class="auth-brand-panel" aria-label="PIGS">
+  <div class="auth-brand-mark">
+    <span class="auth-brand-icon">P</span>
+    <span>PIGS</span>
+  </div>
+
+  <div class="auth-brand-copy">
+    {% if language == "sw" %}
+    <span>Secure Account Activation</span>
+    <h2>Password yako, siri yako.</h2>
+    <p>
+      Owner na Platform Admin wanaidhinisha access tu.
+      Wewe ndiye unaweka password yako mwenyewe.
+    </p>
+    {% else %}
+    <span>Secure Account Activation</span>
+    <h2>Your password stays yours.</h2>
+    <p>
+      Owner and Platform Admin approve access only.
+      You choose your own password.
+    </p>
+    {% endif %}
+  </div>
+
+  <div class="auth-trust-row">
+    <span>One-time activation</span>
+    <span>Hashed token</span>
+    <span>Audit trail</span>
+  </div>
+</section>
+
+<section class="auth-card">
+  <div class="auth-mobile-brand">PIGS · Secure Activation</div>
+
+  {% if invalid %}
+    <div class="auth-kicker">Activation unavailable</div>
+
+    {% if language == "sw" %}
+    <h1>Link si halali au ime-expire</h1>
+    <p class="auth-intro">
+      Link inaweza kuwa imetumika, ime-expire, au imebadilishwa na
+      resend mpya. Wasiliana na Platform Admin kwa link mpya.
+    </p>
+    {% else %}
+    <h1>This activation link is unavailable</h1>
+    <p class="auth-intro">
+      The link may be expired, already used, or replaced by a newer
+      activation email. Ask Platform Admin to resend it.
+    </p>
+    {% endif %}
+
+    <a class="auth-primary" href="{% url 'users:login' %}">
+      Login
+    </a>
+
+  {% else %}
+    <div class="auth-kicker">First secure activation</div>
+
+    {% if language == "sw" %}
+    <h1>Weka password yako</h1>
+    {% else %}
+    <h1>Choose your password</h1>
+    {% endif %}
+
+    <p class="auth-intro">
+      <strong>{{ activation.user.username }}</strong><br>
+      {{ activation.membership.company.name }}
+    </p>
+
+    {% for error in errors %}
+    <div class="auth-message error">{{ error }}</div>
+    {% endfor %}
+
+    <form method="post" autocomplete="off">
+      {% csrf_token %}
+
+      <div class="auth-fields">
+        <div class="auth-field">
+          <label for="new_password1">
+            {% if language == "sw" %}Password mpya{% else %}New password{% endif %}
+          </label>
+          <div class="auth-password-wrap">
+            <input
+              id="new_password1"
+              type="password"
+              name="new_password1"
+              autocomplete="new-password"
+              required
+              autofocus
+            >
+            <button
+              type="button"
+              class="auth-password-toggle"
+              data-password-toggle="new_password1"
+              aria-label="Show password"
+            >
+              Show
+            </button>
+          </div>
+        </div>
+
+        <div class="auth-field">
+          <label for="new_password2">
+            {% if language == "sw" %}Rudia password{% else %}Confirm password{% endif %}
+          </label>
+          <div class="auth-password-wrap">
+            <input
+              id="new_password2"
+              type="password"
+              name="new_password2"
+              autocomplete="new-password"
+              required
+            >
+            <button
+              type="button"
+              class="auth-password-toggle"
+              data-password-toggle="new_password2"
+              aria-label="Show password"
+            >
+              Show
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <button class="auth-primary" type="submit">
+        {% if language == "sw" %}Washa akaunti kwa usalama{% else %}Securely activate account{% endif %}
+      </button>
+    </form>
+  {% endif %}
+</section>
+</main>
+</body>
+</html>

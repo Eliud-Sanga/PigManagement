@@ -1,0 +1,176 @@
+{% extends "control_center/base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Admin Control Center" %} | PIGS{% endblock %}
+
+{% block content %}
+<section class="cc-f3-hero">
+    <div>
+        <div class="muted">{% trans "PIGS Platform" %}</div>
+        <h1>{% trans "Admin Control Center" %}</h1>
+        <p>
+            {% trans "Global governance for companies, identities, permissions, security and policy enforcement." %}
+        </p>
+    </div>
+
+    <div class="cc-f3-actions">
+        <a class="btn btn-primary" href="{% url 'users:company_create' %}">
+            {% trans "Create company" %}
+        </a>
+        <a class="btn" href="{% url 'users:policy_console' %}">
+            {% trans "Open policy console" %}
+        </a>
+    </div>
+</section>
+
+<section class="cc-f3-metrics">
+    <article class="cc-f3-card">
+        <span class="cc-f3-label">{% trans "Companies" %}</span>
+        <strong class="cc-f3-value">{{ company_total }}</strong>
+        <small>{{ company_active }} {% trans "active" %}</small>
+    </article>
+
+    <article class="cc-f3-card">
+        <span class="cc-f3-label">{% trans "Pending approvals" %}</span>
+        <strong class="cc-f3-value">{{ pending_memberships }}</strong>
+        <small>{% trans "Membership governance" %}</small>
+    </article>
+
+    <article class="cc-f3-card">
+        <span class="cc-f3-label">{% trans "Platform users" %}</span>
+        <strong class="cc-f3-value">{{ user_total }}</strong>
+        <small>{% trans "Global identities" %}</small>
+    </article>
+
+    <article class="cc-f3-card {% if locked_accounts or locked_browsers %}cc-f3-card-alert{% endif %}">
+        <span class="cc-f3-label">{% trans "Security locks" %}</span>
+        <strong class="cc-f3-value">
+            {{ locked_accounts|add:locked_browsers }}
+        </strong>
+        <small>
+            {{ locked_accounts }} {% trans "account" %} ·
+            {{ locked_browsers }} {% trans "browser" %}
+        </small>
+    </article>
+</section>
+
+<section class="cc-console-section">
+    <div class="cc-console-head">
+        <div>
+            <span class="cc-console-eyebrow">{% trans "Management Console" %}</span>
+            <h2>{% trans "Platform administration" %}</h2>
+        </div>
+        <p>
+            {% trans "Use these modules like policy consoles: configure a rule once, then the application enforces it." %}
+        </p>
+    </div>
+
+    <div class="cc-console-grid">
+        <a class="cc-console-card" href="{% url 'users:company_list' %}">
+            <span class="cc-console-icon">C</span>
+            <strong>{% trans "Companies" %}</strong>
+            <small>{% trans "Lifecycle, languages, owner delegation and company policy." %}</small>
+        </a>
+
+        <a class="cc-console-card" href="{% url 'users:user_list' %}">
+            <span class="cc-console-icon">U</span>
+            <strong>{% trans "Users & Memberships" %}</strong>
+            <small>{% trans "Global identities and their company memberships." %}</small>
+        </a>
+
+        <a class="cc-console-card" href="{% url 'users:approvals' %}">
+            <span class="cc-console-icon">A</span>
+            <strong>{% trans "Approvals" %}</strong>
+            <small>{% trans "Review pending company membership requests." %}</small>
+        </a>
+
+        <a class="cc-console-card" href="{% url 'users:owner_invitation_list' %}">
+            <span class="cc-console-icon">I</span>
+            <strong>{% trans "Owner Invitations" %}</strong>
+            <small>{% trans "Secure commercial onboarding for company owners." %}</small>
+        </a>
+
+        <a class="cc-console-card featured" href="{% url 'users:policy_console' %}">
+            <span class="cc-console-icon">P</span>
+            <strong>{% trans "Policy Console" %}</strong>
+            <small>{% trans "Session, authentication, maintenance, language and delegation policy." %}</small>
+        </a>
+
+        <a class="cc-console-card" href="{% url 'users:company_list' %}">
+            <span class="cc-console-icon">R</span>
+            <strong>{% trans "Roles & Permissions" %}</strong>
+            <small>{% trans "Open a company to manage role permissions and individual overrides." %}</small>
+        </a>
+
+        <a class="cc-console-card" href="{% url 'users:audit_logs' %}">
+            <span class="cc-console-icon">S</span>
+            <strong>{% trans "Security Audit" %}</strong>
+            <small>{% trans "Immutable security and administration history." %}</small>
+        </a>
+
+        <a class="cc-console-card" href="{% url 'users:security_settings' %}">
+            <span class="cc-console-icon">M</span>
+            <strong>{% trans "Security & Maintenance" %}</strong>
+            <small>{% trans "Login controls, session limits and maintenance windows." %}</small>
+        </a>
+    </div>
+</section>
+
+<section class="cc-f3-security">
+    <article class="card wide cc-audit-card">
+        <div class="page-head cc-audit-head">
+            <div>
+                <h2>{% trans "Recent security events" %}</h2>
+                <div class="muted">{% trans "Immutable authentication and administration events." %}</div>
+            </div>
+            <a class="btn" href="{% url 'users:audit_logs' %}">{% trans "Open audit center" %}</a>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead><tr>
+                    <th>{% trans "Time" %}</th>
+                    <th>{% trans "Severity" %}</th>
+                    <th>{% trans "Result" %}</th>
+                    <th>{% trans "Action" %}</th>
+                    <th>{% trans "Actor / target" %}</th>
+                    <th>IP</th>
+                </tr></thead>
+                <tbody>
+                {% for event in recent_security_events %}
+                    <tr>
+                        <td>{{ event.occurred_at|date:"Y-m-d H:i:s" }}</td>
+                        <td>{{ event.severity }}</td>
+                        <td>{{ event.result }}</td>
+                        <td><a href="{% url 'users:audit_detail' event.event_id %}">{{ event.action }}</a></td>
+                        <td>{{ event.actor_identifier|default:event.attempted_identifier|default:"—" }}</td>
+                        <td>{{ event.ip_address|default:"—" }}</td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="6">{% trans "No security events yet." %}</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </article>
+
+    <div class="cc-f3-status-row">
+        <article class="cc-f3-status" data-status-card>
+            <span class="cc-f3-label">{% trans "Login policy" %}</span>
+            <strong>{{ policy.max_failed_login_attempts }} {% trans "attempts" %}</strong>
+            <small class="muted">{{ policy.login_lock_minutes }} {% trans "minute lock" %}</small>
+        </article>
+
+        <article class="cc-f3-status" data-status-card>
+            <span class="cc-f3-label">{% trans "Idle logout" %}</span>
+            <strong>{{ policy.idle_timeout_minutes }} {% trans "minutes" %}</strong>
+            <small class="muted">{% trans "Server-enforced inactivity limit" %}</small>
+        </article>
+
+        <article class="cc-f3-status" data-status-card>
+            <span class="cc-f3-label">{% trans "Maximum session" %}</span>
+            <strong>{{ policy.absolute_session_timeout_minutes }} {% trans "minutes" %}</strong>
+            <small class="muted">{% trans "Activity cannot extend this limit" %}</small>
+        </article>
+    </div>
+</section>
+{% endblock %}

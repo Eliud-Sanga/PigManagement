@@ -1,0 +1,110 @@
+{% extends "control_center/base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Security & Session Policy" %} | PIGS{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <div class="muted">{% trans "Platform Policy" %}</div>
+        <h1>{% trans "Security & Session Policy" %}</h1>
+        <div class="muted">
+            {% trans "Every save requires the current Platform Administrator password and is written to Security Audit." %}
+        </div>
+    </div>
+    <a class="btn" href="{% url 'users:policy_console' %}">
+        {% trans "Policy Console" %}
+    </a>
+</div>
+
+<form class="panel cc-policy-form" method="post" autocomplete="off">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+
+    <section class="cc-policy-group">
+        <div>
+            <span class="cc-console-eyebrow">{% trans "Authentication" %}</span>
+            <h2>{% trans "Login protection" %}</h2>
+            <p>{% trans "Control failed-login windows, lockout duration and trusted browser lifetime." %}</p>
+        </div>
+
+        <div class="fields">
+            {% for field in form %}
+                {% if field.name == "max_failed_login_attempts" or field.name == "failed_attempt_window_minutes" or field.name == "login_lock_minutes" or field.name == "device_cookie_days" %}
+                <div class="field">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {{ field.errors }}
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="cc-policy-group">
+        <div>
+            <span class="cc-console-eyebrow">{% trans "Session Policy" %}</span>
+            <h2>{% trans "Automatic logout rules" %}</h2>
+            <p>
+                {% trans "Idle timeout logs out users who stop using the application. Maximum lifetime ends a session even when activity continues." %}
+            </p>
+        </div>
+
+        <div class="fields">
+            {% for field in form %}
+                {% if field.name == "idle_timeout_minutes" or field.name == "absolute_session_timeout_minutes" %}
+                <div class="field">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {{ field.errors }}
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="cc-policy-group">
+        <div>
+            <span class="cc-console-eyebrow">{% trans "Availability" %}</span>
+            <h2>{% trans "Maintenance policy" %}</h2>
+            <p>
+                {% trans "Platform Admin remains able to sign in while maintenance blocks normal business users." %}
+            </p>
+        </div>
+
+        <div class="fields">
+            {% for field in form %}
+                {% if field.name == "maintenance_enabled" or field.name == "maintenance_starts_at" or field.name == "maintenance_ends_at" or field.name == "maintenance_message" %}
+                <div class="field {% if field.name == 'maintenance_message' %}full{% endif %}">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {{ field.errors }}
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </section>
+
+    {% for field in form %}
+        {% if field.name == "admin_password" %}
+        <section class="cc-policy-confirm">
+            <div>
+                <strong>{% trans "Administrator confirmation" %}</strong>
+                <p>{% trans "Re-enter your own current password to apply these platform policies." %}</p>
+            </div>
+            <div class="field">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {{ field.errors }}
+            </div>
+        </section>
+        {% endif %}
+    {% endfor %}
+
+    <div class="actions">
+        <a class="btn" href="{% url 'users:policy_console' %}">{% trans "Cancel" %}</a>
+        <button class="btn btn-primary" type="submit">
+            {% trans "Confirm password & apply policy" %}
+        </button>
+    </div>
+</form>
+{% endblock %}

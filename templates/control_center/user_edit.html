@@ -1,0 +1,18 @@
+{% extends "control_center/base.html" %}
+{% block title %}Edit {{ target.username }} | PIGS{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Edit identity</h1><div class="muted">Every save requires your current administrator password.</div></div></div>
+<form class="panel" method="post" autocomplete="off">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <div class="fields">
+        {% for field in form %}
+        <div class="field {% if field.name == 'admin_password' %}full{% endif %}">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}{{ field.errors }}
+        </div>
+        {% endfor %}
+    </div>
+    <div class="actions"><a class="btn" href="{% url 'users:user_detail' target.id %}">Cancel</a><button class="btn btn-primary">Confirm password & save</button></div>
+</form>
+{% endblock %}

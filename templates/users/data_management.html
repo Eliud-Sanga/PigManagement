@@ -1,0 +1,1118 @@
+{% extends "pigs/base.html" %}
+
+{% block title %}
+Data Management
+{% endblock %}
+
+{% block extra_css %}
+
+<style>
+
+/* ============================================================
+   DATA MANAGEMENT PAGE
+============================================================ */
+
+.data-management-page {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding-bottom: 40px;
+}
+
+
+/* ============================================================
+   HEADER
+============================================================ */
+
+.data-management-header {
+    background:
+        linear-gradient(
+            135deg,
+            #172554,
+            #2563eb
+        );
+
+    color: white;
+
+    border-radius: 18px;
+
+    padding: 24px 26px;
+
+    margin-bottom: 18px;
+
+    box-shadow:
+        0 8px 25px
+        rgba(37, 99, 235, 0.18);
+}
+
+
+.data-management-header-top {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 15px;
+
+    flex-wrap: wrap;
+}
+
+
+.data-management-header h2 {
+    margin: 0 0 5px;
+
+    font-size: 26px;
+
+    font-weight: 800;
+}
+
+
+.data-management-header p {
+    margin: 0;
+
+    color: #dbeafe;
+
+    font-size: 13px;
+}
+
+
+.data-management-header-badge {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    padding: 7px 11px;
+
+    border-radius: 20px;
+
+    background:
+        rgba(255, 255, 255, 0.12);
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.18);
+
+    color: white;
+
+    font-size: 10px;
+
+    font-weight: 750;
+
+    white-space: nowrap;
+}
+
+
+/* ============================================================
+   SUMMARY
+============================================================ */
+
+.data-summary-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 15px;
+
+    margin-bottom: 22px;
+}
+
+
+.data-summary-card {
+    background: white;
+
+    border:
+        1px solid #f1f5f9;
+
+    border-radius: 14px;
+
+    padding: 17px;
+
+    box-shadow:
+        0 4px 15px
+        rgba(15, 23, 42, 0.06);
+}
+
+
+.data-summary-content {
+    display: flex;
+
+    align-items: center;
+
+    gap: 13px;
+}
+
+
+.data-summary-icon {
+    width: 45px;
+
+    height: 45px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 11px;
+
+    background: #dbeafe;
+
+    color: #1d4ed8;
+
+    font-size: 18px;
+}
+
+
+.data-summary-icon.green {
+    background: #dcfce7;
+
+    color: #15803d;
+}
+
+
+.data-summary-icon.purple {
+    background: #ede9fe;
+
+    color: #6d28d9;
+}
+
+
+.data-summary-label {
+    color: #94a3b8;
+
+    font-size: 10px;
+
+    font-weight: 750;
+
+    text-transform: uppercase;
+
+    letter-spacing: .3px;
+}
+
+
+.data-summary-value {
+    margin-top: 3px;
+
+    color: #172554;
+
+    font-size: 21px;
+
+    font-weight: 800;
+}
+
+
+/* ============================================================
+   SECTION HEADER
+============================================================ */
+
+.data-section-header {
+    display: flex;
+
+    align-items: flex-end;
+
+    justify-content: space-between;
+
+    gap: 15px;
+
+    margin-bottom: 13px;
+}
+
+
+.data-section-title h3 {
+    margin: 0;
+
+    color: #172554;
+
+    font-size: 20px;
+
+    font-weight: 800;
+}
+
+
+.data-section-title p {
+    margin: 4px 0 0;
+
+    color: #64748b;
+
+    font-size: 12px;
+}
+
+
+.data-section-count {
+    color: #64748b;
+
+    font-size: 11px;
+
+    font-weight: 650;
+
+    white-space: nowrap;
+}
+
+
+/* ============================================================
+   DATA GRID
+============================================================ */
+
+.data-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 16px;
+}
+
+
+/* ============================================================
+   DATA CARD
+============================================================ */
+
+.data-card {
+    position: relative;
+
+    display: flex;
+
+    flex-direction: column;
+
+    background: white;
+
+    border:
+        1px solid #e2e8f0;
+
+    border-radius: 15px;
+
+    padding: 17px;
+
+    min-height: 200px;
+
+    box-shadow:
+        0 4px 15px
+        rgba(15, 23, 42, 0.06);
+
+    transition:
+        transform .18s ease,
+        box-shadow .18s ease,
+        border-color .18s ease;
+}
+
+
+.data-card:hover {
+    transform:
+        translateY(-2px);
+
+    border-color:
+        #bfdbfe;
+
+    box-shadow:
+        0 8px 22px
+        rgba(15, 23, 42, 0.10);
+}
+
+
+/* ============================================================
+   CARD TOP
+============================================================ */
+
+.data-card-top {
+    display: flex;
+
+    align-items: flex-start;
+
+    justify-content: space-between;
+
+    gap: 12px;
+}
+
+
+.data-card-icon {
+    width: 44px;
+
+    height: 44px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 11px;
+
+    background: #eff6ff;
+
+    color: #2563eb;
+
+    font-size: 18px;
+}
+
+
+.data-card-count {
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    min-width: 34px;
+
+    height: 28px;
+
+    padding: 0 9px;
+
+    border-radius: 18px;
+
+    background: #f1f5f9;
+
+    color: #334155;
+
+    font-size: 11px;
+
+    font-weight: 800;
+}
+
+
+/* ============================================================
+   CARD CONTENT
+============================================================ */
+
+.data-card-content {
+    margin-top: 14px;
+}
+
+
+.data-card-title {
+    margin: 0;
+
+    color: #172554;
+
+    font-size: 16px;
+
+    font-weight: 750;
+}
+
+
+.data-card-description {
+    margin: 5px 0 0;
+
+    color: #64748b;
+
+    font-size: 11px;
+
+    line-height: 1.45;
+}
+
+
+/* ============================================================
+   ACCESS BADGES
+============================================================ */
+
+.data-permissions {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    align-items: center;
+
+    gap: 5px;
+
+    margin-top: 11px;
+}
+
+
+.data-permission {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 5px;
+
+    padding: 5px 8px;
+
+    border-radius: 16px;
+
+    font-size: 9px;
+
+    font-weight: 750;
+}
+
+
+.data-permission.edit {
+    background: #fef3c7;
+
+    color: #92400e;
+}
+
+
+.data-permission.delete {
+    background: #fee2e2;
+
+    color: #991b1b;
+}
+
+
+.data-permission.full {
+    background: #ede9fe;
+
+    color: #6d28d9;
+}
+
+
+.data-permission-dot {
+    width: 5px;
+
+    height: 5px;
+
+    border-radius: 50%;
+
+    background: currentColor;
+}
+
+
+/* ============================================================
+   CARD ACTION
+============================================================ */
+
+.data-card-action {
+    margin-top: auto;
+
+    padding-top: 15px;
+}
+
+
+.data-manage-button {
+    width: 100%;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 7px;
+
+    padding: 9px 12px;
+
+    border-radius: 9px;
+
+    background: #2563eb;
+
+    color: white;
+
+    text-decoration: none;
+
+    font-size: 11px;
+
+    font-weight: 750;
+
+    transition: .18s ease;
+}
+
+
+.data-manage-button:hover {
+    background: #1d4ed8;
+
+    transform:
+        translateY(-1px);
+}
+
+
+/* ============================================================
+   EMPTY STATE
+============================================================ */
+
+.data-empty {
+    background: white;
+
+    border:
+        1px dashed #cbd5e1;
+
+    border-radius: 15px;
+
+    padding: 50px 20px;
+
+    text-align: center;
+
+    box-shadow:
+        0 4px 15px
+        rgba(15, 23, 42, 0.04);
+}
+
+
+.data-empty-icon {
+    font-size: 42px;
+
+    margin-bottom: 10px;
+}
+
+
+.data-empty h3 {
+    margin: 0 0 6px;
+
+    color: #475569;
+
+    font-size: 18px;
+}
+
+
+.data-empty p {
+    margin: 0 auto;
+
+    max-width: 500px;
+
+    color: #94a3b8;
+
+    font-size: 12px;
+
+    line-height: 1.5;
+}
+
+
+/* ============================================================
+   FOOTER NOTE
+============================================================ */
+
+.data-management-footer-note {
+    margin-top: 20px;
+
+    text-align: center;
+
+    color: #94a3b8;
+
+    font-size: 10px;
+}
+
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+
+@media (max-width: 950px) {
+
+    .data-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+
+@media (max-width: 800px) {
+
+    .data-summary-grid {
+        grid-template-columns:
+            1fr;
+    }
+
+    .data-management-header-top {
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .data-management-page {
+        padding-bottom: 25px;
+    }
+
+    .data-management-header {
+        padding: 20px;
+    }
+
+    .data-management-header h2 {
+        font-size: 22px;
+    }
+
+    .data-grid {
+        grid-template-columns:
+            1fr;
+    }
+
+    .data-section-header {
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+    .data-section-count {
+        white-space: normal;
+    }
+
+}
+
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+
+<div class="data-management-page">
+
+```
+<!-- ========================================================
+     HEADER
+========================================================= -->
+
+<div class="data-management-header">
+
+    <div class="data-management-header-top">
+
+        <div>
+
+            <h2>
+                🔐 Data Management
+            </h2>
+
+            <p>
+                Simamia data kulingana na permissions zako.
+            </p>
+
+        </div>
+
+
+        {% if user.is_superuser %}
+
+            <div class="data-management-header-badge">
+                👑 Super Admin · Full Access
+            </div>
+
+        {% else %}
+
+            <div class="data-management-header-badge">
+                🛡️ Limited Access
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+<!-- ========================================================
+     SUMMARY
+========================================================= -->
+
+{% with category_count=available_data|length %}
+
+<div class="data-summary-grid">
+
+
+    <!-- CATEGORIES -->
+
+    <div class="data-summary-card">
+
+        <div class="data-summary-content">
+
+            <div class="data-summary-icon">
+
+                <i class="fas fa-database"></i>
+
+            </div>
+
+            <div>
+
+                <div class="data-summary-label">
+                    Categories
+                </div>
+
+                <div class="data-summary-value">
+                    {{ category_count }}
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- TOTAL RECORDS -->
+
+    <div class="data-summary-card">
+
+        <div class="data-summary-content">
+
+            <div class="data-summary-icon green">
+
+                <i class="fas fa-layer-group"></i>
+
+            </div>
+
+            <div>
+
+                <div class="data-summary-label">
+                    Records
+                </div>
+
+                <div class="data-summary-value">
+                    {{ total_records }}
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ACCESS -->
+
+    <div class="data-summary-card">
+
+        <div class="data-summary-content">
+
+            <div class="data-summary-icon purple">
+
+                <i class="fas fa-user-shield"></i>
+
+            </div>
+
+            <div>
+
+                <div class="data-summary-label">
+                    Access
+                </div>
+
+                <div
+                    class="data-summary-value"
+                    style="font-size:16px;"
+                >
+
+                    {% if user.is_superuser %}
+
+                        Full Access
+
+                    {% else %}
+
+                        Limited Access
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endwith %}
+
+
+<!-- ========================================================
+     SECTION HEADER
+========================================================= -->
+
+<div class="data-section-header">
+
+    <div class="data-section-title">
+
+        <h3>
+            Data Categories
+        </h3>
+
+        <p>
+            Chagua data unayotaka kusimamia.
+        </p>
+
+    </div>
+
+
+    <div class="data-section-count">
+
+        {{ available_data|length }}
+        available
+
+    </div>
+
+</div>
+
+
+<!-- ========================================================
+     DATA CARDS
+========================================================= -->
+
+{% if available_data %}
+
+    <div class="data-grid">
+
+        {% for item in available_data %}
+
+            <div class="data-card">
+
+
+                <!-- ========================================
+                     CARD TOP
+                ========================================= -->
+
+                <div class="data-card-top">
+
+                    <div class="data-card-icon">
+
+                        {% if item.key == "purchase" %}
+                            🛒
+
+                        {% elif item.key == "pig" %}
+                            🐖
+
+                        {% elif item.key == "slaughterbatch" %}
+                            🔪
+
+                        {% elif item.key == "meatstock" %}
+                            🥩
+
+                        {% elif item.key == "dailysale" %}
+                            💰
+
+                        {% elif item.key == "pigsalerecord" %}
+                            🍖
+
+                        {% elif item.key == "meatpartsale" %}
+                            🦴
+
+                        {% elif item.key == "fooditem" %}
+                            🍽️
+
+                        {% elif item.key == "foodsalerecord" %}
+                            🧾
+
+                        {% elif item.key == "batchprofitreport" %}
+                            📊
+
+                        {% elif item.key == "dailysalereport" %}
+                            📈
+
+                        {% elif item.key == "expense" %}
+                            💸
+
+                        {% else %}
+                            📁
+                        {% endif %}
+
+                    </div>
+
+
+                    <div class="data-card-count">
+                        {{ item.count }}
+                    </div>
+
+                </div>
+
+
+                <!-- ========================================
+                     CARD CONTENT
+                ========================================= -->
+
+                <div class="data-card-content">
+
+                    <h4 class="data-card-title">
+                        {{ item.label }}
+                    </h4>
+
+
+                    <p class="data-card-description">
+
+                        {% if item.key == "purchase" %}
+
+                            Rekodi za manunuzi.
+
+                        {% elif item.key == "pig" %}
+
+                            Taarifa za nguruwe.
+
+                        {% elif item.key == "slaughterbatch" %}
+
+                            Batches za machinjio.
+
+                        {% elif item.key == "meatstock" %}
+
+                            Stock ya nyama.
+
+                        {% elif item.key == "dailysale" %}
+
+                            Mauzo ya kila siku.
+
+                        {% elif item.key == "pigsalerecord" %}
+
+                            Mauzo ya nyama.
+
+                        {% elif item.key == "meatpartsale" %}
+
+                            Sehemu za nyama.
+
+                        {% elif item.key == "fooditem" %}
+
+                            Aina za chakula.
+
+                        {% elif item.key == "foodsalerecord" %}
+
+                            Mauzo ya chakula.
+
+                        {% elif item.key == "batchprofitreport" %}
+
+                            Ripoti za profit.
+
+                        {% elif item.key == "dailysalereport" %}
+
+                            Ripoti za kila siku.
+
+                        {% elif item.key == "expense" %}
+
+                            Matumizi ya biashara.
+
+                        {% else %}
+
+                            Taarifa za mfumo.
+
+                        {% endif %}
+
+                    </p>
+
+
+                    <!-- =====================================
+                         PERMISSIONS
+                    ====================================== -->
+
+                   <div class="data-permissions">
+
+                        {% if user.is_superuser %}
+
+                            <span class="data-permission full">
+
+                                <span class="data-permission-dot"></span>
+
+                                Full Access
+
+                            </span>
+
+                        {% else %}
+
+                            {% if item.can_view %}
+
+                                <span class="data-permission">
+
+                                    <span class="data-permission-dot"></span>
+
+                                    View
+
+                                </span>
+
+                            {% endif %}
+
+
+                            {% if item.can_edit %}
+
+                                <span class="data-permission edit">
+
+                                    <span class="data-permission-dot"></span>
+
+                                    Edit
+
+                                </span>
+
+                            {% endif %}
+
+
+                            {% if item.can_delete %}
+
+                                <span class="data-permission delete">
+
+                                    <span class="data-permission-dot"></span>
+
+                                    Delete
+
+                                </span>
+
+                            {% endif %}
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+                <!-- ========================================
+                     CARD ACTION
+                ========================================= -->
+
+                <div class="data-card-action">
+
+                    <a
+                        href="{% url 'users:data_management_model' item.key %}"
+                        class="data-manage-button"
+                    >
+
+                        <i class="fas fa-cog"></i>
+
+                        Simamia Data
+
+                        <span>
+                            →
+                        </span>
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+
+{% else %}
+
+
+    <!-- ====================================================
+         EMPTY STATE
+    ===================================================== -->
+
+    <div class="data-empty">
+
+        <div class="data-empty-icon">
+            🔒
+        </div>
+
+        <h3>
+            Hakuna Access
+        </h3>
+
+        <p>
+            Huna permission ya kusimamia
+            data yoyote kwa sasa.
+        </p>
+
+    </div>
+
+{% endif %}
+
+
+<!-- ========================================================
+     FOOTER
+========================================================= -->
+
+<div class="data-management-footer-note">
+
+    🔐 Access inadhibitiwa na backend permissions.
+
+</div>
+
+</div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends "control_center/base.html" %}
+{% block title %}Users | PIGS{% endblock %}
+{% block content %}
+<div class="page-head">
+    <div><h1>Users</h1><div class="muted">Global identities with company memberships.</div></div>
+</div>
+<form class="panel" method="get" style="margin-bottom:16px">
+    <div class="field"><label>Search</label><input name="q" value="{{ query }}" placeholder="Username, email or name"></div>
+</form>
+<div class="table-wrap">
+<table>
+<thead><tr><th>User</th><th>Email</th><th>Status</th><th>Platform</th><th>Companies</th><th></th></tr></thead>
+<tbody>
+{% for item in users %}
+<tr>
+    <td>{{ item.username }}</td>
+    <td>{{ item.email }}</td>
+    <td>{% if item.is_active %}<span class="success">Active</span>{% else %}<span class="danger">Inactive</span>{% endif %}</td>
+    <td>{% if item.is_platform_admin %}Platform Admin{% else %}User{% endif %}</td>
+    <td>
+        {% for membership in item.company_memberships.all %}
+            <span class="badge">{{ membership.company.name }} · {{ membership.role.name }}</span>
+        {% empty %}—{% endfor %}
+    </td>
+    <td><a class="btn" href="{% url 'users:user_detail' item.id %}">Open</a></td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+{% endblock %}

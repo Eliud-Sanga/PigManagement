@@ -1,0 +1,29 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Registration decision · Home Management</title>
+  <link rel="stylesheet" href="{% static 'css/onboarding-stage1.css' %}">
+</head>
+<body class="onboard-body">
+<main class="onboard-shell narrow">
+  <section class="onboard-card centered">
+    <div class="brand-mark">H</div>
+    <div class="step">Registration review</div>
+    <h1>Your company registration was not approved</h1>
+    <p class="lead">
+      Please contact the Platform Administrator if you need clarification
+      or a new invitation.
+    </p>
+    {% if invitation.decision_reason %}
+    <div class="bound-email">
+      <span>Review note</span>
+      <strong>{{ invitation.decision_reason }}</strong>
+    </div>
+    {% endif %}
+  </section>
+</main>
+</body>
+</html>

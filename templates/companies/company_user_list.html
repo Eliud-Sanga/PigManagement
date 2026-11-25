@@ -1,0 +1,108 @@
+{% extends "pigs/base.html" %}
+{% block title %}Company Users | PIGS{% endblock %}
+
+{% block content %}
+<div class="company-team-shell">
+    <section class="company-team-head">
+        <div>
+            <span class="company-hub-eyebrow">Company · Team</span>
+            <h1>Company Users</h1>
+            <p>
+                {{ company.name }} · only this company's memberships are shown.
+            </p>
+        </div>
+
+        <div class="company-team-head-actions">
+            <a class="company-card-action secondary"
+               href="{% url 'users:company_hub' %}">
+                Company
+            </a>
+            <a class="company-card-action primary"
+               href="{% url 'users:company_user_request' %}">
+                Add user
+            </a>
+        </div>
+    </section>
+
+    <section class="company-team-note">
+        <strong>Governance:</strong>
+        new memberships remain pending until Platform Admin approval.
+        Removing a user archives only this company's membership; the global
+        identity and memberships in other companies are preserved.
+    </section>
+
+    <section class="company-team-table-wrap">
+        <table class="company-team-table">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Language</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+            {% for item in memberships %}
+                <tr>
+                    <td data-label="User">
+                        <strong>{{ item.user.username }}</strong>
+                        <small>{{ item.user.email }}</small>
+                    </td>
+
+                    <td data-label="Role">
+                        <span class="company-role-chip">
+                            {{ item.role.name }}
+                        </span>
+                    </td>
+
+                    <td data-label="Status">
+                        <span class="company-status-chip status-{{ item.status|lower }}">
+                            {{ item.get_status_display }}
+                        </span>
+                    </td>
+
+                    <td data-label="Language">
+                        {{ item.approved_language|default:item.requested_language|upper }}
+                    </td>
+
+                    <td data-label="Action">
+                        {% if item.role.code != "OWNER" and item.user_id != request.user.id and item.status != "ARCHIVED" %}
+                        <form
+                            method="post"
+                            action="{% url 'users:company_user_remove' item.public_id %}"
+                            class="company-remove-form"
+                        >
+                            {% csrf_token %}
+                            <input
+                                type="password"
+                                name="current_password"
+                                autocomplete="current-password"
+                                placeholder="Your current password"
+                                required
+                            >
+                            <button
+                                class="company-card-action danger"
+                                type="submit"
+                            >
+                                Remove
+                            </button>
+                        </form>
+                        {% else %}
+                        <span class="company-card-disabled">Protected</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="5" class="company-team-empty">
+                        No company users found.
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </section>
+</div>
+{% endblock %}

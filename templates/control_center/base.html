@@ -1,0 +1,195 @@
+{% load static i18n %}
+<!doctype html>
+<html lang="{{ LANGUAGE_CODE|default:'sw' }}" data-theme="{{ request.user.theme_preference|default:'SYSTEM'|lower }}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#172554">
+<title>{% block title %}{% trans "PIGS Control Center" %}{% endblock %}</title>
+{% block extra_head %}{% endblock %}
+<link rel="stylesheet" href="{% static 'css/control-center-f1.css' %}">
+<script src="{% static 'js/control-center-f1.js' %}" defer></script>
+<link rel="stylesheet" href="{% static 'css/profile-f2.css' %}">
+<link rel="stylesheet" href="{% static 'css/control-center-auth-polish.css' %}">
+</head>
+<body class="control-app">
+<a class="skip-link" href="#main-content">{% trans "Skip to content" %}</a>
+
+<header class="topbar cc-topbar-v2">
+<div class="topbar-inner cc-topbar-grid">
+    <div class="cc-header-left">
+        <button class="control-nav-toggle cc-hamburger" id="control-nav-toggle"
+                type="button" aria-label="{% trans 'Open control center navigation' %}"
+                aria-expanded="false" aria-controls="control-nav">
+            <span></span><span></span><span></span>
+        </button>
+    </div>
+
+    <a class="cc-header-title" href="{% url 'users:control_center' %}">
+        <span class="cc-header-system-title">Home Management</span>
+        <small class="cc-header-system-subtitle">Admin Control Center</small>
+    </a>
+
+    {% if user.is_authenticated %}
+    <div class="cc-header-right">
+        <form class="cc-language-switch" method="post"
+              action="{% url 'users:language_switch' %}">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+            <label class="sr-only" for="cc-language">{% trans "Language" %}</label>
+            <select id="cc-language" name="language"
+                    aria-label="{% trans 'Language' %}"
+                    onchange="this.form.submit()">
+                <option value="sw" {% if request.LANGUAGE_CODE == "sw" %}selected{% endif %}>SW</option>
+                <option value="en" {% if request.LANGUAGE_CODE == "en" %}selected{% endif %}>EN</option>
+            </select>
+        </form>
+
+        <a class="cc-header-profile" href="{% url 'users:profile_settings' %}"
+           title="{% trans 'My Account' %}">
+            <span class="cc-header-avatar">
+                {% if user.profile_photo %}
+                    <img src="{{ user.profile_photo.url }}" alt="">
+                {% else %}
+                    {{ user.username|first|upper }}
+                {% endif %}
+            </span>
+            <span class="cc-header-username">{{ user.username }}</span>
+        </a>
+    </div>
+    {% endif %}
+</div>
+</header>
+
+<nav class="nav cc-admin-drawer" id="control-nav"
+     aria-label="{% trans 'Platform administration' %}" aria-hidden="true">
+
+    <div class="cc-drawer-brand">
+        <span class="cc-drawer-brand-mark">P</span>
+        <div>
+            <strong>Home Management</strong>
+            <small>Admin Control Center</small>
+        </div>
+    </div>
+
+    <div class="cc-drawer-group">
+        <span class="cc-drawer-label">{% trans "Management Console" %}</span>
+
+        <a href="{% url 'users:control_center' %}">
+            <span class="cc-drawer-icon">O</span>
+            <span class="cc-drawer-copy">
+                <strong>{% trans "Overview" %}</strong>
+                <small>Dashboard</small>
+            </span>
+        </a>
+
+        <a href="{% url 'users:company_list' %}">
+            <span class="cc-drawer-icon">C</span>
+            <span class="cc-drawer-copy">
+                <strong>{% trans "Companies" %}</strong>
+                <small>Company management</small>
+            </span>
+        </a>
+
+        <a href="{% url 'users:user_list' %}">
+            <span class="cc-drawer-icon">U</span>
+            <span class="cc-drawer-copy">
+                <strong>{% trans "Users" %}</strong>
+                <small>Global identities</small>
+            </span>
+        </a>
+    </div>
+
+    <div class="cc-drawer-group">
+        <span class="cc-drawer-label">Access & Governance</span>
+
+        <a href="{% url 'users:approvals' %}">
+            <span class="cc-drawer-icon">A</span>
+            <span class="cc-drawer-copy">
+                <strong>{% trans "Approvals" %}</strong>
+                <small>Pending memberships</small>
+            </span>
+        </a>
+
+        <a href="{% url 'users:owner_invitation_list' %}">
+            <span class="cc-drawer-icon">I</span>
+            <span class="cc-drawer-copy">
+                <strong>{% trans "Owner Invitations" %}</strong>
+                <small>Secure onboarding</small>
+            </span>
+        </a>
+
+        <a href="{% url 'users:policy_console' %}">
+            <span class="cc-drawer-icon">P</span>
+            <span class="cc-drawer-copy">
+                <strong>{% trans "Policy Console" %}</strong>
+                <small>Platform policies</small>
+            </span>
+        </a>
+    </div>
+
+    <div class="cc-drawer-group">
+        <span class="cc-drawer-label">Security</span>
+
+        <a href="{% url 'users:security_settings' %}">
+            <span class="cc-drawer-icon">S</span>
+            <span class="cc-drawer-copy">
+                <strong>{% trans "Security & Maintenance" %}</strong>
+                <small>Session and login rules</small>
+            </span>
+        </a>
+
+        <a href="{% url 'users:audit_logs' %}">
+            <span class="cc-drawer-icon">L</span>
+            <span class="cc-drawer-copy">
+                <strong>{% trans "Security Audit" %}</strong>
+                <small>Immutable activity history</small>
+            </span>
+        </a>
+    </div>
+
+    {% if user.is_authenticated %}
+    <div class="cc-drawer-group cc-drawer-account">
+        <span class="cc-drawer-label">{% trans "My Account" %}</span>
+
+        <a href="{% url 'users:profile_settings' %}">
+            <span class="cc-drawer-icon">P</span>
+            <span class="cc-drawer-copy">
+                <strong>{% trans "My Account" %}</strong>
+                <small>{{ user.username }}</small>
+            </span>
+        </a>
+
+        <form class="cc-drawer-logout" method="post"
+              action="{% url 'users:logout' %}">
+            {% csrf_token %}
+            <button type="submit">
+                <span class="cc-drawer-icon">↪</span>
+                <span class="cc-drawer-copy">
+                    <strong>{% trans "Logout" %}</strong>
+                    <small>End secure session</small>
+                </span>
+            </button>
+        </form>
+    </div>
+    {% endif %}
+</nav>
+
+<div class="cc-nav-backdrop" id="control-nav-backdrop" aria-hidden="true"></div>
+
+<main class="container" id="main-content">
+    {% if messages %}
+    <div class="messages" role="status" aria-live="polite">
+        {% for message in messages %}
+        <div class="message {{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+</main>
+
+<script src="{% static 'js/admin-password-modal-f2.js' %}" defer></script>
+</body>
+</html>

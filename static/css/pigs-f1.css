@@ -1,0 +1,603 @@
+/* ================================================================
+   PIG MANAGEMENT MASTER - FRONTEND F1 FOUNDATION
+   Purpose: responsive shell, theme foundation, accessibility,
+            mobile performance and print behavior.
+   Identity preserved: #172554, #1e3a8a, #2563eb.
+   ================================================================ */
+
+:root {
+    color-scheme: light;
+    --pigs-bg: #f4f6fa;
+    --pigs-surface: #ffffff;
+    --pigs-surface-soft: #f8fafc;
+    --pigs-text: #1f2937;
+    --pigs-heading: #172554;
+    --pigs-muted: #64748b;
+    --pigs-line: #e2e8f0;
+    --pigs-brand-900: #172554;
+    --pigs-brand-800: #1e3a8a;
+    --pigs-brand-600: #2563eb;
+    --pigs-brand-700: #1d4ed8;
+    --pigs-success: #16a34a;
+    --pigs-danger: #dc2626;
+    --pigs-warning: #d97706;
+    --pigs-shadow-sm: 0 3px 12px rgba(15, 23, 42, 0.07);
+    --pigs-shadow-md: 0 10px 28px rgba(15, 23, 42, 0.10);
+    --pigs-radius-sm: 10px;
+    --pigs-radius-md: 14px;
+    --pigs-radius-lg: 18px;
+    --pigs-content: 1240px;
+    --pigs-touch: 44px;
+}
+
+html[data-theme="dark"] {
+    color-scheme: dark;
+    --pigs-bg: #0f172a;
+    --pigs-surface: #172033;
+    --pigs-surface-soft: #111c2f;
+    --pigs-text: #f8fafc;
+    --pigs-heading: #f8fafc;
+    --pigs-muted: #a9b4c7;
+    --pigs-line: #334155;
+    --pigs-brand-600: #60a5fa;
+    --pigs-brand-700: #93c5fd;
+    --pigs-shadow-sm: 0 3px 12px rgba(0, 0, 0, 0.22);
+    --pigs-shadow-md: 0 12px 30px rgba(0, 0, 0, 0.30);
+}
+
+@media (prefers-color-scheme: dark) {
+    html[data-theme="system"] {
+        color-scheme: dark;
+        --pigs-bg: #0f172a;
+        --pigs-surface: #172033;
+        --pigs-surface-soft: #111c2f;
+        --pigs-text: #f8fafc;
+        --pigs-heading: #f8fafc;
+        --pigs-muted: #a9b4c7;
+        --pigs-line: #334155;
+        --pigs-brand-600: #60a5fa;
+        --pigs-brand-700: #93c5fd;
+        --pigs-shadow-sm: 0 3px 12px rgba(0, 0, 0, 0.22);
+        --pigs-shadow-md: 0 12px 30px rgba(0, 0, 0, 0.30);
+    }
+}
+
+html {
+    max-width: 100%;
+    overflow-x: clip;
+    -webkit-text-size-adjust: 100%;
+}
+
+body.pigs-app {
+    max-width: 100%;
+    overflow-x: clip;
+    background: var(--pigs-bg);
+    color: var(--pigs-text);
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system,
+                 BlinkMacSystemFont, "Segoe UI", sans-serif;
+    line-height: 1.5;
+    text-rendering: optimizeLegibility;
+}
+
+body.pigs-app a,
+body.pigs-app button,
+body.pigs-app input,
+body.pigs-app select,
+body.pigs-app textarea {
+    font: inherit;
+}
+
+.skip-link {
+    position: fixed;
+    z-index: 50000;
+    top: 8px;
+    left: 8px;
+    transform: translateY(-160%);
+    padding: 10px 14px;
+    border-radius: 10px;
+    background: #ffffff;
+    color: #172554;
+    box-shadow: var(--pigs-shadow-md);
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.skip-link:focus {
+    transform: translateY(0);
+}
+
+/* ----------------------------------------------------------------
+   Header - same visual identity, less wasted space on small screens.
+   ---------------------------------------------------------------- */
+body.pigs-app .header {
+    background: linear-gradient(135deg, #172554, #1e3a8a);
+    padding: clamp(14px, 2.4vw, 22px) 18px;
+}
+
+body.pigs-app .header h1 {
+    font-size: clamp(20px, 3vw, 27px);
+}
+
+body.pigs-app .header p {
+    font-size: clamp(12px, 1.8vw, 14px);
+}
+
+/* ----------------------------------------------------------------
+   Navigation
+   ---------------------------------------------------------------- */
+body.pigs-app .navbar {
+    background: var(--pigs-surface);
+    border-color: var(--pigs-line);
+}
+
+body.pigs-app .nav-container {
+    width: 100%;
+    max-width: var(--pigs-content);
+    min-height: 60px;
+}
+
+body.pigs-app .nav-link,
+body.pigs-app .menu-link {
+    color: var(--pigs-muted);
+}
+
+body.pigs-app .nav-link:hover,
+body.pigs-app .menu-link:hover {
+    color: var(--pigs-brand-700);
+}
+
+body.pigs-app .nav-link.is-active,
+body.pigs-app .menu-link.is-active {
+    color: #ffffff;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    box-shadow: 0 5px 14px rgba(37, 99, 235, 0.22);
+}
+
+body.pigs-app .menu-dropdown {
+    background: color-mix(in srgb, var(--pigs-surface) 97%, transparent);
+    border-color: var(--pigs-line);
+}
+
+/* ----------------------------------------------------------------
+   Main content
+   ---------------------------------------------------------------- */
+body.pigs-app > main.container,
+body.pigs-app main.container {
+    width: 100%;
+    max-width: var(--pigs-content);
+    margin: clamp(18px, 3vw, 34px) auto;
+    padding-left: clamp(12px, 2.3vw, 22px);
+    padding-right: clamp(12px, 2.3vw, 22px);
+}
+
+/* Common surfaces. External F1 CSS loads after page CSS intentionally. */
+body.pigs-app .card,
+body.pigs-app .report-card,
+body.pigs-app .summary-card,
+body.pigs-app .table-card,
+body.pigs-app .purchase-card,
+body.pigs-app .sale-card,
+body.pigs-app .expense-card,
+body.pigs-app .food-card,
+body.pigs-app .daily-sale-card,
+body.pigs-app .form-card,
+body.pigs-app .sale-record,
+body.pigs-app .month-navigation {
+    border-color: var(--pigs-line);
+}
+
+/* Render long feeds/list cards lazily where supported. */
+body.pigs-app .purchase-card,
+body.pigs-app .expense-card,
+body.pigs-app .sale-record,
+body.pigs-app .report-card,
+body.pigs-app .daily-sale-card {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 260px;
+}
+
+/* Forms */
+body.pigs-app input:not([type="checkbox"]):not([type="radio"]),
+body.pigs-app select,
+body.pigs-app textarea {
+    max-width: 100%;
+}
+
+body.pigs-app input:focus-visible,
+body.pigs-app select:focus-visible,
+body.pigs-app textarea:focus-visible,
+body.pigs-app button:focus-visible,
+body.pigs-app a:focus-visible {
+    outline: 3px solid #93c5fd;
+    outline-offset: 2px;
+}
+
+/* Tables */
+body.pigs-app .table-wrapper,
+body.pigs-app .table-container,
+body.pigs-app .report-table-wrapper {
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+}
+
+/* Dashboard: remove decorative-photo dependency, keep identity. */
+body.pigs-app .dashboard {
+    max-width: var(--pigs-content);
+}
+
+body.pigs-app .dashboard-header {
+    margin-bottom: clamp(18px, 3vw, 30px);
+}
+
+body.pigs-app .dashboard-profile-initial {
+    display: grid;
+    place-items: center;
+    width: clamp(48px, 7vw, 64px);
+    height: clamp(48px, 7vw, 64px);
+    margin: 0 auto 10px;
+    border-radius: 18px;
+    border: 1px solid #bfdbfe;
+    background: linear-gradient(135deg, #172554, #2563eb);
+    color: #ffffff;
+    font-size: clamp(20px, 3vw, 27px);
+    font-weight: 900;
+    box-shadow: 0 8px 20px rgba(23, 37, 84, 0.18);
+}
+
+body.pigs-app .dashboard-header h2 {
+    color: var(--pigs-heading);
+    font-size: clamp(20px, 3vw, 26px);
+}
+
+body.pigs-app .dashboard-header p {
+    color: var(--pigs-muted);
+    margin-top: 5px;
+}
+
+body.pigs-app .quick-grid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: clamp(10px, 1.6vw, 15px);
+}
+
+body.pigs-app .quick-card {
+    min-height: 104px;
+    border-color: var(--pigs-line);
+    box-shadow: var(--pigs-shadow-sm);
+}
+
+body.pigs-app .quick-card:hover {
+    box-shadow: var(--pigs-shadow-md);
+}
+
+/* Dark-theme shell/common surface support. Detailed per-page theming
+   remains additive and can continue in F2 without changing light mode. */
+html[data-theme="dark"] body.pigs-app .navbar,
+html[data-theme="dark"] body.pigs-app .menu-dropdown,
+html[data-theme="dark"] body.pigs-app .card,
+html[data-theme="dark"] body.pigs-app .report-card,
+html[data-theme="dark"] body.pigs-app .summary-card,
+html[data-theme="dark"] body.pigs-app .table-card,
+html[data-theme="dark"] body.pigs-app .purchase-card,
+html[data-theme="dark"] body.pigs-app .sale-card,
+html[data-theme="dark"] body.pigs-app .expense-card,
+html[data-theme="dark"] body.pigs-app .food-card,
+html[data-theme="dark"] body.pigs-app .daily-sale-card,
+html[data-theme="dark"] body.pigs-app .form-card,
+html[data-theme="dark"] body.pigs-app .sale-record,
+html[data-theme="dark"] body.pigs-app .month-navigation {
+    background: var(--pigs-surface) !important;
+    color: var(--pigs-text);
+    border-color: var(--pigs-line) !important;
+}
+
+html[data-theme="dark"] body.pigs-app .dashboard-header h2,
+html[data-theme="dark"] body.pigs-app .quick-card h4,
+html[data-theme="dark"] body.pigs-app .report-title h2,
+html[data-theme="dark"] body.pigs-app .report-card h3 {
+    color: var(--pigs-heading) !important;
+}
+
+html[data-theme="dark"] body.pigs-app .quick-card,
+html[data-theme="dark"] body.pigs-app .statistics-grid > div {
+    background: var(--pigs-surface-soft) !important;
+    border-color: var(--pigs-line) !important;
+}
+
+html[data-theme="dark"] body.pigs-app .report-table th,
+html[data-theme="dark"] body.pigs-app table th {
+    border-color: var(--pigs-line);
+}
+
+@media (prefers-color-scheme: dark) {
+    html[data-theme="system"] body.pigs-app .navbar,
+    html[data-theme="system"] body.pigs-app .menu-dropdown,
+    html[data-theme="system"] body.pigs-app .card,
+    html[data-theme="system"] body.pigs-app .report-card,
+    html[data-theme="system"] body.pigs-app .summary-card,
+    html[data-theme="system"] body.pigs-app .table-card,
+    html[data-theme="system"] body.pigs-app .purchase-card,
+    html[data-theme="system"] body.pigs-app .sale-card,
+    html[data-theme="system"] body.pigs-app .expense-card,
+    html[data-theme="system"] body.pigs-app .food-card,
+    html[data-theme="system"] body.pigs-app .daily-sale-card,
+    html[data-theme="system"] body.pigs-app .form-card,
+    html[data-theme="system"] body.pigs-app .sale-record,
+    html[data-theme="system"] body.pigs-app .month-navigation {
+        background: var(--pigs-surface) !important;
+        color: var(--pigs-text);
+        border-color: var(--pigs-line) !important;
+    }
+
+    html[data-theme="system"] body.pigs-app .dashboard-header h2,
+    html[data-theme="system"] body.pigs-app .quick-card h4,
+    html[data-theme="system"] body.pigs-app .report-title h2,
+    html[data-theme="system"] body.pigs-app .report-card h3 {
+        color: var(--pigs-heading) !important;
+    }
+
+    html[data-theme="system"] body.pigs-app .quick-card,
+    html[data-theme="system"] body.pigs-app .statistics-grid > div {
+        background: var(--pigs-surface-soft) !important;
+        border-color: var(--pigs-line) !important;
+    }
+}
+
+/* ----------------------------------------------------------------
+   Tablet
+   ---------------------------------------------------------------- */
+@media (max-width: 1023px) {
+    body.pigs-app .container {
+        max-width: 100%;
+    }
+
+    body.pigs-app .quick-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+/* ----------------------------------------------------------------
+   Mobile - intentionally simpler than desktop.
+   Primary navigation disappears; hamburger becomes a lightweight drawer.
+   ---------------------------------------------------------------- */
+@media (max-width: 767px) {
+    body.pigs-app .header {
+        padding: 12px 14px;
+    }
+
+    body.pigs-app .header p {
+        display: none;
+    }
+
+    body.pigs-app .nav-container {
+        min-height: 56px;
+        padding: 6px 10px;
+        justify-content: flex-start;
+    }
+
+    body.pigs-app .nav-main {
+        display: none !important;
+    }
+
+    body.pigs-app .menu-wrapper {
+        position: static !important;
+        inset: auto !important;
+    }
+
+    body.pigs-app .menu-button {
+        width: var(--pigs-touch);
+        height: var(--pigs-touch);
+        border-radius: 12px;
+        box-shadow: none;
+    }
+
+    body.pigs-app .menu-dropdown {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: min(86vw, 320px) !important;
+        height: 100dvh;
+        max-height: 100dvh !important;
+        padding: 70px 12px 24px !important;
+        border: 0 !important;
+        border-right: 1px solid var(--pigs-line) !important;
+        border-radius: 0 20px 20px 0 !important;
+        box-shadow: 16px 0 45px rgba(15, 23, 42, 0.22) !important;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+    }
+
+    body.pigs-app.menu-open {
+        overflow: hidden;
+    }
+
+    body.pigs-app.menu-open::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: 1500;
+        background: rgba(15, 23, 42, 0.48);
+        backdrop-filter: blur(2px);
+    }
+
+    body.pigs-app .menu-wrapper {
+        z-index: 2000;
+    }
+
+    body.pigs-app .menu-dropdown {
+        z-index: 2100;
+    }
+
+    body.pigs-app .menu-link,
+    body.pigs-app .logout-button {
+        min-height: var(--pigs-touch);
+        display: flex;
+        align-items: center;
+        padding: 11px 13px;
+        font-size: 14px;
+    }
+
+    body.pigs-app > main.container,
+    body.pigs-app main.container {
+        margin-top: 18px;
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+    body.pigs-app .quick-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 10px !important;
+    }
+
+    body.pigs-app .quick-card {
+        min-height: 92px !important;
+        padding: 12px 8px !important;
+        border-radius: 13px !important;
+    }
+
+    body.pigs-app .quick-icon {
+        width: 40px !important;
+        height: 40px !important;
+        font-size: 19px !important;
+        border-radius: 11px !important;
+    }
+
+    body.pigs-app .quick-card h4 {
+        font-size: 12px !important;
+    }
+
+    body.pigs-app .report-summary,
+    body.pigs-app .statistics-grid {
+        gap: 10px;
+    }
+
+    body.pigs-app .report-card,
+    body.pigs-app .card,
+    body.pigs-app .form-card {
+        padding: clamp(13px, 4vw, 18px);
+    }
+
+    body.pigs-app .messages {
+        top: 68px;
+        left: 10px;
+        right: 10px;
+        width: auto;
+        max-width: none;
+    }
+
+    body.pigs-app footer {
+        margin-top: 24px;
+        padding: 18px 12px;
+    }
+}
+
+@media (max-width: 380px) {
+    body.pigs-app .quick-grid {
+        gap: 8px !important;
+    }
+
+    body.pigs-app .quick-card {
+        min-height: 86px !important;
+        padding: 10px 6px !important;
+    }
+
+    body.pigs-app .quick-card h4 {
+        font-size: 11px !important;
+    }
+}
+
+/* Devices without hover should not pay for decorative hover motion. */
+@media (hover: none) {
+    body.pigs-app .card:hover,
+    body.pigs-app .quick-card:hover,
+    body.pigs-app .summary-card:hover {
+        transform: none !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto !important;
+    }
+
+    body.pigs-app *,
+    body.pigs-app *::before,
+    body.pigs-app *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* ----------------------------------------------------------------
+   Printing - controls must never appear inside business reports/PDF.
+   ---------------------------------------------------------------- */
+@media print {
+    @page {
+        size: A4;
+        margin: 12mm;
+    }
+
+    body.pigs-app {
+        background: #ffffff !important;
+        color: #111827 !important;
+        font-size: 10.5pt;
+    }
+
+    body.pigs-app .header,
+    body.pigs-app .navbar,
+    body.pigs-app footer,
+    body.pigs-app .messages,
+    body.pigs-app .confirm-overlay,
+    body.pigs-app .no-print,
+    body.pigs-app .report-actions,
+    body.pigs-app .top-actions,
+    body.pigs-app .form-actions,
+    body.pigs-app .sale-actions,
+    body.pigs-app .status-buttons,
+    body.pigs-app button,
+    body.pigs-app a.button,
+    body.pigs-app a.btn,
+    body.pigs-app .report-link {
+        display: none !important;
+    }
+
+    body.pigs-app main.container {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    body.pigs-app .report-card,
+    body.pigs-app .summary-card,
+    body.pigs-app .card,
+    body.pigs-app .table-card {
+        break-inside: avoid;
+        box-shadow: none !important;
+    }
+
+    body.pigs-app .table-wrapper,
+    body.pigs-app .table-container,
+    body.pigs-app .report-table-wrapper {
+        overflow: visible !important;
+    }
+
+    body.pigs-app table,
+    body.pigs-app .report-table {
+        min-width: 0 !important;
+        width: 100% !important;
+        font-size: 9pt !important;
+    }
+
+    body.pigs-app thead {
+        display: table-header-group;
+    }
+
+    body.pigs-app tr {
+        break-inside: avoid;
+    }
+}

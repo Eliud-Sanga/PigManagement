@@ -1,0 +1,8 @@
+{% extends "control_center/base.html" %}
+{% block title %}Approvals | PIGS{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Pending approvals</h1><div class="muted">Review company, role and language before activation.</div></div></div>
+<div class="table-wrap"><table><thead><tr><th>User</th><th>Company</th><th>Role</th><th>Language</th><th>Requested by</th><th>Time</th><th></th></tr></thead><tbody>
+{% for membership in memberships %}<tr><td><strong>{{ membership.user.username }}</strong><div class="muted">{{ membership.user.email }}</div></td><td>{{ membership.company.name }}</td><td>{{ membership.role.name }}</td><td>{{ membership.requested_language|upper }}</td><td>{{ membership.created_by.username }}</td><td>{{ membership.created_at|date:"Y-m-d H:i" }}</td><td><a class="btn btn-primary" href="{% url 'users:approval_review' membership.public_id %}">Review</a></td></tr>{% empty %}<tr><td colspan="7">No pending approvals.</td></tr>{% endfor %}
+</tbody></table></div>
+{% endblock %}

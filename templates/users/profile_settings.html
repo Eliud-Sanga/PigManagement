@@ -1,0 +1,114 @@
+{% extends base_template %}
+{% load static i18n %}
+{% block title %}{% trans "Profile & Settings" %} | PIGS{% endblock %}
+
+{% block content %}
+<div class="f2-settings-shell">
+<div class="f2-settings-head">
+    <div>
+        <h1 class="f2-settings-title">{% trans "Profile & Settings" %}</h1>
+        <p class="f2-settings-subtitle">
+            {% trans "Manage your identity, language and appearance in one place." %}
+        </p>
+    </div>
+</div>
+
+<div class="f2-settings-grid">
+<aside class="f2-identity-card">
+    <div class="f2-avatar">
+        {% if user.profile_photo %}
+            <img src="{{ user.profile_photo.url }}" alt="{{ user.username }}">
+        {% else %}
+            {{ user.username|first|upper }}
+        {% endif %}
+    </div>
+    <div>
+        <h2>{{ user.get_full_name|default:user.username }}</h2>
+        <div class="f2-muted">{{ user.email }}</div>
+        {% if user.is_platform_admin %}
+            <span class="f2-badge">{% trans "Platform Administrator" %}</span>
+        {% elif request.company_membership %}
+            <span class="f2-badge">{{ request.company_membership.role.name }}</span>
+        {% endif %}
+        {% if company %}
+            <div class="f2-muted" style="margin-top:10px">{{ company.name }}</div>
+        {% endif %}
+    </div>
+</aside>
+
+<section class="f2-settings-card">
+    <h2 class="f2-section-title">{% trans "Personal information" %}</h2>
+    <p class="f2-section-help">
+        {% trans "Saving identity changes requires your current password. Language changes take effect on the next request." %}
+    </p>
+
+    <form method="post" enctype="multipart/form-data" autocomplete="off" data-f2-confirm-form>
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+
+        <div class="f2-fields">
+        {% for field in form %}
+            {% if field.name != "current_password" %}
+            <div class="f2-field {% if field.name == 'profile_photo' %}full{% endif %}">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}
+                    <div class="f2-muted">{{ field.help_text }}</div>
+                {% endif %}
+                {{ field.errors }}
+            </div>
+            {% else %}
+                {{ field }}
+            {% endif %}
+        {% endfor %}
+
+            <div class="f2-preference-preview">
+                <strong>{% trans "Language priority:" %}</strong>
+                {% trans "Your preference is used when the active company allows it; otherwise the membership language and company default are used." %}
+            </div>
+        </div>
+
+        <div class="f2-actions">
+            <a class="f2-action secondary" href="{% url 'users:user_change_password' user.id %}">
+                {% trans "Change password" %}
+            </a>
+
+            {% if not user.is_platform_admin and request.company_membership.role.code == "OWNER" %}
+            <a class="f2-action secondary" href="{% url 'users:company_hub' %}">
+                {% trans "Company" %}
+            </a>
+            {% endif %}
+
+            <button type="submit" class="f2-action primary">
+                {% trans "Save changes" %}
+            </button>
+        </div>
+    </form>
+
+    <div class="f2-confirm-overlay" data-f2-confirm-overlay aria-hidden="true">
+        <div class="f2-confirm-dialog" role="dialog" aria-modal="true">
+            <div class="f2-confirm-icon">✓</div>
+            <h3>{% trans "Confirm this change" %}</h3>
+            <p>{% trans "Enter your current password to save profile or preference changes." %}</p>
+            <input
+                type="password"
+                autocomplete="current-password"
+                placeholder="{% trans 'Current password' %}"
+                data-f2-popup-password
+            >
+            <div class="f2-confirm-actions">
+                <button type="button" class="f2-confirm-cancel" data-f2-confirm-cancel>
+                    {% trans "Cancel" %}
+                </button>
+                <button type="button" class="f2-confirm-save" data-f2-confirm-save>
+                    {% trans "Confirm & save" %}
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+</div>
+</div>
+
+<script src="{% static 'js/profile-f2.js' %}" defer></script>
+{% endblock %}

@@ -1,0 +1,13 @@
+body.control-app .topbar{background:linear-gradient(135deg,#172554,#1e3a8a);border-bottom:0;box-shadow:0 8px 28px rgba(23,37,84,.16)}
+body.control-app .topbar .brand{color:#fff}body.control-app .topbar .brand small{color:#bfdbfe}
+body.control-app .topbar .nav a,body.control-app .topbar .btn,body.control-app .topbar button.btn{border-color:rgba(255,255,255,.14);background:rgba(255,255,255,.08);color:#eaf2ff}
+body.control-app .topbar .nav a:hover,body.control-app .topbar .nav a.is-active,body.control-app .topbar .btn:hover{background:#fff;border-color:#fff;color:#172554}
+body.control-app .topbar .control-user{border-color:rgba(255,255,255,.14);background:rgba(255,255,255,.1);color:#fff}
+body.control-app .topbar .control-nav-toggle{border-color:rgba(255,255,255,.18);background:rgba(255,255,255,.1);color:#fff}
+body.control-app .container{padding-top:24px}body.control-app .page-head{margin-bottom:18px}body.control-app .page-head h1{letter-spacing:-.03em}
+body.control-app .card,body.control-app .panel,body.control-app .table-wrap{border-color:color-mix(in srgb,var(--line) 88%,#bfdbfe)}
+body.control-app .card{box-shadow:0 8px 26px rgba(15,23,42,.055)}body.control-app .table-wrap{border-radius:14px}
+body.control-app table thead th{background:var(--panel-soft);color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+body.control-app table tbody tr:hover td{background:color-mix(in srgb,var(--brand) 4%,var(--panel))}
+body.control-app .btn-primary{box-shadow:0 8px 20px rgba(37,99,235,.16)}
+@media(max-width:820px){body.control-app .topbar .nav{padding:9px;border-radius:14px;background:rgba(15,23,42,.22)}}

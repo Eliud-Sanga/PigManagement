@@ -1,0 +1,640 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PIGS 1.0\n"
+"Language: sw\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "A user's own language preference is used first when that language is allowed by the company. Otherwise the approved membership language is used, then the company default."
+msgstr "Chaguo la lugha la user linatumika kwanza kama kampuni imeruhusu lugha hiyo. Vinginevyo lugha ya membership inatumika, kisha default ya kampuni."
+
+msgid "ACTIVE"
+msgstr "IMEWASHWA"
+
+msgid "Absolute session lifetime"
+msgstr "Muda wa juu wa session"
+
+msgid "Action"
+msgstr "Kitendo"
+
+msgid "Actions"
+msgstr "Vitendo"
+
+msgid "Activate"
+msgstr "Washa"
+
+msgid "Active company"
+msgstr "Kampuni inayofanya kazi"
+
+msgid "Active members"
+msgstr "Users wanaofanya kazi"
+
+msgid "Active roles"
+msgstr "Roles zinazofanya kazi"
+
+msgid "Activity cannot extend this limit"
+msgstr "Matumizi hayawezi kuongeza kikomo hiki"
+
+msgid "Actor / target"
+msgstr "Mtendaji / mlengwa"
+
+msgid "Add user"
+msgstr "Ongeza user"
+
+msgid "Admin Control Center"
+msgstr "Kituo cha Usimamizi cha Admin"
+
+msgid "Admin password"
+msgstr "Password ya Admin"
+
+msgid "Administrator Preferences"
+msgstr "Mipangilio ya Admin"
+
+msgid "Administrator confirmation"
+msgstr "Uthibitisho wa Admin"
+
+msgid "Allow the Company Owner to request and remove users inside this company. Platform Admin approval remains required."
+msgstr "Ruhusu Owner kuomba na kuondoa users ndani ya kampuni hii. Idhini ya Platform Admin bado inahitajika."
+
+msgid "Allowed languages"
+msgstr "Lugha zinazoruhusiwa"
+
+msgid "Append-only company governance and administration history."
+msgstr "Historia ya usimamizi wa kampuni inayoongezwa tu bila kufutwa."
+
+msgid "Approval Policy"
+msgstr "Sera ya Idhini"
+
+msgid "Approvals"
+msgstr "Idhini"
+
+msgid "Archive"
+msgstr "Weka Archive"
+
+msgid "Audit Policy"
+msgstr "Sera ya Ukaguzi"
+
+msgid "Authentication"
+msgstr "Uthibitishaji"
+
+msgid "Automatic logout rules"
+msgstr "Kanuni za logout ya kiotomatiki"
+
+msgid "Availability"
+msgstr "Upatikanaji"
+
+msgid "Block normal business writes."
+msgstr "Zuia uandishi wa kawaida wa biashara."
+
+msgid "Business dashboard"
+msgstr "Dashboard ya biashara"
+
+msgid "Business data"
+msgstr "Data za biashara"
+
+msgid "Business identity"
+msgstr "Utambulisho wa biashara"
+
+msgid "Cancel"
+msgstr "Ghairi"
+
+msgid "Central rules for authentication, sessions, companies, permissions, languages and maintenance."
+msgstr "Kanuni kuu za login, session, kampuni, ruhusa, lugha na matengenezo."
+
+msgid "Change password"
+msgstr "Badilisha password"
+
+msgid "Companies"
+msgstr "Kampuni"
+
+msgid "Companies with Owner user management enabled"
+msgstr "Kampuni zenye usimamizi wa users kwa Owner uliowashwa"
+
+msgid "Company"
+msgstr "Kampuni"
+
+msgid "Company Audit"
+msgstr "Ukaguzi wa Kampuni"
+
+msgid "Company Lifecycle"
+msgstr "Mzunguko wa Maisha wa Kampuni"
+
+msgid "Company Members"
+msgstr "Watumiaji wa Kampuni"
+
+msgid "Company Policy"
+msgstr "Sera ya Kampuni"
+
+msgid "Company Profile"
+msgstr "Taarifa za Kampuni"
+
+msgid "Company access"
+msgstr "Access ya kampuni"
+
+msgid "Company accounts"
+msgstr "Akaunti za kampuni"
+
+msgid "Company default language"
+msgstr "Lugha ya default ya kampuni"
+
+msgid "Company information"
+msgstr "Taarifa za kampuni"
+
+msgid "Company profile"
+msgstr "Profile ya kampuni"
+
+msgid "Company records"
+msgstr "Rekodi za kampuni"
+
+msgid "Company workspace"
+msgstr "Eneo la Kampuni"
+
+msgid "Confirm & save"
+msgstr "Thibitisha na hifadhi"
+
+msgid "Confirm password & apply policy"
+msgstr "Thibitisha password na tekeleza sera"
+
+msgid "Confirm password & save language policy"
+msgstr "Thibitisha password na hifadhi sera ya lugha"
+
+msgid "Confirm password & save overrides"
+msgstr "Thibitisha password na hifadhi mabadiliko"
+
+msgid "Confirm password & save role permissions"
+msgstr "Thibitisha password na hifadhi ruhusa za role"
+
+msgid "Confirm this change"
+msgstr "Thibitisha mabadiliko haya"
+
+msgid "Control failed-login windows, lockout duration and trusted browser lifetime."
+msgstr "Dhibiti majaribio yaliyoshindikana, muda wa kufungwa na muda wa browser inayoaminika."
+
+msgid "Create company"
+msgstr "Tengeneza kampuni"
+
+msgid "Created"
+msgstr "Imeundwa"
+
+msgid "Current password"
+msgstr "Password ya sasa"
+
+msgid "DISABLED"
+msgstr "IMEZIMWA"
+
+msgid "Data management"
+msgstr "Usimamizi wa data"
+
+msgid "Default language"
+msgstr "Lugha ya default"
+
+msgid "Disable"
+msgstr "Zima"
+
+msgid "ENABLED"
+msgstr "IMEWASHWA"
+
+msgid "Edit company profile"
+msgstr "Badilisha profile ya kampuni"
+
+msgid "Edit security & session policy"
+msgstr "Badilisha sera za usalama na session"
+
+msgid "Effective permissions"
+msgstr "Ruhusa Halisi"
+
+msgid "Enable"
+msgstr "Washa"
+
+msgid "Enable or disable delegated user management per company."
+msgstr "Washa au zima usimamizi wa users kwa Owner kwa kila kampuni."
+
+msgid "English"
+msgstr "Kiingereza"
+
+msgid "Enter your current password to save profile or preference changes."
+msgstr "Ingiza password yako ya sasa kuhifadhi profile au preferences."
+
+msgid "Every lifecycle change requires the current Platform Administrator password and is audited."
+msgstr "Kila mabadiliko ya hali ya kampuni yanahitaji password ya sasa ya Platform Admin na yanafanyiwa audit."
+
+msgid "Every save requires the current Platform Administrator password and is written to Security Audit."
+msgstr "Kila hifadhi inahitaji password ya sasa ya Platform Admin na inaandikwa kwenye Security Audit."
+
+msgid "Explicit deny wins"
+msgstr "Deny ya moja kwa moja ndiyo hushinda"
+
+msgid "Find a permission"
+msgstr "Tafuta ruhusa"
+
+msgid "Global governance for companies, identities, permissions, security and policy enforcement."
+msgstr "Usimamizi mkuu wa kampuni, akaunti, ruhusa, usalama na utekelezaji wa sera."
+
+msgid "Global identities"
+msgstr "Akaunti za mfumo"
+
+msgid "Global identities and their company memberships."
+msgstr "Akaunti za mfumo na uanachama wao kwenye kampuni."
+
+msgid "Governance"
+msgstr "Utawala"
+
+msgid "How language resolution works"
+msgstr "Jinsi lugha inavyochaguliwa"
+
+msgid "Idle logout"
+msgstr "Logout kwa kutotumika"
+
+msgid "Idle logout, maximum lifetime, login lockout and trusted-device lifetime."
+msgstr "Logout ya kutotumika, muda wa juu, lockout ya login na muda wa kifaa kinachoaminika."
+
+msgid "Idle timeout logs out users who stop using the application. Maximum lifetime ends a session even when activity continues."
+msgstr "Idle timeout humtoa user asipotumia mfumo. Muda wa juu hufunga session hata kama user anaendelea kutumia mfumo."
+
+msgid "Immutable authentication and administration events."
+msgstr "Matukio ya login na usimamizi yasiyoweza kubadilishwa."
+
+msgid "Immutable security and administration history."
+msgstr "Historia ya usalama na usimamizi isiyobadilishwa."
+
+msgid "Inactive authenticated session"
+msgstr "Session iliyologin lakini haitumiki"
+
+msgid "Individual Policy"
+msgstr "Sera ya User Mmoja"
+
+msgid "Individual membership grants or denials may further adjust access without changing this role for every user."
+msgstr "Ruhusa za mtu mmoja zinaweza kubadilisha access bila kubadilisha role hii kwa users wote."
+
+msgid "Installation-wide maintenance policy"
+msgstr "Sera ya matengenezo ya mfumo mzima"
+
+msgid "Kiswahili"
+msgstr "Kiswahili"
+
+msgid "Language"
+msgstr "Lugha"
+
+msgid "Language Policy"
+msgstr "Sera ya Lugha"
+
+msgid "Language priority:"
+msgstr "Kipaumbele cha lugha:"
+
+msgid "Language, appearance and personal account settings."
+msgstr "Lugha, muonekano na mipangilio ya akaunti binafsi."
+
+msgid "Lifecycle, languages, owner delegation and company policy."
+msgstr "Hali ya kampuni, lugha, mamlaka ya Owner na sera za kampuni."
+
+msgid "Login controls, session limits and maintenance windows."
+msgstr "Udhibiti wa login, mipaka ya session na muda wa matengenezo."
+
+msgid "Login policy"
+msgstr "Sera ya login"
+
+msgid "Login protection"
+msgstr "Ulinzi wa login"
+
+msgid "Logout"
+msgstr "Toka"
+
+msgid "Maintenance"
+msgstr "Matengenezo"
+
+msgid "Maintenance Policy"
+msgstr "Sera ya Matengenezo"
+
+msgid "Maintenance policy"
+msgstr "Sera ya matengenezo"
+
+msgid "Manage"
+msgstr "Simamia"
+
+msgid "Manage Owner, Manager, Staff and custom role permission templates."
+msgstr "Simamia ruhusa za Owner, Manager, Staff na role maalum."
+
+msgid "Manage individual memberships, grants and explicit denials."
+msgstr "Simamia uanachama, ruhusa za ziada na ruhusa zilizokataliwa kwa mtu mmoja."
+
+msgid "Manage team"
+msgstr "Simamia timu"
+
+msgid "Manage your company"
+msgstr "Simamia kampuni yako"
+
+msgid "Manage your identity, language and appearance in one place."
+msgstr "Simamia taarifa zako, lugha na muonekano sehemu moja."
+
+msgid "Management Console"
+msgstr "Dashibodi ya Usimamizi"
+
+msgid "Maximum session"
+msgstr "Session ya juu kabisa"
+
+msgid "Members & Overrides"
+msgstr "Wanachama na Ruhusa Maalum"
+
+msgid "Membership governance"
+msgstr "Usimamizi wa uanachama"
+
+msgid "My Account"
+msgstr "Akaunti Yangu"
+
+msgid "My account"
+msgstr "Akaunti yangu"
+
+msgid "Name, contacts, address and company identity."
+msgstr "Jina, mawasiliano, anwani na utambulisho wa kampuni."
+
+msgid "New companies default to Kiswahili. Platform Admin may change the company default to any enabled language."
+msgstr "Kampuni mpya zina Kiswahili kama default. Platform Admin anaweza kubadilisha default kwenda lugha yoyote iliyoruhusiwa."
+
+msgid "No memberships."
+msgstr "Hakuna uanachama."
+
+msgid "No security events yet."
+msgstr "Bado hakuna matukio ya usalama."
+
+msgid "None"
+msgstr "Hakuna"
+
+msgid "OFF"
+msgstr "IMEZIMWA"
+
+msgid "Open a company to manage role permissions and individual overrides."
+msgstr "Fungua kampuni kusimamia ruhusa za role na mabadiliko ya mtu mmoja."
+
+msgid "Open audit center"
+msgstr "Fungua kituo cha ukaguzi"
+
+msgid "Open control center navigation"
+msgstr "Fungua menyu ya usimamizi"
+
+msgid "Open dashboard"
+msgstr "Fungua dashboard"
+
+msgid "Open policy console"
+msgstr "Fungua kituo cha sera"
+
+msgid "Overview"
+msgstr "Muhtasari"
+
+msgid "Owner Invitations"
+msgstr "Mialiko ya Wamiliki"
+
+msgid "Owner User Management"
+msgstr "Usimamizi wa Users kwa Owner"
+
+msgid "Owner controls"
+msgstr "Udhibiti wa Owner"
+
+msgid "Owner delegation"
+msgstr "Mamlaka ya Owner"
+
+msgid "Owner user management"
+msgstr "Usimamizi wa users kwa Owner"
+
+msgid "Owner user management enabled"
+msgstr "Usimamizi wa users kwa Owner umewashwa"
+
+msgid "PIGS Control Center"
+msgstr "Kituo cha Usimamizi cha PIGS"
+
+msgid "PIGS Platform"
+msgstr "Mfumo Mkuu wa PIGS"
+
+msgid "Pending approval"
+msgstr "Inasubiri idhini"
+
+msgid "Pending approvals"
+msgstr "Idhini zinazosubiri"
+
+msgid "Permission Overrides"
+msgstr "Ruhusa Maalum"
+
+msgid "Permission governance"
+msgstr "Usimamizi wa ruhusa"
+
+msgid "Permissions"
+msgstr "Ruhusa"
+
+msgid "Personal information"
+msgstr "Taarifa Binafsi"
+
+msgid "Personal settings"
+msgstr "Mipangilio binafsi"
+
+msgid "Platform Admin controlled"
+msgstr "Inadhibitiwa na Platform Admin"
+
+msgid "Platform Admin enablement required"
+msgstr "Platform Admin lazima awashe kwanza"
+
+msgid "Platform Admin password"
+msgstr "Password ya Platform Admin"
+
+msgid "Platform Admin remains able to sign in while maintenance blocks normal business users."
+msgstr "Platform Admin anaendelea kuweza kuingia wakati matengenezo yanazuia watumiaji wa kawaida."
+
+msgid "Platform Administrator"
+msgstr "Platform Administrator"
+
+msgid "Platform Control Center"
+msgstr "Kituo cha Usimamizi wa Mfumo"
+
+msgid "Platform Policy"
+msgstr "Sera ya Mfumo"
+
+msgid "Platform administration"
+msgstr "Usimamizi wa mfumo"
+
+msgid "Platform users"
+msgstr "Watumiaji wa mfumo"
+
+msgid "Policies"
+msgstr "Sera"
+
+msgid "Policy Console"
+msgstr "Kituo cha Sera"
+
+msgid "Preserve history and remove from normal operations."
+msgstr "Hifadhi historia na iondoe kwenye matumizi ya kawaida."
+
+msgid "Profile & Settings"
+msgstr "Profile na Mipangilio"
+
+msgid "Protected company policy"
+msgstr "Sera ya kampuni iliyolindwa"
+
+msgid "Re-enter your own current password to apply these platform policies."
+msgstr "Ingiza tena password yako ya sasa kutekeleza sera hizi za mfumo."
+
+msgid "Read-only summary"
+msgstr "Muhtasari wa kusoma tu"
+
+msgid "Recent security events"
+msgstr "Matukio ya hivi karibuni ya usalama"
+
+msgid "Restore operational access."
+msgstr "Rudisha matumizi ya kawaida."
+
+msgid "Result"
+msgstr "Matokeo"
+
+msgid "Review"
+msgstr "Kagua"
+
+msgid "Review immutable, hash-chained security history."
+msgstr "Kagua historia ya usalama isiyobadilishwa na iliyounganishwa kwa hash."
+
+msgid "Review pending company membership requests."
+msgstr "Kagua maombi ya uanachama wa kampuni yanayosubiri."
+
+msgid "Role"
+msgstr "Role"
+
+msgid "Role Policy"
+msgstr "Sera ya Role"
+
+msgid "Role base permissions plus individual user grants and denials."
+msgstr "Ruhusa za role pamoja na ruhusa za ziada au zilizokataliwa kwa user mmoja."
+
+msgid "Role baseline"
+msgstr "Msingi wa Role"
+
+msgid "Role permissions are the company baseline"
+msgstr "Ruhusa za role ndiyo msingi wa kampuni"
+
+msgid "Role permissions form the base. Individual grants and denials can override that base for this company only."
+msgstr "Ruhusa za role ndiyo msingi. Ruhusa za mtu mmoja zinaweza kuongeza au kupunguza msingi huo ndani ya kampuni hii tu."
+
+msgid "Roles & Permissions"
+msgstr "Roles na Ruhusa"
+
+msgid "Roles & access"
+msgstr "Roles na access"
+
+msgid "Save changes"
+msgstr "Hifadhi mabadiliko"
+
+msgid "Saving identity changes requires your current password. Language changes take effect on the next request."
+msgstr "Kuhifadhi mabadiliko ya akaunti kunahitaji password yako ya sasa. Mabadiliko ya lugha yanaanza kutumika kwenye request inayofuata."
+
+msgid "Schedule maintenance and publish a controlled user message."
+msgstr "Panga matengenezo na ujumbe unaodhibitiwa kwa watumiaji."
+
+msgid "Search permission name or code"
+msgstr "Tafuta jina au code ya ruhusa"
+
+msgid "Secure commercial onboarding for company owners."
+msgstr "Usajili salama wa kibiashara kwa wamiliki wa kampuni."
+
+msgid "Security & Maintenance"
+msgstr "Usalama na Matengenezo"
+
+msgid "Security & Session Policy"
+msgstr "Sera za Usalama na Session"
+
+msgid "Security Audit"
+msgstr "Ukaguzi wa Usalama"
+
+msgid "Security locks"
+msgstr "Vifungo vya usalama"
+
+msgid "Server-enforced inactivity limit"
+msgstr "Kikomo cha kutotumika kinachotekelezwa na server"
+
+msgid "Session & Login Policy"
+msgstr "Sera za Session na Login"
+
+msgid "Session Policy"
+msgstr "Sera ya Session"
+
+msgid "Session, authentication, maintenance, language and delegation policy."
+msgstr "Sera za session, login, matengenezo, lugha na ugawaji wa mamlaka."
+
+msgid "Severity"
+msgstr "Uzito"
+
+msgid "Skip to content"
+msgstr "Ruka hadi kwenye maudhui"
+
+msgid "Status"
+msgstr "Hali"
+
+msgid "Suspend"
+msgstr "Sitisha"
+
+msgid "Team & users"
+msgstr "Timu na users"
+
+msgid "Time"
+msgstr "Muda"
+
+msgid "Use grants for exceptional extra access and denials to remove a permission from this individual even when the role normally allows it."
+msgstr "Tumia grant kuongeza access maalum na deny kuondoa ruhusa kwa user huyu hata kama role inaruhusu."
+
+msgid "Use these modules like policy consoles: configure a rule once, then the application enforces it."
+msgstr "Tumia sehemu hizi kama sera za mfumo: weka kanuni mara moja, kisha mfumo utaitekeleza."
+
+msgid "User"
+msgstr "User"
+
+msgid "User management controlled by Platform Admin"
+msgstr "Usimamizi wa users unadhibitiwa na Platform Admin"
+
+msgid "Users"
+msgstr "Watumiaji"
+
+msgid "Users & Memberships"
+msgstr "Watumiaji na Uanachama"
+
+msgid "You were signed out because the session was inactive."
+msgstr "Umetolewa kwenye mfumo kwa sababu session haikutumika kwa muda uliowekwa."
+
+msgid "Your access"
+msgstr "Access yako"
+
+msgid "Your preference is used when the active company allows it; otherwise the membership language and company default are used."
+msgstr "Chaguo lako linatumika kampuni ikiruhusu; vinginevyo lugha ya membership na default ya kampuni hutumika."
+
+msgid "Your session reached its maximum lifetime. Please sign in again."
+msgstr "Session yako imefikia muda wake wa juu. Tafadhali ingia tena."
+
+msgid "Your workspace"
+msgstr "Eneo lako la kazi"
+
+msgid "account"
+msgstr "akaunti"
+
+msgid "active"
+msgstr "zinazofanya kazi"
+
+msgid "attempts"
+msgstr "majaribio"
+
+msgid "browser"
+msgstr "browser"
+
+msgid "companies default to Kiswahili"
+msgstr "kampuni zina Kiswahili kama default"
+
+msgid "default"
+msgstr "default"
+
+msgid "default to English"
+msgstr "zina Kiingereza kama default"
+
+msgid "membership requests awaiting review"
+msgstr "maombi ya uanachama yanayosubiri kukaguliwa"
+
+msgid "minute lock"
+msgstr "dakika za kufungwa"
+
+msgid "minutes"
+msgstr "dakika"
+
+msgid "reserved role"
+msgstr "role iliyohifadhiwa"

@@ -1,0 +1,60 @@
+{% extends "pigs/base.html" %}
+{% block title %}Add Company User | PIGS{% endblock %}
+
+{% block content %}
+<div class="company-form-shell">
+    <section class="company-team-head">
+        <div>
+            <span class="company-hub-eyebrow">Company · Team</span>
+            <h1>Add Company User</h1>
+            <p>
+                {{ company.name }} · create a company-local membership request.
+            </p>
+        </div>
+
+        <a class="company-card-action secondary"
+           href="{% url 'users:company_hub' %}">
+            Company
+        </a>
+    </section>
+
+    <section class="company-team-note">
+        <strong>Approval flow:</strong>
+        this request does not bypass Platform Admin.
+        The selected role applies only inside {{ company.name }}.
+    </section>
+
+    <form method="post"
+          autocomplete="off"
+          class="company-user-form">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+
+        <div class="company-user-fields">
+            {% for field in form %}
+            <div class="company-user-field {% if field.name == 'current_password' %}full{% endif %}">
+                <label for="{{ field.id_for_label }}">
+                    {{ field.label }}
+                </label>
+                {{ field }}
+                {% if field.help_text %}
+                    <small>{{ field.help_text }}</small>
+                {% endif %}
+                {{ field.errors }}
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="company-form-actions">
+            <a class="company-card-action secondary"
+               href="{% url 'users:company_users' %}">
+                Cancel
+            </a>
+            <button class="company-card-action primary"
+                    type="submit">
+                Confirm password & create request
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
