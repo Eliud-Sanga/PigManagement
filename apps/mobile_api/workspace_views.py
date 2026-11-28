@@ -7,7 +7,7 @@ unscoped business query.
 """
 
 from datetime import date, timedelta
-from decimal import Decimal
+from decimal import Decimal, ROUND_HALF_UP
 
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db.models import (
@@ -30,6 +30,7 @@ from django.views.decorators.http import require_GET, require_POST
 from apps.companies.authorization import get_effective_permission_codes
 from apps.companies.context import resolve_company_context
 from apps.companies.middleware import COMPANY_SESSION_KEY
+from apps.companies.scope import get_current_company, get_current_membership, get_current_permissions
 from apps.companies.models import Company, CompanyMembership
 from apps.pigs.models import (
     BatchProfitReport,
@@ -111,6 +112,18 @@ def _authenticated(request):
     return user is not None and user.is_authenticated
 
 
+def _read_permission_codes(request, company, membership):
+    # Only reuse the middleware snapshot for read requests within the exact
+    # current request scope. Writes and direct calls resolve permissions anew.
+    if (request.method == "GET" and get_current_company() is company
+            and get_current_membership() is membership
+            and getattr(request, "company_membership", None) is membership
+            and getattr(request, "company", None) is company
+            and getattr(request, "company_permissions", None) == get_current_permissions()):
+        return get_current_permissions()
+    return get_effective_permission_codes(membership)
+
+
 def _business_context(request, *, permissions=()):
     if not _authenticated(request):
         return None, None, frozenset(), _error(
@@ -159,7 +172,7 @@ def _business_context(request, *, permissions=()):
             403,
         )
 
-    codes = get_effective_permission_codes(membership)
+    codes = _read_permission_codes(request, company, membership)
     required = tuple(permissions)
 
     if required and not any(code in codes for code in required):
@@ -250,7 +263,7 @@ def workspace(request):
         else None
     )
     permissions = (
-        sorted(get_effective_permission_codes(selected_membership))
+        sorted(_read_permission_codes(request, selected_company, selected_membership))
         if selected_membership is not None
         else []
     )
@@ -403,72 +416,64 @@ def pig_dashboard(request):
     month_start = today.replace(day=1)
     trend_start = today - timedelta(days=13)
 
-    total_pigs = Pig.objects.count()
-    available_pigs = Pig.objects.filter(status=Pig.AVAILABLE).count()
-    slaughtered_pigs = Pig.objects.filter(status=Pig.SLAUGHTERED).count()
-    finished_pigs = Pig.objects.filter(status=Pig.FINISHED).count()
-    purchase_count = Purchase.objects.count()
-    sales_count = DailySale.objects.count()
-    active_stock_count = MeatStock.objects.filter(is_finished=False).count()
-
-    total_income = (
-        DailySale.objects.aggregate(total=Sum("total_money_received"))[
-            "total"
-        ]
-        or ZERO
-    )
-    food_income = (
-        FoodSaleRecord.objects.aggregate(total=Sum("total_price"))["total"]
-        or ZERO
-    )
+    # A dashboard is a read endpoint, not an implicit grant to every module.
+    # Retain Build 14's numeric/string contract; clients may use summaryAccess
+    # to display unavailable fields as restricted rather than as real zeroes.
+    can_pigs = "pigs.view_pig" in codes
+    can_purchases = "pigs.view_purchase" in codes
+    can_sales = "pigs.view_dailysale" in codes
+    can_stock = "pigs.view_meatstock" in codes
+    can_expenses = "pigs.view_expense" in codes
+    can_daily_reports = "pigs.view_dailysalereport" in codes
+    can_profit = "pigs.view_batchprofitreport" in codes
+    pig_counts = {"total": 0, "available": 0, "slaughtered": 0, "finished": 0}
+    if can_pigs:
+        pig_counts = Pig.objects.aggregate(
+            total=Count("pk"),
+            available=Count("pk", filter=Q(status=Pig.AVAILABLE)),
+            slaughtered=Count("pk", filter=Q(status=Pig.SLAUGHTERED)),
+            finished=Count("pk", filter=Q(status=Pig.FINISHED)),
+        )
+    total_pigs = pig_counts["total"]
+    available_pigs = pig_counts["available"]
+    slaughtered_pigs = pig_counts["slaughtered"]
+    finished_pigs = pig_counts["finished"]
+    purchase_count = Purchase.objects.count() if can_purchases else 0
+    active_stock_count = MeatStock.objects.filter(is_finished=False).count() if can_stock else 0
+    sales = {"count": 0, "total": ZERO, "today": ZERO, "monthly": ZERO}
+    if can_sales:
+        sales = DailySale.objects.aggregate(
+            count=Count("pk"), total=Sum("total_money_received"),
+            today=Sum("total_money_received", filter=Q(sale_date=today)),
+            monthly=Sum("total_money_received", filter=Q(sale_date__range=(month_start, today))),
+        )
+    sales_count = sales["count"]
+    total_income = sales["total"] or ZERO
+    today_income = sales["today"] or ZERO
+    monthly_income = sales["monthly"] or ZERO
+    food_income = (FoodSaleRecord.objects.aggregate(total=Sum("total_price"))["total"] or ZERO) if can_sales else ZERO
     meat_income = max(total_income - food_income, ZERO)
-    today_income = (
-        DailySale.objects.filter(sale_date=today).aggregate(
-            total=Sum("total_money_received")
-        )["total"]
-        or ZERO
-    )
-    monthly_income = (
-        DailySale.objects.filter(
-            sale_date__gte=month_start,
-            sale_date__lte=today,
-        ).aggregate(total=Sum("total_money_received"))["total"]
-        or ZERO
-    )
-    monthly_profit = (
-        BatchProfitReport.objects.filter(
-            finalized_date__gte=month_start,
-            finalized_date__lte=today,
-        ).aggregate(total=Sum("total_profit"))["total"]
-        or ZERO
-    )
-    monthly_expenses = (
-        Expense.objects.filter(
-            expense_date__gte=month_start,
-            expense_date__lte=today,
-        ).aggregate(total=Sum("amount"))["total"]
-        or ZERO
-    )
-    total_expenses = (
-        Expense.objects.aggregate(total=Sum("amount"))["total"] or ZERO
-    )
-
+    monthly_profit = (BatchProfitReport.objects.filter(
+        finalized_date__range=(month_start, today),
+    ).aggregate(total=Sum("total_profit"))["total"] or ZERO) if can_profit else ZERO
+    expenses = {"monthly": ZERO, "total": ZERO}
+    if can_expenses:
+        expenses = Expense.objects.aggregate(
+            total=Sum("amount"),
+            monthly=Sum("amount", filter=Q(expense_date__range=(month_start, today))),
+        )
+    monthly_expenses = expenses["monthly"] or ZERO
+    total_expenses = expenses["total"] or ZERO
     sales_by_date = {
         row["sale_date"]: row["total"] or ZERO
-        for row in (
-            DailySale.objects.filter(sale_date__gte=trend_start)
-            .values("sale_date")
-            .annotate(total=Sum("total_money_received"))
-        )
-    }
+        for row in DailySale.objects.filter(sale_date__range=(trend_start, today))
+        .order_by().values("sale_date").annotate(total=Sum("total_money_received"))
+    } if can_sales else {}
     expenses_by_date = {
         row["expense_date"]: row["total"] or ZERO
-        for row in (
-            Expense.objects.filter(expense_date__gte=trend_start)
-            .values("expense_date")
-            .annotate(total=Sum("amount"))
-        )
-    }
+        for row in Expense.objects.filter(expense_date__range=(trend_start, today))
+        .order_by().values("expense_date").annotate(total=Sum("amount"))
+    } if can_expenses else {}
     trend = []
     for offset in range(14):
         day = trend_start + timedelta(days=offset)
@@ -489,7 +494,7 @@ def pig_dashboard(request):
             "amount": _money(sale.total_money_received),
         }
         for sale in DailySale.objects.order_by("-sale_date", "-created_at")[:5]
-    ]
+    ] if can_sales else []
     recent_expenses = [
         {
             "kind": "expense",
@@ -501,7 +506,7 @@ def pig_dashboard(request):
         for expense in Expense.objects.order_by(
             "-expense_date", "-created_at"
         )[:5]
-    ]
+    ] if can_expenses else []
     recent_activity = sorted(
         recent_sales + recent_expenses,
         key=lambda item: (item["date"], item["id"]),
@@ -510,10 +515,9 @@ def pig_dashboard(request):
 
     active_batches = []
     stocks = (
-        MeatStock.objects.filter(is_finished=False)
-        .select_related("slaughter_batch")
+        _stock_summary_queryset().filter(is_finished=False)
         .order_by("-slaughter_batch__slaughter_date", "-created_at")[:5]
-    )
+    ) if can_stock else []
     for stock in stocks:
         batch = stock.slaughter_batch
         active_batches.append(
@@ -521,16 +525,17 @@ def pig_dashboard(request):
                 "id": str(stock.pk),
                 "batchNumber": batch.batch_number,
                 "slaughterDate": _date(batch.slaughter_date),
-                "pigCount": batch.pigs.count(),
+                "pigCount": stock.pig_count,
                 "needsConfirmation": stock.needs_confirmation,
                 "isFinished": stock.is_finished,
-                "meatSales": _money(batch.get_total_meat_sales()),
-                "meatWeightKg": _money(batch.get_total_meat_weight()),
+                "meatSales": _money(stock.meat_sales),
+                "meatWeightKg": _money(stock.meat_weight),
             }
         )
 
     reports_count = (
-        DailySaleReport.objects.count() + BatchProfitReport.objects.count()
+        (DailySaleReport.objects.count() if can_daily_reports else 0)
+        + (BatchProfitReport.objects.count() if can_profit else 0)
     )
     module_access = _module_access(codes)
 
@@ -568,6 +573,11 @@ def pig_dashboard(request):
                 "totalExpenses": _money(total_expenses),
             },
             "moduleAccess": module_access,
+            "summaryAccess": {
+                "pigs": can_pigs, "purchases": can_purchases, "sales": can_sales,
+                "stock": can_stock, "expenses": can_expenses,
+                "dailyReports": can_daily_reports, "profit": can_profit,
+            },
             "recentActivity": recent_activity,
             "activeBatches": active_batches,
             "trend": trend,
@@ -904,6 +914,37 @@ def _report_page(query, codes, page, limit):
     return total, items, (start + limit) < total
 
 
+def _stock_summary_queryset():
+    sale_totals = DailySale.objects.filter(
+        slaughter_batch_id=OuterRef("slaughter_batch_id")
+    ).order_by().values("slaughter_batch_id").annotate(value=Sum("total_meat_sales")).values(
+        "value"
+    )
+    weight_totals = DailySale.objects.filter(
+        slaughter_batch_id=OuterRef("slaughter_batch_id")
+    ).order_by().values("slaughter_batch_id").annotate(value=Sum("total_meat_weight_kg")).values(
+        "value"
+    )
+    amount_field = DecimalField(max_digits=14, decimal_places=2)
+    queryset = MeatStock.objects.select_related("slaughter_batch").annotate(
+        pig_count=Count("slaughter_batch__pigs", distinct=True, filter=Q(
+            slaughter_batch__pigs__company_id=F("company_id"),
+            slaughter_batch__pigs__is_archived=False,
+        )),
+        meat_sales=Coalesce(
+            Subquery(sale_totals, output_field=amount_field),
+            Value(ZERO),
+            output_field=amount_field,
+        ),
+        meat_weight=Coalesce(
+            Subquery(weight_totals, output_field=amount_field),
+            Value(ZERO),
+            output_field=amount_field,
+        ),
+    ).order_by("-created_at", "-pk")
+    return queryset
+
+
 def _module_page(module, query, codes, page, limit, *, archived=False, pig_status='', company=None):
     if module == "farm":
         queryset = FarmRecord.objects.select_related("pig").order_by(
@@ -954,30 +995,7 @@ def _module_page(module, query, codes, page, limit, *, archived=False, pig_statu
         total, records, has_next = _page_queryset(queryset, page, limit)
         items = [_sale_item(record) for record in records]
     elif module == "stock":
-        sale_totals = DailySale.objects.filter(
-            slaughter_batch_id=OuterRef("slaughter_batch_id")
-        ).values("slaughter_batch_id").annotate(value=Sum("total_meat_sales")).values(
-            "value"
-        )
-        weight_totals = DailySale.objects.filter(
-            slaughter_batch_id=OuterRef("slaughter_batch_id")
-        ).values("slaughter_batch_id").annotate(value=Sum("total_meat_weight_kg")).values(
-            "value"
-        )
-        amount_field = DecimalField(max_digits=14, decimal_places=2)
-        queryset = MeatStock.objects.select_related("slaughter_batch").annotate(
-            pig_count=Count("slaughter_batch__pigs", distinct=True),
-            meat_sales=Coalesce(
-                Subquery(sale_totals, output_field=amount_field),
-                Value(ZERO),
-                output_field=amount_field,
-            ),
-            meat_weight=Coalesce(
-                Subquery(weight_totals, output_field=amount_field),
-                Value(ZERO),
-                output_field=amount_field,
-            ),
-        ).order_by("-created_at", "-pk")
+        queryset = _stock_summary_queryset()
         queryset = _search_stock(queryset, query)
         total, records, has_next = _page_queryset(queryset, page, limit)
         items = [_stock_item(record) for record in records]
@@ -991,6 +1009,25 @@ def _module_page(module, query, codes, page, limit, *, archived=False, pig_statu
     else:
         return _report_page(query, codes, page, limit)
     return total, items, has_next
+
+
+def _pig_purchase_total(queryset):
+    """Keep per-pig HALF_UP rounding; transfer grouped costs, not model rows."""
+    explicit = queryset.filter(purchase_price__isnull=False).aggregate(
+        total=Sum("purchase_price"),
+    )["total"] or ZERO
+    groups = queryset.filter(purchase_price__isnull=True).order_by().values(
+        "purchase__total_cost", "purchase__number_of_pigs",
+    ).annotate(quantity=Count("pk"))
+    total = explicit
+    for group in groups.iterator(chunk_size=500):
+        number = group["purchase__number_of_pigs"]
+        if number > 0:
+            cost = (group["purchase__total_cost"] / Decimal(number)).quantize(
+                Decimal("0.01"), rounding=ROUND_HALF_UP,
+            )
+            total += cost * group["quantity"]
+    return total
 
 
 @never_cache
@@ -1045,12 +1082,7 @@ def pig_module(request, module):
             available=Count('pk', filter=Q(status=Pig.AVAILABLE)),
             slaughtered=Count('pk', filter=Q(status__in=(Pig.SLAUGHTERED, Pig.FINISHED))),
         )
-        # Match Pig.get_purchase_cost(), including individually priced pigs
-        # and the model's HALF_UP cent rounding for shared purchases.
-        purchase_total = sum(
-            (pig.get_purchase_cost() for pig in current.iterator(chunk_size=500)),
-            ZERO,
-        )
+        purchase_total = _pig_purchase_total(current)
         pig_summary = {
             **counts,
             'archived': Pig.all_objects.filter(company=company, is_archived=True).count(),

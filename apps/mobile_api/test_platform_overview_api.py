@@ -43,8 +43,7 @@ class PlatformOverviewTests(SimpleTestCase):
     @patch('apps.mobile_api.platform_views.CompanyMembership.objects')
     @patch('apps.mobile_api.platform_views.Company.objects')
     def test_admin_receives_aggregate_counts_only(self, companies, memberships):
-        companies.count.return_value = 8
-        companies.filter.return_value.count.side_effect = (5, 2)
+        companies.aggregate.return_value = {'total': 8, 'active': 5, 'suspended': 2}
         memberships.filter.return_value.count.return_value = 3
         response = self._get(authenticated=True, platform=True)
         self.assertEqual(response.status_code, 200)
@@ -542,7 +541,7 @@ class PlatformOverviewTests(SimpleTestCase):
         import json
         company = SimpleNamespace(public_id='123', name='Test Company',
                                   code='test-company', status='ACTIVE')
-        qs = companies.order_by.return_value
+        qs = companies.order_by.return_value.only.return_value
         qs.filter.return_value = qs
         with patch('apps.mobile_api.platform_views.Paginator') as paginator:
             page = paginator.return_value.get_page.return_value

@@ -169,6 +169,14 @@ SESSION_STARTED_AT_KEY = "_pigs_session_started_at"
 SESSION_LAST_ACTIVITY_AT_KEY = "_pigs_session_last_activity_at"
 
 
+def initialize_session_policy(sender, request, user, **kwargs):
+    """Initialize both clocks on every successful Django login, including mobile."""
+    if request is not None and hasattr(request, "session"):
+        now_ts = int(timezone.now().timestamp())
+        request.session[SESSION_STARTED_AT_KEY] = now_ts
+        request.session[SESSION_LAST_ACTIVITY_AT_KEY] = now_ts
+
+
 class SessionPolicyMiddleware:
     # Installation-wide authenticated session policy.
     #
@@ -280,6 +288,12 @@ class SessionPolicyMiddleware:
             )
 
             logout(request)
+            if request.path_info.startswith("/api/mobile/v1/"):
+                from apps.mobile_api.views import _json
+
+                return _json(request, {"authenticated": False,
+                    "code": "authentication_required", "reason": reason_code,
+                    "message": message}, status_code=401)
             messages.info(
                 request,
                 message,
@@ -301,16 +315,16 @@ class SessionPolicyMiddleware:
         ] = now_ts
 
         remaining_absolute = max(
-            60,
+            1,
             absolute_seconds
             - (now_ts - started_at),
         )
 
-        request.session.set_expiry(
-            min(
-                idle_seconds,
-                remaining_absolute,
+        # Preserve a non-remembered browser session as a session cookie.
+        # The middleware still enforces both server-side clocks.
+        if not request.session.get_expire_at_browser_close():
+            request.session.set_expiry(
+                min(idle_seconds, remaining_absolute)
             )
-        )
 
         return self.get_response(request)

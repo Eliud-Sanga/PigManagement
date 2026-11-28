@@ -687,7 +687,6 @@ def complete_owner_onboarding(
     invitation = (
         CompanyOwnerInvitation.objects
         .select_for_update()
-        .select_related("reviewed_by")
         .get(pk=invitation.pk)
     )
 
@@ -704,7 +703,12 @@ def complete_owner_onboarding(
             "Owner setup link has expired."
         )
 
-    actor = invitation.reviewed_by
+    # Lock the approving identity separately: reviewed_by is nullable,
+    # so PostgreSQL cannot lock it through an outer join.
+    actor = (
+        User.objects.select_for_update().filter(pk=invitation.reviewed_by_id).first()
+        if invitation.reviewed_by_id is not None else None
+    )
     if (
         actor is None
         or not actor.is_active
@@ -874,10 +878,6 @@ def consume_login_now_token(
     invitation = (
         CompanyOwnerInvitation.objects
         .select_for_update()
-        .select_related(
-            "owner_user",
-            "provisioned_company",
-        )
         .get(pk=invitation.pk)
     )
 

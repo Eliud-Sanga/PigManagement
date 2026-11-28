@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.paginator import Paginator
 from django.db import OperationalError, transaction
-from django.db.models import Q
+from django.db.models import Count, Q
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from django.http import Http404
@@ -50,13 +50,14 @@ def overview(request):
     if denied is not None:
         return denied
 
+    companies = Company.objects.aggregate(
+        total=Count('pk'),
+        active=Count('pk', filter=Q(status=Company.Status.ACTIVE)),
+        suspended=Count('pk', filter=Q(status=Company.Status.SUSPENDED)),
+    )
     return _json(request, {
         'ok': True,
-        'companies': {
-            'total': Company.objects.count(),
-            'active': Company.objects.filter(status=Company.Status.ACTIVE).count(),
-            'suspended': Company.objects.filter(status=Company.Status.SUSPENDED).count(),
-        },
+        'companies': companies,
         'memberships': {
             'pending': CompanyMembership.objects.filter(
                 status=CompanyMembership.Status.PENDING_APPROVAL,
@@ -91,7 +92,7 @@ def records(request, kind):
         return _json(request, {'ok': False, 'code': 'unknown_list'}, status_code=404)
     query = request.GET.get('q', '').strip()[:80]
     if kind == 'companies':
-        qs = Company.objects.order_by('name', 'pk')
+        qs = Company.objects.order_by('name', 'pk').only('public_id', 'name', 'code', 'status')
         if query:
             qs = qs.filter(Q(name__icontains=query) | Q(code__icontains=query))
         def item(obj):
@@ -108,7 +109,7 @@ def records(request, kind):
             return {'id': str(obj.public_id), 'title': obj.user.get_username(),
                     'subtitle': obj.company.name, 'status': obj.status}
     elif kind == 'users':
-        qs = get_user_model().objects.order_by('username', 'pk')
+        qs = get_user_model().objects.order_by('username', 'pk').only('public_id', 'username', 'email', 'is_active')
         if query:
             qs = qs.filter(Q(username__icontains=query) | Q(email__icontains=query))
         def item(obj):
@@ -123,7 +124,7 @@ def records(request, kind):
                     'subtitle': obj.category, 'status': obj.result,
                     'timestamp': obj.occurred_at.isoformat()}
     else:
-        qs = AuditLog.objects.select_related('user').order_by('-timestamp', '-pk')
+        qs = AuditLog.objects.order_by('-timestamp', '-pk').only('event_id', 'action', 'model_name', 'result', 'timestamp')
         if query:
             qs = qs.filter(Q(action__icontains=query) | Q(model_name__icontains=query))
         def item(obj):

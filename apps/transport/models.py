@@ -5,7 +5,7 @@ not create a second User, Company, role, or authentication system.
 """
 
 import uuid
-from decimal import Decimal
+from decimal import Decimal, DecimalException, InvalidOperation, ROUND_HALF_UP
 
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
@@ -21,6 +21,17 @@ from apps.companies.models import (
 
 ZERO = Decimal("0.00")
 CENT = Decimal("0.01")
+
+
+def _cargo_line_amount(quantity, unit_price):
+    """Round a computed line total once, consistently with Pig money rules."""
+    try:
+        value = Decimal(str(quantity)) * Decimal(str(unit_price))
+        if not value.is_finite():
+            raise InvalidOperation
+        return value.quantize(CENT, rounding=ROUND_HALF_UP)
+    except (DecimalException, ValueError, TypeError) as exc:
+        raise ValidationError({"original_amount": "Enter a valid monetary amount."}) from exc
 
 
 def generate_booking_reference():
@@ -439,7 +450,7 @@ class Cargo(TransportRecord):
         super().clean()
         if not self.trip_id or self.trip.company_id != self.company_id:
             raise ValidationError({"trip": "Select a trip belonging to this company."})
-        if self._state.adding and self.trip.status not in (Trip.Status.PLANNED, Trip.Status.IN_PROGRESS):
+        if self._state.adding and self.trip.status not in (Trip.Status.PLANNED, Trip.Status.IN_PROGRESS) and not (self.trip.status == Trip.Status.COMPLETED and getattr(self, "_allow_completed_trip_entry", False)):
             raise ValidationError({"trip": "Cargo can only be added to a planned or active trip."})
         self.cargo_type = (self.cargo_type or "").strip()
         self.description = (self.description or "").strip()
@@ -448,7 +459,7 @@ class Cargo(TransportRecord):
         self.customer_phone = (self.customer_phone or "").strip()
         self.destination = (self.destination or "").strip()
         if self.pricing_method == self.PricingMethod.PER_UNIT:
-            self.original_amount = self.quantity * self.unit_price
+            self.original_amount = _cargo_line_amount(self.quantity, self.unit_price)
         if self.agreed_amount is not None and self.agreed_amount > self.original_amount:
             raise ValidationError({"agreed_amount": "Agreed amount cannot exceed the original amount."})
         if self.agreed_amount is not None and self.amount_paid > self.agreed_amount:
@@ -462,14 +473,14 @@ class Cargo(TransportRecord):
         if not self.destination and self.trip_id:
             self.destination = self.trip.destination
         if self.pricing_method == self.PricingMethod.PER_UNIT:
-            self.original_amount = self.quantity * self.unit_price
+            self.original_amount = _cargo_line_amount(self.quantity, self.unit_price)
         self.update_payment_status(save=False)
         self.full_clean()
         return super().save(*args, **kwargs)
 
     @property
     def calculated_amount(self):
-        return self.quantity * self.unit_price if self.pricing_method == self.PricingMethod.PER_UNIT else self.original_amount
+        return _cargo_line_amount(self.quantity, self.unit_price) if self.pricing_method == self.PricingMethod.PER_UNIT else self.original_amount
 
     @property
     def discount_amount(self):

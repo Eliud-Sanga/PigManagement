@@ -6,6 +6,7 @@ from django.contrib.auth.models import AnonymousUser
 from django.test import RequestFactory, SimpleTestCase, override_settings
 
 from apps.companies.middleware import COMPANY_SESSION_KEY
+from apps.companies.models import Company
 
 from . import workspace_views
 
@@ -106,6 +107,7 @@ class MobileWorkspaceContractTests(SimpleTestCase):
             code="farm",
             name="Eliud Farm",
             default_language="sw",
+            business_type=Company.BusinessType.PIG,
         )
         role = SimpleNamespace(code="OWNER", name="Owner")
         membership = SimpleNamespace(
@@ -131,6 +133,39 @@ class MobileWorkspaceContractTests(SimpleTestCase):
         self.assertEqual(len(payload["companies"]), 1)
         self.assertEqual(payload["selectedCompany"]["name"], "Eliud Farm")
         self.assertEqual(payload["permissions"], ["pigs.view_pig"])
+        self.assertEqual(payload["selectedCompany"]["businessType"], "pig")
+        self.assertIsNone(payload["selectedCompany"]["transportServices"])
+        self.assertTrue(payload["selectedCompany"]["selected"])
+
+    def test_transport_company_payload_reports_enabled_services(self):
+        company = SimpleNamespace(
+            public_id="13f49e07-b99e-48d5-8ce8-18b34c37e647",
+            code="transport-test",
+            name="Synthetic Transport",
+            default_language="sw",
+            business_type=Company.BusinessType.TRANSPORT,
+        )
+        membership = SimpleNamespace(
+            company=company,
+            role=SimpleNamespace(code="OWNER", name="Owner"),
+            approved_language="sw",
+            requested_language="sw",
+        )
+        for profile, expected in (
+            (None, {"cargo": False, "passenger": False}),
+            (SimpleNamespace(cargo_enabled=True, passenger_enabled=False),
+             {"cargo": True, "passenger": False}),
+            (SimpleNamespace(cargo_enabled=False, passenger_enabled=True),
+             {"cargo": False, "passenger": True}),
+            (SimpleNamespace(cargo_enabled=True, passenger_enabled=True),
+             {"cargo": True, "passenger": True}),
+        ):
+            with self.subTest(expected=expected):
+                company.transport_profile = profile
+                payload = workspace_views._company_payload(membership)
+                self.assertEqual(payload["businessType"], "transport")
+                self.assertEqual(payload["transportServices"], expected)
+                self.assertFalse(payload["selected"])
 
     @override_settings(DEBUG=True)
     def test_new_endpoints_keep_exact_dev_cors_allowlist(self):

@@ -1,10 +1,16 @@
 """Company-scoped mobile API for Home Management Transport operations."""
 
 from decimal import Decimal, InvalidOperation
+import hashlib
+import json
+import re
+
+from django.contrib.auth import get_user_model
 
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import IntegrityError, transaction
-from django.db.models import Q, Sum
+from django.db.models import Count, F, IntegerField, OuterRef, Prefetch, Q, Subquery, Sum, Value
+from django.db.models.functions import Coalesce, TruncDate
 from django.utils import timezone
 from django.utils.dateparse import parse_date, parse_datetime
 from django.views.decorators.cache import never_cache
@@ -28,6 +34,8 @@ from apps.transport.models import (
 )
 
 from apps.transport import round_trip
+from apps.users.models import AuditLog
+from apps.users.utils import create_audit_log
 
 from .views import _json
 from .workspace_views import _business_context
@@ -125,7 +133,7 @@ def _date(value):
     return value.isoformat() if value is not None else None
 
 
-def _record_payload(module, obj):
+def _record_payload(module, obj, *, include_sizes=False):
     common = {"id": obj.pk, "createdAt": obj.created_at.isoformat() if getattr(obj, "created_at", None) else None}
     if module == "vehicles":
         return {**common, "title": obj.plate_number, "subtitle": f"{obj.name} • {obj.vehicle_type}", "status": "ACTIVE" if obj.is_active else "INACTIVE", "date": _date(obj.created_at.date()), "amount": _money(obj.current_value), "name": obj.name, "plateNumber": obj.plate_number}
@@ -134,7 +142,7 @@ def _record_payload(module, obj):
     if module == "trips":
         return {**common, "title": f"Trip #{obj.trip_number}", "subtitle": f"{obj.origin} → {obj.destination}", "status": obj.status, "date": _date(obj.departure_at.date() if obj.departure_at else obj.created_at.date()), "amount": "0.00"}
     if module == "cargo":
-        return {**common, "title": obj.description, "subtitle": f"{obj.customer_name} • {obj.destination or obj.trip.destination}", "status": obj.payment_status, "date": _date(obj.cargo_date), "amount": _money(obj.agreed_amount), "delivered": obj.delivered}
+        return {**common, "title": obj.description, "cargoType": obj.cargo_type, **({"sizeDetails": [{"size": row.size, "quantity": row.quantity} for row in obj.size_details.all()]} if include_sizes else {}), "subtitle": f"{obj.customer_name} • {obj.destination or obj.trip.destination}", "status": obj.payment_status, "date": _date(obj.cargo_date), "amount": _money(obj.agreed_amount), "delivered": obj.delivered, "customerName": obj.customer_name, "customerPhone": obj.customer_phone, "destination": obj.destination, "quantity": str(obj.quantity) if obj.agreed_amount is not None or (include_sizes and obj.unit == "pieces") else None, "unit": obj.unit if obj.agreed_amount is not None or (include_sizes and obj.unit == "pieces") else None, "amountPaid": _money(obj.amount_paid), "balanceDue": _money(obj.balance_due) if obj.agreed_amount is not None else None, "tripStatus": obj.trip.status, "tripId": obj.trip_id, "notes": obj.notes}
     if module == "cargo_sizes":
         return {**common, "title": obj.size, "subtitle": f"{obj.cargo.description} • Quantity {obj.quantity}", "status": "RECORDED", "date": _date(obj.created_at.date()), "amount": "0.00"}
     if module == "cargo_payments":
@@ -144,7 +152,7 @@ def _record_payload(module, obj):
     if module == "maintenance":
         return {**common, "title": obj.service_type, "subtitle": f"{obj.vehicle.plate_number} • {obj.description}", "status": "RECORDED", "date": _date(obj.service_date), "amount": _money(obj.cost)}
     if module == "passenger_schedules":
-        return {**common, "title": f"{obj.trip.origin} → {obj.trip.destination}", "subtitle": obj.scheduled_departure.isoformat(), "status": obj.status, "date": _date(obj.scheduled_departure.date()), "amount": _money(obj.fare_amount), "seatsRemaining": obj.seats_remaining}
+        return {**common, "title": f"{obj.trip.origin} → {obj.trip.destination}", "subtitle": obj.scheduled_departure.isoformat(), "status": obj.status, "date": _date(obj.scheduled_departure.date()), "amount": _money(obj.fare_amount), "seatsRemaining": max(obj.seat_capacity - obj._mobile_booked_count, 0) if hasattr(obj, "_mobile_booked_count") else obj.seats_remaining}
     if module == "passenger_bookings":
         return {**common, "title": obj.passenger_name, "subtitle": f"Seat {obj.seat_number} • {obj.booking_reference}", "status": obj.payment_status, "date": _date(obj.created_at.date()), "amount": _money(obj.fare_amount), "amountPaid": _money(obj.amount_paid), "bookingReference": obj.booking_reference, "bookingStatus": obj.status, "tripStatus": obj.schedule.trip.status}
     if module == "passenger_payments":
@@ -168,7 +176,15 @@ def _module_queryset(module):
     if module == "maintenance":
         return queryset.select_related("vehicle")
     if module == "passenger_schedules":
-        return queryset.select_related("trip", "trip__route", "trip__route__vehicle")
+        booked = PassengerBooking.all_objects.filter(
+            company_id=OuterRef("company_id"), schedule_id=OuterRef("pk"),
+            is_archived=False,
+        ).exclude(status=PassengerBooking.Status.CANCELLED).order_by().values(
+            "schedule_id",
+        ).annotate(total=Count("pk")).values("total")
+        return queryset.select_related("trip").annotate(
+            _mobile_booked_count=Coalesce(Subquery(booked, output_field=IntegerField()), Value(0)),
+        )
     if module == "passenger_bookings":
         return queryset.select_related("schedule", "schedule__trip", "schedule__trip__route")
     if module == "passenger_payments":
@@ -176,7 +192,7 @@ def _module_queryset(module):
     return queryset
 
 
-def _form_options(profile, codes):
+def _form_options(profile, codes, *, cargo_history=False, payment_options=False):
     options = {
         "vehicles": [],
         "routes": [],
@@ -202,6 +218,20 @@ def _form_options(profile, codes):
             {"id": row.pk, "label": f"#{row.trip_number} • {row.origin} → {row.destination}"}
             for row in Trip.objects.filter(status__in=(Trip.Status.PLANNED, Trip.Status.IN_PROGRESS)).select_related("route")[:200]
         ]
+        if cargo_history:
+            if {"transport.add_cargosize", "transport.view_cargosize"}.issubset(codes):
+                options["timberIntakeSizes"] = []
+            options["cargoTrips"] = [
+                {"id": row.pk, "label": f"#{row.trip_number} • {row.origin} → {row.destination} • {row.status}"}
+                for row in Trip.objects.filter(status__in=(Trip.Status.IN_PROGRESS, Trip.Status.PLANNED)).order_by("-departure_at", "-pk")[:100]
+            ] + [
+                {"id": row.pk, "label": f"#{row.trip_number} • {row.origin} → {row.destination} • COMPLETED"}
+                for row in Trip.objects.filter(status=Trip.Status.COMPLETED).order_by("-arrival_at", "-pk")[:100]
+            ]
+            options["activeCargoTrips"] = [
+                {"id": row.pk, "label": f"#{row.trip_number}"}
+                for row in Trip.objects.filter(status=Trip.Status.IN_PROGRESS).order_by("-departure_at", "-pk")[:2]
+            ]
     if profile.passenger_enabled and "transport.view_passengerschedule" in codes:
         options["passengerSchedules"] = [
             {"id": row.pk, "label": f"{row.trip.origin} → {row.trip.destination} • {row.scheduled_departure:%Y-%m-%d %H:%M}"}
@@ -217,7 +247,39 @@ def _form_options(profile, codes):
             {"id": row.pk, "label": f"{row.description} • {row.customer_name}"}
             for row in Cargo.objects.all()[:200]
         ]
+        if payment_options:
+            options["payableCargo"] = [
+                {"id": row.pk, "label": f"{row.description} • {row.customer_name} • {row.balance_due}"}
+                for row in Cargo.objects.filter(payment_status__in=(Cargo.PaymentStatus.UNPAID,Cargo.PaymentStatus.PARTIAL)).order_by("-cargo_date","-pk")[:200]
+            ]
     return options
+
+
+def _monthly_cash_summary(company, codes, profile, today):
+    """Cash receipts by receipt date; never infer from cargo booking dates."""
+    start = today.replace(day=1)
+    scope = dict(company=company, is_archived=False)
+    summary = {}
+    cargo_allowed = profile.cargo_enabled and {"transport.view_cargo", "transport.view_cargopayment"}.issubset(codes)
+    passenger_allowed = profile.passenger_enabled and {"transport.view_passengerbooking", "transport.view_passengerpayment"}.issubset(codes)
+    if cargo_allowed:
+        rows = list(CargoPayment.all_objects.filter(**scope, cargo__company=company, cargo__is_archived=False,
+            payment_date__date__range=(start, today)).annotate(day=TruncDate("payment_date"))
+            .values("day").annotate(total=Sum("amount")).order_by("day"))
+        by_day = {row["day"].day: row["total"] for row in rows}
+        summary["monthlyCargoCash"] = _money(sum(by_day.values(), ZERO))
+        summary["cashTrend"] = [{"day": day, "cash": _money(by_day.get(day, ZERO))} for day in range(1, today.day+1)]
+        debt = Cargo.all_objects.filter(**scope, agreed_amount__isnull=False).aggregate(total=Sum("agreed_amount")-Sum("amount_paid"))["total"]
+        summary["cargoOutstanding"] = _money(debt)
+    if passenger_allowed:
+        summary["monthlyPassengerCash"] = _money(PassengerPayment.all_objects.filter(**scope, booking__company=company, booking__is_archived=False,
+            payment_date__date__range=(start,today)).aggregate(total=Sum("amount"))["total"])
+    if "transport.view_maintenance" in codes:
+        summary["monthlyMaintenance"] = _money(Maintenance.all_objects.filter(**scope, service_date__range=(start,today)).aggregate(total=Sum("cost"))["total"])
+    if "transport.view_trip" in codes:
+        trips = Trip.all_objects.filter(**scope, departure_at__date__range=(start,today)).exclude(status=Trip.Status.CANCELLED).annotate(day=TruncDate("departure_at")).values("day").annotate(total=Count("pk")).order_by("day")
+        summary["tripTrend"] = [{"day": row["day"].day, "trips": row["total"]} for row in trips]
+    return summary
 
 
 @never_cache
@@ -244,19 +306,39 @@ def transport_dashboard(request):
         or "transport.view_passengerbooking" in codes
     )
     can_view_expenses = "transport.view_expense" in codes
-    vehicle_count = Vehicle.objects.count() if can_view_vehicles else 0
-    active_vehicle_count = Vehicle.objects.filter(is_active=True).count() if can_view_vehicles else 0
+    vehicles = Vehicle.objects.aggregate(
+        total=Count("pk"), active=Count("pk", filter=Q(is_active=True)),
+    ) if can_view_vehicles else {"total": 0, "active": 0}
+    vehicle_count, active_vehicle_count = vehicles["total"], vehicles["active"]
     route_active_count = Route.objects.filter(status=Route.Status.ACTIVE).count() if can_view_routes else 0
     trip_active_count = Trip.objects.filter(status=Trip.Status.IN_PROGRESS).count() if can_view_trips else 0
-    cargo_count = Cargo.objects.count() if can_view_cargo else 0
-    cargo_unpaid = Cargo.objects.filter(payment_status__in=(Cargo.PaymentStatus.UNPAID, Cargo.PaymentStatus.PARTIAL)).count() if can_view_cargo else 0
+    cargo = Cargo.objects.aggregate(
+        total=Count("pk"),
+        unpaid=Count("pk", filter=Q(payment_status__in=(Cargo.PaymentStatus.UNPAID, Cargo.PaymentStatus.PARTIAL))),
+        income=Sum("agreed_amount", filter=Q(cargo_date__range=(month_start, today))),
+    ) if can_view_cargo else {"total": 0, "unpaid": 0, "income": ZERO}
+    cargo_count, cargo_unpaid = cargo["total"], cargo["unpaid"]
     passenger_schedule_count = PassengerSchedule.objects.count() if can_view_passengers and "transport.view_passengerschedule" in codes else 0
-    passenger_booking_count = PassengerBooking.objects.exclude(status=PassengerBooking.Status.CANCELLED).count() if can_view_passengers and "transport.view_passengerbooking" in codes else 0
-    cargo_income = (Cargo.objects.filter(cargo_date__gte=month_start, cargo_date__lte=today).aggregate(total=Sum("agreed_amount"))["total"] or ZERO) if can_view_cargo else ZERO
-    passenger_income = (PassengerBooking.objects.filter(created_at__date__gte=month_start, created_at__date__lte=today).exclude(status=PassengerBooking.Status.CANCELLED).aggregate(total=Sum("fare_amount"))["total"] or ZERO) if can_view_passengers and "transport.view_passengerbooking" in codes else ZERO
+    passenger = PassengerBooking.objects.exclude(status=PassengerBooking.Status.CANCELLED).aggregate(
+        total=Count("pk"),
+        income=Sum("fare_amount", filter=Q(created_at__date__range=(month_start, today))),
+    ) if can_view_passengers and "transport.view_passengerbooking" in codes else {"total": 0, "income": ZERO}
+    passenger_booking_count = passenger["total"]
+    cargo_income = cargo["income"] or ZERO
+    passenger_income = passenger["income"] or ZERO
     expense_total = (Expense.objects.filter(expense_date__date__gte=month_start, expense_date__date__lte=today).aggregate(total=Sum("amount"))["total"] or ZERO) if can_view_expenses else ZERO
+    cash = _monthly_cash_summary(company, codes, profile, today)
+    cash_summary = {key: value for key, value in cash.items() if key not in ("cashTrend", "tripTrend")}
+    if ((not profile.cargo_enabled or "monthlyCargoCash" in cash_summary)
+            and (not profile.passenger_enabled or "monthlyPassengerCash" in cash_summary)
+            and can_view_expenses and "monthlyMaintenance" in cash_summary):
+        cash_summary["monthlyCashProfit"] = _money(Decimal(cash_summary.get("monthlyCargoCash", "0"))
+            + Decimal(cash_summary.get("monthlyPassengerCash", "0")) - expense_total - Decimal(cash_summary["monthlyMaintenance"]))
     return _json(request, {
         "ok": True,
+        "recentActivity": _recent_transport(company, codes, profile),
+        "cashTrend": cash.get("cashTrend", []),
+        "tripTrend": cash.get("tripTrend", []),
         "company": {"id": str(company.public_id), "name": company.name, "businessType": company.business_type},
         "services": {"cargo": profile.cargo_enabled, "passenger": profile.passenger_enabled},
         "summary": {
@@ -272,14 +354,62 @@ def transport_dashboard(request):
             "monthlyIncome": _money(cargo_income + passenger_income),
             "monthlyExpenses": _money(expense_total),
             "monthlyProfit": _money(cargo_income + passenger_income - expense_total),
+            **cash_summary,
         },
         "moduleAccess": access,
+        "createAccess": {module: CREATE_PERMISSION[module] in codes for module in MODULES},
         "canManageServices": "transport.manage_transport_services" in codes,
         "moduleServicesEnabled": {
             module: (True if service is None else (profile.cargo_enabled if service == "cargo" else profile.passenger_enabled))
             for module, (_model, _label, service) in MODULES.items()
         },
     })
+
+
+def _report_summary(module, queryset, company, codes):
+    today = timezone.localdate()
+    start = today.replace(day=1)
+    result = {"month": start.isoformat(), "count": queryset.count()}
+    if module == "cargo":
+        result.update(queryset.aggregate(paid=Count("pk", filter=Q(payment_status=Cargo.PaymentStatus.PAID)), debt=Count("pk", filter=Q(payment_status__in=(Cargo.PaymentStatus.PARTIAL, Cargo.PaymentStatus.UNPAID))), pending=Count("pk", filter=Q(payment_status=Cargo.PaymentStatus.PRICE_PENDING))))
+        result["outstanding"] = _money(queryset.filter(agreed_amount__isnull=False).aggregate(total=Sum("agreed_amount")-Sum("amount_paid"))["total"])
+        if "transport.view_cargopayment" not in codes:
+            return result
+        records = CargoPayment.all_objects.filter(company=company, is_archived=False, cargo_id__in=queryset.order_by().values("pk"), payment_date__date__range=(start,today))
+        date_field, amount_field = "payment_date", "amount"
+    elif module == "cargo_payments":
+        records = queryset.filter(payment_date__date__range=(start,today))
+        date_field, amount_field = "payment_date", "amount"
+    elif module == "expenses":
+        records = queryset.filter(expense_date__date__range=(start,today))
+        date_field, amount_field = "expense_date", "amount"
+    elif module == "maintenance":
+        records = queryset.filter(service_date__range=(start,today))
+        date_field, amount_field = "service_date", "cost"
+    else:
+        records = queryset.filter(started_at__date__range=(start,today))
+        result["monthCount"] = records.count()
+        result.update(queryset.aggregate(active=Count("pk",filter=Q(status=Route.Status.ACTIVE)), completed=Count("pk",filter=Q(status=Route.Status.COMPLETED))))
+        rows = records.order_by().annotate(day=TruncDate("started_at")).values("day").annotate(total=Count("pk")).order_by("day")
+        result["trend"] = [{"day": row["day"].day, "value": row["total"]} for row in rows]
+        return result
+    day_expression = date_field if date_field == "service_date" else TruncDate(date_field)
+    rows = list(records.order_by().annotate(day=F(day_expression) if isinstance(day_expression,str) else day_expression).values("day").annotate(total=Sum(amount_field)).order_by("day"))
+    result["monthAmount"] = _money(sum((row["total"] for row in rows), ZERO))
+    result["trend"] = [{"day": row["day"].day, "value": _money(row["total"])} for row in rows]
+    return result
+
+
+def _recent_transport(company, codes, profile):
+    entries = []
+    sources = [("routes", Route, "created_at"), ("trips", Trip, "created_at"), ("cargo", Cargo, "created_at"), ("cargo_payments", CargoPayment, "payment_date"), ("expenses", Expense, "expense_date"), ("maintenance", Maintenance, "created_at")]
+    for module, model, date_field in sources:
+        if VIEW_PERMISSION[module] not in codes or (MODULES[module][2] == "cargo" and not profile.cargo_enabled):
+            continue
+        for item in _module_queryset(module).filter(company=company).order_by("-"+date_field,"-pk")[:5]:
+            entry = _record_payload(module,item)
+            entries.append((getattr(item,date_field), {"module":module,"title":entry["title"],"subtitle":entry["subtitle"],"date":entry["date"],"amount":entry["amount"] if module in ("cargo_payments","expenses","maintenance") else None}))
+    return [item for _,item in sorted(entries,key=lambda pair: pair[0],reverse=True)[:8]]
 
 
 @never_cache
@@ -298,8 +428,35 @@ def transport_module(request, module):
         limit = max(1, min(int(request.GET.get("limit", "25")), 100))
     except ValueError:
         return _error(request, "invalid_pagination", "Page and limit must be positive integers.", 400)
+    include_options = request.GET.get("includeOptions", "1")
+    if include_options not in ("0", "1"):
+        return _error(request, "invalid_options", "includeOptions must be 0 or 1.", 400)
     query = (request.GET.get("q") or "").strip()[:100]
-    queryset = _module_queryset(module)
+    queryset = _module_queryset(module).filter(company=company)
+    report = request.GET.get("report") == "1"
+    vehicle = request.GET.get("vehicle")
+    payment_filter = request.GET.get("paymentStatus", "all")
+    if payment_filter not in ("all", "paid", "debt", "pending") or (payment_filter != "all" and module != "cargo"):
+        return _error(request, "invalid_filter", "Invalid payment filter.", 400)
+    if payment_filter != "all":
+        states = {"paid": (Cargo.PaymentStatus.PAID,), "debt": (Cargo.PaymentStatus.UNPAID, Cargo.PaymentStatus.PARTIAL), "pending": (Cargo.PaymentStatus.PRICE_PENDING,)}
+        queryset = queryset.filter(payment_status__in=states[payment_filter])
+    if report and module not in ("routes", "cargo", "expenses", "maintenance", "cargo_payments"):
+        return _error(request, "invalid_report", "Report not supported.", 400)
+    if vehicle:
+        if not report or "transport.view_vehicle" not in codes:
+            return _error(request, "permission_denied", "Vehicle report permission required.", 403)
+        try:
+            vehicle_id = int(vehicle)
+            if not Vehicle.objects.filter(pk=vehicle_id, company=company).exists():
+                return _error(request, "record_not_found", "Vehicle not found.", 404)
+        except (ValueError, OverflowError):
+            return _error(request, "invalid_vehicle", "Invalid vehicle.", 400)
+        paths = {"routes": "vehicle_id", "cargo": "trip__route__vehicle_id", "maintenance": "vehicle_id", "cargo_payments": "cargo__trip__route__vehicle_id"}
+        if module == "expenses":
+            queryset = queryset.filter(Q(route__vehicle_id=vehicle_id) | Q(trip__route__vehicle_id=vehicle_id))
+        else:
+            queryset = queryset.filter(**{paths[module]: vehicle_id})
     if query:
         searchable = {
             "vehicles": Q(name__icontains=query) | Q(plate_number__icontains=query),
@@ -315,8 +472,12 @@ def transport_module(request, module):
             "passenger_payments": Q(reference__icontains=query) | Q(booking__passenger_name__icontains=query),
         }
         queryset = queryset.filter(searchable[module])
+    report_summary = _report_summary(module, queryset, company, codes) if report else None
     total = queryset.count()
     start = (page - 1) * limit
+    include_sizes = module == "cargo" and "transport.view_cargosize" in codes
+    if include_sizes:
+        queryset = queryset.prefetch_related(Prefetch("size_details", queryset=CargoSize.all_objects.filter(company=company, is_archived=False)))
     rows = list(queryset.order_by("-created_at", "-pk")[start:start + limit])
     service_enabled = service is None or (profile.cargo_enabled if service == "cargo" else profile.passenger_enabled)
     can_create = CREATE_PERMISSION[module] in codes and service_enabled
@@ -333,12 +494,15 @@ def transport_module(request, module):
         "limit": limit,
         "count": total,
         "hasNext": start + limit < total,
-        "canCreate": can_create,
-        "canChange": CHANGE_PERMISSION[module] in codes and service_enabled,
-        "canArchive": module == "vehicles" and "transport.delete_vehicle" in codes,
+        "canCreate": can_create and not report,
+        "canPayCargo": module == "cargo" and not report and service_enabled and "transport.add_cargopayment" in codes and "transport.view_cargopayment" in codes,
+        "canSettleTimber": module == "cargo" and not report and service_enabled and "transport.change_cargo" in codes and "transport.add_cargosize" in codes and "transport.view_cargosize" in codes,
+        "canChange": CHANGE_PERMISSION[module] in codes and service_enabled and not report,
+        "canArchive": module == "vehicles" and "transport.delete_vehicle" in codes and not report,
+        **({"reportSummary": report_summary} if report else {}),
         "serviceEnabled": service_enabled,
-        "items": [_record_payload(module, row) for row in rows],
-        "formOptions": _form_options(profile, codes),
+        "items": [_record_payload(module, row, include_sizes=include_sizes) for row in rows],
+        "formOptions": _form_options(profile, codes, cargo_history=module == "cargo", payment_options=module == "cargo_payments") if include_options == "1" and not report else {},
     })
 
 
@@ -397,6 +561,33 @@ def _datetime_value(value, field, *, default=None):
     return parsed
 
 
+def _transport_create_receipt(request, company, module):
+    """Opt-in retry protection. Must be called inside the mutation transaction."""
+    operation_id = (request.POST.get("operation_id") or "").strip()
+    expected = (request.POST.get("expected_company_id") or "").strip()
+    if (expected or operation_id) and expected != str(company.public_id):
+        return None, _error(request, "company_context_changed", "Select the original company before retrying.", 409)
+    if not operation_id:
+        return None, None  # Legacy Build 14 requests remain compatible.
+    if not re.fullmatch(r"[A-Za-z0-9_.:-]{1,100}", operation_id):
+        return None, _error(request, "invalid_operation_id", "Invalid operation identifier.", 400)
+    body = {key: request.POST.getlist(key) for key in sorted(request.POST)
+            if key not in {"csrfmiddlewaretoken", "operation_id", "expected_company_id"}}
+    fingerprint = hashlib.sha256(json.dumps([module, body], ensure_ascii=False, sort_keys=True,
+                                            separators=(",", ":")).encode("utf-8")).hexdigest()
+    # PostgreSQL serializes retries by the same account, including the audit receipt.
+    actor = get_user_model().objects.select_for_update().only("is_active").get(pk=request.user.pk)
+    if not actor.is_active:
+        return None, _error(request, "account_inactive", "This account is inactive.", 403)
+    prior = AuditLog.objects.filter(user=request.user, company_public_id=company.public_id,
+        result="SUCCESS", metadata__transport_operation_id=operation_id).values_list("metadata", flat=True).first()
+    if prior is not None:
+        if prior.get("transport_fingerprint") != fingerprint:
+            return None, _error(request, "operation_id_conflict", "Operation identifier is already bound to a different request.", 409)
+        return None, _error(request, "duplicate_operation", "This action was already saved. Refresh to see the latest data.", 409)
+    return {"transport_operation_id": operation_id, "transport_fingerprint": fingerprint}, None
+
+
 @never_cache
 @require_POST
 @csrf_protect
@@ -410,6 +601,9 @@ def transport_create(request, module):
     )
     if error is not None:
         return error
+    receipt, receipt_error = _transport_create_receipt(request, company, module)
+    if receipt_error is not None:
+        return receipt_error
     data = request.POST
     try:
         if module == "vehicles":
@@ -436,24 +630,56 @@ def transport_create(request, module):
             if round_trip.enabled(_profile):
                 if not round_trip.REQUIRED.issubset(codes):
                     return _error(request, "permission_denied", "Journey and trip permissions are required.", 403)
-                obj = round_trip.depart(company, data.get("vehicle_id"), data.get("origin"), data.get("destination"), data.get("notes", ""))
+                obj = round_trip.depart(company, data.get("vehicle_id"), data.get("origin"), data.get("destination"), data.get("notes", ""), close_previous=data.get("close_previous") == "1")
             else:
                 route = _get_related(Route, data.get("route_id"), company)
                 obj = Trip.objects.create(company=company, route=route, origin=data.get("origin", ""), destination=data.get("destination", ""), notes=data.get("notes", ""))
         elif module == "cargo":
             trip = _get_related(Trip, data.get("trip_id"), company)
-            pricing_method = data.get("pricing_method", Cargo.PricingMethod.PER_UNIT)
+            intake = data.get("intake") == "1"
+            if intake and data.get("cargo_type") not in {"TIMBER", "BANANAS", "GOODS", "OTHER"}:
+                raise ValidationError({"cargo_type": "Select a cargo type."})
+            pricing_method = Cargo.PricingMethod.TOTAL if intake else data.get("pricing_method", Cargo.PricingMethod.PER_UNIT)
             quantity = _decimal(data.get("quantity", "1"), "quantity")
             unit_price = _decimal(data.get("unit_price", "0"), "unit_price")
             original = _decimal(data.get("original_amount"), "original_amount", required=False, default=ZERO)
             agreed = _decimal(data.get("agreed_amount"), "agreed_amount", required=False)
-            obj = Cargo.objects.create(company=company, trip=trip, cargo_date=_date_value(data.get("cargo_date"), "cargo_date", default=timezone.localdate()), cargo_type=data.get("cargo_type", "GOODS"), description=data.get("description", ""), quantity=quantity, unit=data.get("unit", "Unit"), pricing_method=pricing_method, unit_price=unit_price, original_amount=original, agreed_amount=agreed, destination=data.get("destination", ""), customer_name=data.get("customer_name", ""), customer_phone=data.get("customer_phone", ""), notes=data.get("notes", ""))
+            obj = Cargo(company=company, trip=trip, cargo_date=_date_value(data.get("cargo_date"), "cargo_date", default=timezone.localdate()), cargo_type=data.get("cargo_type", "GOODS"), description=data.get("description", ""), quantity=quantity, unit=data.get("unit", "Unit"), pricing_method=pricing_method, unit_price=unit_price, original_amount=original, agreed_amount=agreed, destination=data.get("destination", ""), customer_name=data.get("customer_name", ""), customer_phone=data.get("customer_phone", ""), notes=data.get("notes", ""))
+            intake_sizes = {}
+            if intake:
+                obj.quantity = Decimal("1")  # internal placeholder, not displayed for pending cargo
+                obj.unit = "Unit"
+                obj.unit_price = obj.original_amount = ZERO
+                obj.agreed_amount = None
+                if obj.cargo_type == "TIMBER":
+                    obj.description = "TIMBER"
+                if not obj.description.strip() or not obj.customer_name.strip():
+                    raise ValidationError("Cargo and customer name are required.")
+                if data.get("sizes") is not None:
+                    if obj.cargo_type != "TIMBER" or not {"transport.add_cargosize", "transport.view_cargosize"}.issubset(codes):
+                        raise ValidationError("Permission to record timber sizes is required.")
+                    intake_sizes = _clean_timber_sizes(data.get("sizes"))
+                    obj.quantity = sum(intake_sizes.values())
+                    obj.unit = "pieces"
+            # Late entry is explicit, audited and never allowed for cancelled/stopped trips.
+            obj._allow_completed_trip_entry = data.get("late_entry") == "1"
+            obj.save()
+            for size, quantity in intake_sizes.items():
+                CargoSize.objects.create(company=company, cargo=obj, size=size, quantity=quantity)
+            if trip.status == Trip.Status.COMPLETED:
+                route = Route.all_objects.select_for_update().get(pk=trip.route_id, company=company, is_archived=False)
+                if route.status == Route.Status.COMPLETED:
+                    route.calculate_financials()
+                    route.save(update_fields=("total_income", "total_expenses", "profit", "updated_at"))
         elif module == "cargo_sizes":
             cargo = _get_related(Cargo, data.get("cargo_id"), company)
             obj = CargoSize.objects.create(company=company, cargo=cargo, size=data.get("size", ""), quantity=_integer(data.get("quantity"), "quantity"))
         elif module == "cargo_payments":
             cargo = _get_related(Cargo, data.get("cargo_id"), company)
-            obj = CargoPayment.objects.create(company=company, cargo=cargo, amount=_decimal(data.get("amount"), "amount"), reference=data.get("reference", ""), notes=data.get("notes", ""))
+            payment_date = _datetime_value(data.get("payment_date"), "payment_date", default=timezone.now())
+            if payment_date > timezone.now():
+                raise ValidationError({"payment_date": "Payment date cannot be in the future."})
+            obj = CargoPayment.objects.create(company=company, cargo=cargo, amount=_decimal(data.get("amount"), "amount"), payment_date=payment_date, reference=data.get("reference", ""), notes=data.get("notes", ""))
         elif module == "expenses":
             route = _get_related(Route, data.get("route_id"), company) if data.get("route_id") else None
             trip = _get_related(Trip, data.get("trip_id"), company) if data.get("trip_id") else None
@@ -473,10 +699,15 @@ def transport_create(request, module):
         else:
             return _error(request, "module_not_supported", "This Transport module is not writable yet.", 405)
     except (ValidationError, ObjectDoesNotExist, ValueError, InvalidOperation) as exc:
+        transaction.set_rollback(True)
         messages = getattr(exc, "messages", None) or [str(exc)]
         return _json(request, {"ok": False, "code": "validation_error", "message": " ".join(messages)}, status_code=400)
     except IntegrityError:
+        transaction.set_rollback(True)
         return _error(request, "record_conflict", "The record conflicts with existing data. Check duplicate numbers or seat allocations.", 409)
+    if receipt is not None or (module == "cargo" and data.get("late_entry") == "1" and obj.trip.status == Trip.Status.COMPLETED):
+        create_audit_log(request, "CREATE", type(obj).__name__, obj.pk,
+                         "Transport mobile operation committed.", metadata=receipt or {"late_entry": True}, company=company)
     return _json(request, {"ok": True, "module": module, "item": _record_payload(module, obj)}, status_code=201)
 
 
@@ -692,6 +923,58 @@ def update_transport_services(request):
     return _json(request, {"ok": True, "services": {"cargo": cargo_enabled, "passenger": passenger_enabled}})
 
 
+def _clean_timber_sizes(raw):
+    try:
+        sizes = json.loads(raw)
+    except (ValueError, TypeError):
+        raise ValidationError("Invalid timber sizes.")
+    if not isinstance(sizes,list) or not 1 <= len(sizes) <= 100:
+        raise ValidationError("Enter 1 to 100 timber sizes.")
+    clean = {}
+    for row in sizes:
+        if not isinstance(row,dict):
+            raise ValidationError("Invalid timber size.")
+        size = str(row.get("size", "")).strip()
+        quantity = row.get("quantity")
+        if not size or len(size)>50 or type(quantity) is not int or not 1<=quantity<=10000000 or size in clean:
+            raise ValidationError("Enter unique sizes and positive whole quantities.")
+        clean[size] = quantity
+    return clean
+
+
+@transaction.atomic
+def _settle_pending_cargo(company, cargo, data, codes):
+    if cargo.agreed_amount is not None or cargo.amount_paid != ZERO:
+        raise ValidationError("Cargo price has already been set.")
+    amount = _decimal(data.get("agreed_amount"), "agreed_amount")
+    if amount < ZERO:
+        raise ValidationError("Amount must not be negative.")
+    if cargo.cargo_type == "TIMBER":
+        if not {"transport.add_cargosize", "transport.view_cargosize"}.issubset(codes):
+            raise ValidationError("Permission to record timber sizes is required.")
+        clean = _clean_timber_sizes(data.get("sizes", "[]"))
+        existing = list(CargoSize.all_objects.select_for_update().filter(company=company,cargo=cargo))
+        if existing:
+            if any(row.is_archived for row in existing) or {row.size:row.quantity for row in existing} != clean:
+                raise ValidationError("Existing timber sizes differ; review them before settlement.")
+        else:
+            for size, quantity in clean.items():
+                CargoSize.objects.create(company=company,cargo=cargo,size=size,quantity=quantity)
+        cargo.quantity = sum(clean.values())
+        cargo.unit = "pieces"
+    cargo.pricing_method = Cargo.PricingMethod.TOTAL
+    cargo.unit_price = ZERO
+    cargo.original_amount = cargo.agreed_amount = amount
+    cargo.delivered = True
+    cargo.delivered_at = cargo.delivered_at or timezone.now()
+    cargo.save()
+    route = Route.all_objects.select_for_update().get(pk=cargo.trip.route_id,company=company,is_archived=False)
+    if route.status == Route.Status.COMPLETED:
+        route.calculate_financials()
+        route.save(update_fields=("total_income","total_expenses","profit","updated_at"))
+    return cargo
+
+
 @never_cache
 @require_POST
 @csrf_protect
@@ -731,6 +1014,9 @@ def transport_action(request, module, record_id, action):
             elif action == "stop": obj.stop_trip(request.POST.get("reason", ""))
             elif action == "cancel": obj.cancel_trip(request.POST.get("reason", ""))
             else: return _error(request, "action_not_supported", "Trip action not supported.", 404)
+        elif module == "cargo" and action == "settle":
+            obj = _settle_pending_cargo(company, obj, request.POST, codes)
+            create_audit_log(request, "UPDATE", "Cargo", obj.pk, "Cargo price and delivery confirmed.", company=company)
         elif module == "cargo" and action == "deliver":
             obj.mark_delivered()
         elif module == "passenger_bookings" and action == "cancel":
@@ -748,6 +1034,7 @@ def transport_action(request, module, record_id, action):
     except ObjectDoesNotExist:
         return _error(request, "record_not_found", "Record not found.", 404)
     except ValidationError as exc:
+        transaction.set_rollback(True)
         return _json(request, {"ok": False, "code": "invalid_transition", "message": " ".join(exc.messages)}, status_code=400)
     return _json(request, {"ok": True, "module": module, "item": _record_payload(module, obj)})
 

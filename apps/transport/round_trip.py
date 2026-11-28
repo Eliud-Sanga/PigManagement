@@ -19,7 +19,7 @@ def same(left, right):
 
 
 @transaction.atomic
-def depart(company, vehicle_id, origin, destination, notes=''):
+def depart(company, vehicle_id, origin, destination, notes='', *, close_previous=False):
     origin, destination = (origin or '').strip(), (destination or '').strip()
     if not origin or not destination or same(origin, destination):
         raise ValidationError('Enter different departure and destination locations.')
@@ -43,6 +43,15 @@ def depart(company, vehicle_id, origin, destination, notes=''):
         if route.status != Route.Status.ACTIVE or not same(route.start_location, HOME) or route.end_location:
             raise ValidationError('Resolve the existing manual route before starting an automatic journey.')
         last = Trip.all_objects.filter(company=company, route=route, is_archived=False).exclude(status=Trip.Status.CANCELLED).order_by('-trip_number').first()
+        if last is not None and last.status == Trip.Status.IN_PROGRESS and close_previous:
+            if not same(origin, last.destination):
+                raise ValidationError(f'The next departure must be from {last.destination}.')
+            # Arrival and new departure are one transaction, under the vehicle lock.
+            arrive(company, last.pk)
+            last.refresh_from_db()
+            route.refresh_from_db()
+            if route.status == Route.Status.COMPLETED:
+                return depart(company, vehicle_id, origin, destination, notes)
         if last is None or last.status != Trip.Status.COMPLETED:
             raise ValidationError('Complete the previous trip, or resolve the interrupted journey first.')
         if not same(origin, last.destination):

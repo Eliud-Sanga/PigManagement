@@ -1,5 +1,4 @@
 from django.conf import settings
-from django.conf import settings
 from django.contrib.auth import logout
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import redirect
@@ -9,6 +8,7 @@ from .authorization import (
     get_effective_permission_codes,
 )
 from .context import resolve_company_context
+from .constants import SUPPORTED_LANGUAGE_CODES
 from .models import CompanyMembership
 from .scope import (
     pop_company_scope,
@@ -93,6 +93,10 @@ class CompanyContextMiddleware:
                     )
 
             if is_platform_admin:
+                language = getattr(user, "preferred_language", None)
+                if language in SUPPORTED_LANGUAGE_CODES:
+                    translation.activate(language)
+                    request.LANGUAGE_CODE = language
                 request.session.pop(
                     COMPANY_SESSION_KEY,
                     None,
